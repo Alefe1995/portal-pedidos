@@ -9,8 +9,28 @@ st.set_page_config(layout="wide")
 st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
+
 # =========================
-# FORMATAÇÕES
+# CONVERSÃO PARA NÚMERO
+# =========================
+def para_float(valor):
+    try:
+        if pd.isna(valor):
+            return 0
+
+        if isinstance(valor, (int, float)):
+            return float(valor)
+
+        valor = str(valor).replace("R$", "").strip()
+        valor = valor.replace(".", "").replace(",", ".")
+
+        return float(valor)
+    except:
+        return 0
+
+
+# =========================
+# FORMATAÇÃO MOEDA
 # =========================
 def formatar_moeda(valor):
     try:
@@ -79,6 +99,9 @@ if rc_input:
             "Soma de Valor": "Valor (R$)"
         })
 
+        # =========================
+        # FORMATAÇÃO
+        # =========================
         for col in ["Valor (R$)", "Soma de Valores"]:
             if col in base.columns:
                 base[col] = base[col].apply(formatar_moeda)
@@ -87,11 +110,11 @@ if rc_input:
             base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR FILTROS (STATUS PRIMEIRO)
+        # SIDEBAR
         # =========================
         st.sidebar.header("🔎 Filtros")
 
-        # ---- STATUS (PRINCIPAL) ----
+        # ---- STATUS ----
         status_disp = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
         status = st.sidebar.selectbox("Status", ["Todos"] + status_disp)
 
@@ -99,7 +122,7 @@ if rc_input:
         if status != "Todos":
             df1 = df1[df1["Status"] == status]
 
-        # ---- MOTIVO (DEPENDE DO STATUS) ----
+        # ---- MOTIVO ----
         motivo_disp = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
         motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_disp)
 
@@ -107,22 +130,49 @@ if rc_input:
         if motivo != "Todos":
             df2 = df2[df2["Motivo"] == motivo]
 
-        # ---- CLIENTE (DEPENDE DOS DOIS) ----
+        # ---- CLIENTE ----
         cliente = st.sidebar.text_input("Cliente (buscar)")
 
         df3 = df2.copy()
         if cliente:
             df3 = df3[df3["Cliente"].str.contains(cliente, case=False, na=False)]
 
-        # =========================
-        # RESULTADO FINAL
-        # =========================
         pedidos_view = df3
 
+        # =========================
+        # 🔥 CARD VALOR TOTAL
+        # =========================
+        pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
+
+        valor_total = pedidos_view["Valor_num"].sum()
+
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("💰 Valor Total")
+
+        st.sidebar.markdown(
+            f"""
+            <div style="
+                background-color:#e8f4ff;
+                padding:15px;
+                border-radius:10px;
+                text-align:center;
+                font-size:20px;
+                font-weight:bold;
+                border:1px solid #b3daff;
+            ">
+                R$ {valor_total:,.2f}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # =========================
+        # TABELA
+        # =========================
         st.subheader("🧾 Seus Pedidos")
 
         st.dataframe(
-            pedidos_view,
+            pedidos_view.drop(columns=["Valor_num"]),
             use_container_width=True,
             hide_index=True
         )
