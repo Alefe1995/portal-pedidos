@@ -46,11 +46,28 @@ def formatar_data(valor):
         return valor
 
 # =========================
+# FUNÇÃO LIMPAR TEXTO AÇÃO
+# =========================
+def limpar_texto(texto):
+    if pd.isna(texto):
+        return ""
+    
+    texto = str(texto)
+
+    # Corrigir quebra de linha do Excel
+    texto = texto.replace("_x000D_", "\n")
+
+    # Remover espaços duplicados
+    texto = texto.replace("\n\n", "\n")
+
+    return texto.strip()
+
+# =========================
 # CARREGAR DADOS
 # =========================
 pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
-acoes = pd.read_excel("Ação.xlsx")  # 👈 NOVO ARQUIVO
+acoes = pd.read_excel("Ação.xlsx")
 
 # =========================
 # ENTRADA RC
@@ -64,16 +81,13 @@ if rc_input:
 
         pedidos_view = pedidos_rc.copy()
 
-        # Remover RC
         if "RC" in pedidos_view.columns:
             pedidos_view = pedidos_view.drop(columns=["RC"])
 
-        # Formatar moedas (Pedidos)
         for col in ["Valor (R$)", "Soma de Valor", "Soma de Valores"]:
             if col in pedidos_view.columns:
                 pedidos_view[col] = pedidos_view[col].apply(formatar_moeda)
 
-        # Formatar data
         if "Previsão" in pedidos_view.columns:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
@@ -96,9 +110,6 @@ if rc_input:
             }
         )
 
-        # =========================
-        # SELEÇÃO DE PEDIDO
-        # =========================
         lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
 
         pedido_selecionado = st.selectbox(
@@ -106,22 +117,16 @@ if rc_input:
             lista_pedidos
         )
 
-        # =========================
-        # ITENS
-        # =========================
         if pedido_selecionado:
             itens_pedido = itens[itens['Pedido'].astype(str) == pedido_selecionado].copy()
 
-            # Remover RC
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
-            # Formatar moedas (Itens)
             for col in ["Soma de Valor", "Soma de Valores"]:
                 if col in itens_pedido.columns:
                     itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
 
-            # Formatar data
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
@@ -143,26 +148,21 @@ if rc_input:
             )
 
             # =========================
-            # AÇÕES
+            # AÇÃO (EM TEXTO)
             # =========================
             acoes_pedido = acoes[
                 (acoes['Pedido'].astype(str) == pedido_selecionado) &
                 (acoes['RC'].astype(str) == rc_input)
-            ].copy()
+            ]
 
             if not acoes_pedido.empty:
 
-                # remover RC (não precisa mostrar)
-                if "RC" in acoes_pedido.columns:
-                    acoes_pedido = acoes_pedido.drop(columns=["RC"])
+                texto = limpar_texto(acoes_pedido.iloc[0]["Texto"])
 
-                st.subheader("📌 Ações do Pedido")
+                st.subheader("📌 Ação Recomendada")
 
-                st.dataframe(
-                    acoes_pedido,
-                    use_container_width=True,
-                    hide_index=True
-                )
+                st.info(texto)
+
             else:
                 st.info("Nenhuma ação cadastrada para este pedido.")
 
