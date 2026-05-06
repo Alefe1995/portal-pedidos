@@ -125,7 +125,7 @@ if rc_input:
         # =========================
         # SIDEBAR (AGORA COM IMAGEM NO TOPO)
         # =========================
-        st.sidebar.image("download.png", width=160)
+        st.sidebar.image("download.png", width=200)
 
         st.sidebar.header("🔎 Filtros")
 
