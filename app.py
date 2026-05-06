@@ -6,12 +6,27 @@ import streamlit as st
 # =========================
 st.set_page_config(layout="wide")
 
-st.image("download.png", width=80)
+# =========================
+# 🎨 FAIXA SUPERIOR (BRANDING)
+# =========================
+st.markdown(
+    """
+    <div style="
+        background-color:#c00000;
+        height:45px;
+        width:100%;
+        margin-bottom:10px;
+        border-radius:5px;
+    "></div>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("Portal de Pedidos")
 
 
 # =========================
-# CONVERSÃO PARA NÚMERO
+# CONVERSÕES
 # =========================
 def para_float(valor):
     try:
@@ -29,9 +44,6 @@ def para_float(valor):
         return 0
 
 
-# =========================
-# FORMATAÇÃO MOEDA
-# =========================
 def formatar_moeda(valor):
     try:
         if pd.isna(valor):
@@ -66,7 +78,8 @@ def limpar_texto(texto):
     if pd.isna(texto):
         return ""
 
-    texto = str(texto).replace("_x000D_", "\n").replace("\r\n", "\n").replace("\r", "\n")
+    texto = str(texto)
+    texto = texto.replace("_x000D_", "\n").replace("\r\n", "\n").replace("\r", "\n")
 
     linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
     return "\n".join(linhas)
@@ -87,7 +100,7 @@ rc_input = st.text_input("🔎 Digite seu código RC:")
 
 if rc_input:
 
-    base = pedidos[pedidos['RC'].astype(str) == rc_input].copy()
+    base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
 
     if not base.empty:
 
@@ -110,21 +123,23 @@ if rc_input:
             base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR
+        # SIDEBAR (AGORA COM IMAGEM NO TOPO)
         # =========================
+        st.sidebar.image("download.png", width=90)
+
         st.sidebar.header("🔎 Filtros")
 
         # ---- STATUS ----
-        status_disp = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
-        status = st.sidebar.selectbox("Status", ["Todos"] + status_disp)
+        status_list = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
+        status = st.sidebar.selectbox("Status", ["Todos"] + status_list)
 
         df1 = base.copy()
         if status != "Todos":
             df1 = df1[df1["Status"] == status]
 
         # ---- MOTIVO ----
-        motivo_disp = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
-        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_disp)
+        motivo_list = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
+        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_list)
 
         df2 = df1.copy()
         if motivo != "Todos":
@@ -140,7 +155,7 @@ if rc_input:
         pedidos_view = df3
 
         # =========================
-        # 🔥 CARD VALOR TOTAL
+        # VALOR TOTAL
         # =========================
         pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
 
@@ -186,7 +201,7 @@ if rc_input:
 
         if pedido_selecionado:
 
-            itens_pedido = itens[itens['Pedido'].astype(str) == pedido_selecionado].copy()
+            itens_pedido = itens[itens["Pedido"].astype(str) == pedido_selecionado].copy()
 
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
@@ -211,8 +226,8 @@ if rc_input:
             # AÇÃO
             # =========================
             acoes_pedido = acoes[
-                (acoes['Pedido'].astype(str) == pedido_selecionado) &
-                (acoes['RC'].astype(str) == rc_input)
+                (acoes["Pedido"].astype(str) == pedido_selecionado) &
+                (acoes["RC"].astype(str) == rc_input)
             ]
 
             if not acoes_pedido.empty:
