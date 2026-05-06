@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-# CONFIGURAÇÃO DA PÁGINA (tela larga)
+# CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(layout="wide")
 
 # LOGO + TÍTULO
@@ -13,8 +13,26 @@ st.title("Portal de Pedidos")
 # =========================
 def formatar_moeda(valor):
     try:
-        valor = float(valor)
-        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        if pd.isna(valor):
+            return ""
+
+        valor_str = str(valor).replace(".", "").replace(",", ".")
+        valor_float = float(valor_str)
+
+        return f"R$ {valor_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except:
+        return valor
+
+# =========================
+# FUNÇÃO FORMATAÇÃO DATA
+# =========================
+def formatar_data(valor):
+    try:
+        data = pd.to_datetime(valor, errors="coerce")
+        if pd.notna(data):
+            return data.strftime("%d/%m/%Y")
+        else:
+            return valor  # mantém texto original
     except:
         return valor
 
@@ -43,22 +61,20 @@ if rc_input:
         if "RC" in pedidos_view.columns:
             pedidos_view = pedidos_view.drop(columns=["RC"])
 
-        # Formatar moeda
+        # Formatar moeda (ajuste nome se necessário)
         if "Valores" in pedidos_view.columns:
             pedidos_view["Valores"] = pedidos_view["Valores"].apply(formatar_moeda)
 
-        # Formatar data
+        # Formatar data com texto preservado
         if "Previsão" in pedidos_view.columns:
-            pedidos_view["Previsão"] = pd.to_datetime(
-                pedidos_view["Previsão"], errors="coerce"
-            ).dt.strftime("%d/%m/%Y")
+            pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
         st.subheader("📋 Seus Pedidos")
 
         st.dataframe(
             pedidos_view,
             use_container_width=True,
-            hide_index=True,  # 🔥 REMOVE COLUNA FANTASMA
+            hide_index=True,
             column_config={
                 "Pedido": st.column_config.TextColumn(width="small"),
                 "Cliente": st.column_config.TextColumn(width="large"),
@@ -90,22 +106,20 @@ if rc_input:
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
-            # Formatar moeda
+            # Formatar moeda (ajuste nome se necessário)
             if "Soma de Valores" in itens_pedido.columns:
                 itens_pedido["Soma de Valores"] = itens_pedido["Soma de Valores"].apply(formatar_moeda)
 
-            # Formatar data
+            # Formatar data com texto preservado
             if "Previsão Final" in itens_pedido.columns:
-                itens_pedido["Previsão Final"] = pd.to_datetime(
-                    itens_pedido["Previsão Final"], errors="coerce"
-                ).dt.strftime("%d/%m/%Y")
+                itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
             st.subheader("📦 Itens do Pedido")
 
             st.dataframe(
                 itens_pedido,
                 use_container_width=True,
-                hide_index=True,  # 🔥 REMOVE COLUNA FANTASMA
+                hide_index=True,
                 column_config={
                     "Pedido": st.column_config.TextColumn(width="small"),
                     "Produto": st.column_config.TextColumn(width="large"),
