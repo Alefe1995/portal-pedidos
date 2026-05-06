@@ -48,7 +48,7 @@ def formatar_data(valor):
 
 
 # =========================
-# LIMPAR TEXTO (VERSÃO FINAL DEFINITIVA)
+# LIMPAR TEXTO
 # =========================
 def limpar_texto(texto):
     if pd.isna(texto):
@@ -56,14 +56,12 @@ def limpar_texto(texto):
 
     texto = str(texto)
 
-    # Corrigir quebras do Excel/SharePoint
     texto = (
         texto.replace("_x000D_", "\n")
              .replace("\r\n", "\n")
              .replace("\r", "\n")
     )
 
-    # Separar linhas, limpar espaços e remover vazias
     linhas = [linha.strip() for linha in texto.split("\n")]
     linhas = [linha for linha in linhas if linha != ""]
 
@@ -94,7 +92,18 @@ if rc_input:
         if "RC" in pedidos_view.columns:
             pedidos_view = pedidos_view.drop(columns=["RC"])
 
-        for col in ["Valor (R$)", "Soma de Valor", "Soma de Valores"]:
+        # =========================
+        # RENOMEAR COLUNAS PEDIDOS
+        # =========================
+        pedidos_view = pedidos_view.rename(columns={
+            "Pedido2": "Qtde",
+            "Soma de Valor": "Valor (R$)"
+        })
+
+        # =========================
+        # FORMATAÇÃO PEDIDOS
+        # =========================
+        for col in ["Valor (R$)", "Soma de Valores"]:
             if col in pedidos_view.columns:
                 pedidos_view[col] = pedidos_view[col].apply(formatar_moeda)
 
@@ -123,7 +132,18 @@ if rc_input:
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
-            for col in ["Soma de Valor", "Soma de Valores"]:
+            # =========================
+            # RENOMEAR COLUNAS ITENS
+            # =========================
+            itens_pedido = itens_pedido.rename(columns={
+                "Pedido2": "Qtde",
+                "Soma de Valor": "Valor (R$)"
+            })
+
+            # =========================
+            # FORMATAÇÃO ITENS
+            # =========================
+            for col in ["Valor (R$)", "Soma de Valores"]:
                 if col in itens_pedido.columns:
                     itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
 
@@ -139,7 +159,7 @@ if rc_input:
             )
 
             # =========================
-            # AÇÃO RECOMENDADA (CARD AZUL FINAL)
+            # AÇÃO RECOMENDADA
             # =========================
             acoes_pedido = acoes[
                 (acoes['Pedido'].astype(str) == pedido_selecionado) &
