@@ -67,16 +67,12 @@ if rc_input:
         if "RC" in pedidos_view.columns:
             pedidos_view = pedidos_view.drop(columns=["RC"])
 
-        # =========================
-        # FORMATAR MOEDAS (PEDIDOS)
-        # =========================
+        # Formatar moedas (Pedidos)
         for col in ["Valor (R$)", "Soma de Valor", "Soma de Valores"]:
             if col in pedidos_view.columns:
                 pedidos_view[col] = pedidos_view[col].apply(formatar_moeda)
 
-        # =========================
-        # FORMATAR DATA
-        # =========================
+        # Formatar data
         if "Previsão" in pedidos_view.columns:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
@@ -87,15 +83,15 @@ if rc_input:
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Pedido": st.column_config.TextColumn(width="small"),
-                "Cliente": st.column_config.TextColumn(width="large"),
-                "UF": st.column_config.TextColumn(width="small"),
-                "Status": st.column_config.TextColumn(width="medium"),
-                "Motivo": st.column_config.TextColumn(width="medium"),
-                "Previsão": st.column_config.TextColumn(width="medium"),
-                "Valor (R$)": st.column_config.TextColumn(width="medium"),
-                "Soma de Valor": st.column_config.TextColumn(width="medium"),
-                "Soma de Valores": st.column_config.TextColumn(width="medium"),
+                "Pedido": st.column_config.TextColumn("Pedido", width="small"),
+                "Cliente": st.column_config.TextColumn("Cliente", width="large"),
+                "UF": st.column_config.TextColumn("UF", width="small"),  # 👈 MENOR AGORA
+                "Status": st.column_config.TextColumn("Status", width="medium"),
+                "Motivo": st.column_config.TextColumn("Motivo", width="medium"),
+                "Previsão": st.column_config.TextColumn("Previsão", width="medium"),
+                "Valor (R$)": st.column_config.TextColumn("Valor (R$)", width="medium"),
+                "Soma de Valor": st.column_config.TextColumn("Valor Total", width="medium"),
+                "Soma de Valores": st.column_config.TextColumn("Valor Total", width="medium"),
             }
         )
 
@@ -119,16 +115,12 @@ if rc_input:
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
-            # =========================
-            # FORMATAR MOEDAS (ITENS)
-            # =========================
+            # Formatar moedas (Itens)
             for col in ["Soma de Valor", "Soma de Valores"]:
                 if col in itens_pedido.columns:
                     itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
 
-            # =========================
-            # FORMATAR DATA
-            # =========================
+            # Formatar data
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
@@ -139,12 +131,13 @@ if rc_input:
                 use_container_width=True,
                 hide_index=True,
                 column_config={
-                    "Pedido": st.column_config.TextColumn(width="small"),
-                    "Produto": st.column_config.TextColumn(width="large"),
-                    "Status Reserva": st.column_config.TextColumn(width="medium"),
-                    "Soma de Valor": st.column_config.TextColumn(width="medium"),
-                    "Soma de Valores": st.column_config.TextColumn(width="medium"),
-                    "Previsão Final": st.column_config.TextColumn(width="medium"),
+                    "Pedido": st.column_config.TextColumn("Pedido", width="small"),
+                    "Produto": st.column_config.TextColumn("Produto", width="large"),
+                    "Status Reserva": st.column_config.TextColumn("Status Reserva", width="medium"),
+                    "Pedido2": st.column_config.TextColumn("Qtde", width="small"),  # 👈 RENOMEADO
+                    "Soma de Valor": st.column_config.TextColumn("Valor (R$)", width="medium"),  # 👈 RENOMEADO
+                    "Soma de Valores": st.column_config.TextColumn("Valor (R$)", width="medium"),
+                    "Previsão Final": st.column_config.TextColumn("Previsão Final", width="medium"),
                 }
             )
 
