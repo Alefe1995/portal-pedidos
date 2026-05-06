@@ -77,7 +77,7 @@ acoes = pd.read_excel("Ação.xlsx")
 
 
 # =========================
-# ENTRADA RC
+# ENTRADA RC (PRINCIPAL)
 # =========================
 rc_input = st.text_input("🔎 Digite seu código RC:")
 
@@ -93,7 +93,7 @@ if rc_input:
             pedidos_view = pedidos_view.drop(columns=["RC"])
 
         # =========================
-        # RENOMEAR COLUNAS PEDIDOS
+        # RENOMEAR COLUNAS
         # =========================
         pedidos_view = pedidos_view.rename(columns={
             "Pedido2": "Qtde",
@@ -101,7 +101,7 @@ if rc_input:
         })
 
         # =========================
-        # FORMATAÇÃO PEDIDOS
+        # FORMATAÇÃO
         # =========================
         for col in ["Valor (R$)", "Soma de Valores"]:
             if col in pedidos_view.columns:
@@ -111,21 +111,27 @@ if rc_input:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
         # =========================
-        # TÍTULO + FILTRO MOTIVO
+        # SIDEBAR (FILTROS)
         # =========================
-        st.subheader("🧾 Seus Pedidos")
+        st.sidebar.header("🔎 Filtros")
 
+        # filtro por motivo
         if "Motivo" in pedidos_view.columns:
 
-            motivos_disponiveis = pedidos_view["Motivo"].dropna().unique().tolist()
+            motivos = pedidos_view["Motivo"].dropna().unique().tolist()
 
-            motivo_selecionado = st.selectbox(
-                "📌 Filtrar por Motivo:",
-                options=["Todos"] + motivos_disponiveis
+            motivo_selecionado = st.sidebar.selectbox(
+                "Motivo",
+                ["Todos"] + motivos
             )
 
             if motivo_selecionado != "Todos":
                 pedidos_view = pedidos_view[pedidos_view["Motivo"] == motivo_selecionado]
+
+        # =========================
+        # SEÇÃO PEDIDOS
+        # =========================
+        st.subheader("🧾 Seus Pedidos")
 
         st.dataframe(
             pedidos_view,
@@ -133,10 +139,13 @@ if rc_input:
             hide_index=True
         )
 
+        # =========================
+        # SELEÇÃO DE PEDIDO
+        # =========================
         lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
 
         pedido_selecionado = st.selectbox(
-            "📌 Selecione um pedido para ver os itens:",
+            "📌 Selecione um pedido:",
             lista_pedidos
         )
 
@@ -148,7 +157,7 @@ if rc_input:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
             # =========================
-            # RENOMEAR COLUNAS ITENS
+            # RENOMEAR ITENS
             # =========================
             itens_pedido = itens_pedido.rename(columns={
                 "Pedido2": "Qtde",
@@ -194,7 +203,6 @@ if rc_input:
                         border:1px solid #b3daff;
                         padding:16px;
                         border-radius:10px;
-                        font-family:inherit;
                         white-space:pre-line;
                         line-height:1.5;
                     ">
