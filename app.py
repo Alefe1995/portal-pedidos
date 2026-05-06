@@ -48,7 +48,7 @@ def formatar_data(valor):
 
 
 # =========================
-# LIMPAR TEXTO
+# LIMPAR TEXTO (VERSÃO FINAL DEFINITIVA)
 # =========================
 def limpar_texto(texto):
     if pd.isna(texto):
@@ -56,12 +56,14 @@ def limpar_texto(texto):
 
     texto = str(texto)
 
+    # Corrigir quebras do Excel/SharePoint
     texto = (
         texto.replace("_x000D_", "\n")
              .replace("\r\n", "\n")
              .replace("\r", "\n")
     )
 
+    # Separar linhas, limpar espaços e remover vazias
     linhas = [linha.strip() for linha in texto.split("\n")]
     linhas = [linha for linha in linhas if linha != ""]
 
@@ -101,7 +103,11 @@ if rc_input:
 
         st.subheader("🧾 Seus Pedidos")
 
-        st.dataframe(pedidos_view, use_container_width=True, hide_index=True)
+        st.dataframe(
+            pedidos_view,
+            use_container_width=True,
+            hide_index=True
+        )
 
         lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
 
@@ -126,10 +132,14 @@ if rc_input:
 
             st.subheader("📦 Itens do Pedido")
 
-            st.dataframe(itens_pedido, use_container_width=True, hide_index=True)
+            st.dataframe(
+                itens_pedido,
+                use_container_width=True,
+                hide_index=True
+            )
 
             # =========================
-            # AÇÃO RECOMENDADA (CARD FINAL AJUSTADO VISUALMENTE)
+            # AÇÃO RECOMENDADA (CARD AZUL FINAL)
             # =========================
             acoes_pedido = acoes[
                 (acoes['Pedido'].astype(str) == pedido_selecionado) &
@@ -147,18 +157,13 @@ if rc_input:
                     <div style="
                         background-color:#e8f4ff;
                         border:1px solid #b3daff;
-                        padding:20px 16px;
+                        padding:16px;
                         border-radius:10px;
                         font-family:inherit;
-                        line-height:1.6;
-
-                        /* 🔥 CENTRALIZAÇÃO VISUAL PERFEITA */
-                        display:flex;
-                        align-items:center;
+                        white-space:pre-line;
+                        line-height:1.5;
                     ">
-                        <div style="width:100%; white-space:pre-line;">
-                            {texto}
-                        </div>
+                        {texto}
                     </div>
                     """,
                     unsafe_allow_html=True
