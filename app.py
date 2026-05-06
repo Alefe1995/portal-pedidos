@@ -9,17 +9,31 @@ st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
 # =========================
-# FUNÇÃO FORMATAÇÃO MOEDA
+# FUNÇÃO FORMATAÇÃO MOEDA (ROBUSTA)
 # =========================
 def formatar_moeda(valor):
     try:
         if pd.isna(valor):
             return ""
 
-        valor_str = str(valor).replace(".", "").replace(",", ".")
-        valor_float = float(valor_str)
+        # Se já for número (padrão pandas)
+        if isinstance(valor, (int, float)):
+            valor_float = float(valor)
+
+        else:
+            valor_str = str(valor)
+
+            # Remove símbolo e espaços
+            valor_str = valor_str.replace("R$", "").strip()
+
+            # Se tiver vírgula, assume padrão BR
+            if "," in valor_str:
+                valor_str = valor_str.replace(".", "").replace(",", ".")
+
+            valor_float = float(valor_str)
 
         return f"R$ {valor_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
     except:
         return valor
 
@@ -61,11 +75,11 @@ if rc_input:
         if "RC" in pedidos_view.columns:
             pedidos_view = pedidos_view.drop(columns=["RC"])
 
-        # Formatar moeda (ajuste nome se necessário)
-        if "Valores" in pedidos_view.columns:
-            pedidos_view["Valores"] = pedidos_view["Valores"].apply(formatar_moeda)
+        # Formatar moeda (AGORA CORRETO)
+        if "Valor (R$)" in pedidos_view.columns:
+            pedidos_view["Valor (R$)"] = pedidos_view["Valor (R$)"].apply(formatar_moeda)
 
-        # Formatar data com texto preservado
+        # Formatar data mantendo texto
         if "Previsão" in pedidos_view.columns:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
@@ -82,7 +96,7 @@ if rc_input:
                 "Status": st.column_config.TextColumn(width="medium"),
                 "Motivo": st.column_config.TextColumn(width="medium"),
                 "Previsão": st.column_config.TextColumn(width="medium"),
-                "Valores": st.column_config.TextColumn(width="medium"),
+                "Valor (R$)": st.column_config.TextColumn(width="medium"),
             }
         )
 
@@ -106,11 +120,11 @@ if rc_input:
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
-            # Formatar moeda (ajuste nome se necessário)
+            # Formatar moeda
             if "Soma de Valores" in itens_pedido.columns:
                 itens_pedido["Soma de Valores"] = itens_pedido["Soma de Valores"].apply(formatar_moeda)
 
-            # Formatar data com texto preservado
+            # Formatar data
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
