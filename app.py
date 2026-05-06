@@ -7,22 +7,31 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 # =========================
-# 🎨 FAIXA SUPERIOR (BRANDING)
+# 🎨 HEADER (FAIXA VERMELHA + TÍTULO)
 # =========================
 st.markdown(
     """
     <div style="
         background-color:#c00000;
-        height:45px;
+        height:55px;
         width:100%;
-        margin-bottom:10px;
+        margin-bottom:15px;
         border-radius:5px;
-    "></div>
+        display:flex;
+        align-items:center;
+        padding-left:20px;
+    ">
+        <span style="
+            color:white;
+            font-size:22px;
+            font-weight:bold;
+        ">
+            Portal de Pedidos
+        </span>
+    </div>
     """,
     unsafe_allow_html=True
 )
-
-st.title("Portal de Pedidos")
 
 
 # =========================
@@ -123,9 +132,9 @@ if rc_input:
             base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR (AGORA COM IMAGEM NO TOPO)
+        # SIDEBAR
         # =========================
-        st.sidebar.image("download.png", width=200)
+        st.sidebar.image("download.png", width=100)
 
         st.sidebar.header("🔎 Filtros")
 
