@@ -19,7 +19,10 @@ st.markdown("""
     border-radius: 8px;
     border: 1px solid #e0e0e0;
     margin-bottom: 10px;
+}
+.label {
     font-size: 14px;
+    margin-bottom: 5px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -68,10 +71,13 @@ pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
 
 # =========================
-# ENTRADA RC (COM DESTAQUE)
+# BLOCO RC (ALINHADO)
 # =========================
-st.markdown('<div class="box">🔎 Digite seu código RC:</div>', unsafe_allow_html=True)
-rc_input = st.text_input("", placeholder="Ex: 12345")
+with st.container():
+    st.markdown('<div class="box">', unsafe_allow_html=True)
+    st.markdown('<div class="label">🔎 Digite seu código RC:</div>', unsafe_allow_html=True)
+    rc_input = st.text_input("", placeholder="Ex: 12345")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 if rc_input:
     pedidos_rc = pedidos[pedidos['RC'].astype(str) == rc_input]
@@ -113,16 +119,20 @@ if rc_input:
         )
 
         # =========================
-        # SELEÇÃO DE PEDIDO (COM DESTAQUE)
+        # BLOCO SELEÇÃO PEDIDO (ALINHADO)
         # =========================
         lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
 
-        st.markdown('<div class="box">📌 Selecione um pedido para ver os itens:</div>', unsafe_allow_html=True)
+        with st.container():
+            st.markdown('<div class="box">', unsafe_allow_html=True)
+            st.markdown('<div class="label">📌 Selecione um pedido para ver os itens:</div>', unsafe_allow_html=True)
 
-        pedido_selecionado = st.selectbox(
-            "",
-            lista_pedidos
-        )
+            pedido_selecionado = st.selectbox(
+                "",
+                lista_pedidos
+            )
+
+            st.markdown('</div>', unsafe_allow_html=True)
 
         # =========================
         # ITENS
