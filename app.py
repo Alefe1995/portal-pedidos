@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 # =========================
-# CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÃO
 # =========================
 st.set_page_config(layout="wide")
 
@@ -10,7 +10,7 @@ st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
 # =========================
-# FORMATAÇÃO MOEDA
+# FORMATAÇÕES
 # =========================
 def formatar_moeda(valor):
     try:
@@ -20,8 +20,7 @@ def formatar_moeda(valor):
         if isinstance(valor, (int, float)):
             valor_float = float(valor)
         else:
-            valor_str = str(valor)
-            valor_str = valor_str.replace("R$", "").strip()
+            valor_str = str(valor).replace("R$", "").strip()
 
             if "," in valor_str:
                 valor_str = valor_str.replace(".", "").replace(",", ".")
@@ -33,9 +32,6 @@ def formatar_moeda(valor):
         return valor
 
 
-# =========================
-# FORMATAÇÃO DATA
-# =========================
 def formatar_data(valor):
     try:
         data = pd.to_datetime(valor, errors="coerce")
@@ -46,29 +42,19 @@ def formatar_data(valor):
         return valor
 
 
-# =========================
-# LIMPAR TEXTO
-# =========================
 def limpar_texto(texto):
     if pd.isna(texto):
         return ""
 
-    texto = str(texto)
+    texto = str(texto).replace("_x000D_", "\n").replace("\r\n", "\n").replace("\r", "\n")
 
-    texto = (
-        texto.replace("_x000D_", "\n")
-             .replace("\r\n", "\n")
-             .replace("\r", "\n")
-    )
+    linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
 
-    linhas = [linha.strip() for linha in texto.split("\n")]
-    linhas = [linha for linha in linhas if linha != ""]
-
-    return "\n".join(linhas).strip()
+    return "\n".join(linhas)
 
 
 # =========================
-# CARREGAR DADOS
+# DADOS
 # =========================
 pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
@@ -76,89 +62,64 @@ acoes = pd.read_excel("Ação.xlsx")
 
 
 # =========================
-# ENTRADA RC
+# RC
 # =========================
 rc_input = st.text_input("🔎 Digite seu código RC:")
 
 if rc_input:
 
-    pedidos_rc = pedidos[pedidos['RC'].astype(str) == rc_input]
+    base = pedidos[pedidos['RC'].astype(str) == rc_input].copy()
 
-    if not pedidos_rc.empty:
+    if not base.empty:
 
-        pedidos_view = pedidos_rc.copy()
+        if "RC" in base.columns:
+            base = base.drop(columns=["RC"])
 
-        if "RC" in pedidos_view.columns:
-            pedidos_view = pedidos_view.drop(columns=["RC"])
-
-        # =========================
-        # RENOMEAR COLUNAS
-        # =========================
-        pedidos_view = pedidos_view.rename(columns={
+        base = base.rename(columns={
             "Pedido2": "Qtde",
             "Soma de Valor": "Valor (R$)"
         })
 
-        # =========================
-        # FORMATAÇÃO
-        # =========================
         for col in ["Valor (R$)", "Soma de Valores"]:
-            if col in pedidos_view.columns:
-                pedidos_view[col] = pedidos_view[col].apply(formatar_moeda)
+            if col in base.columns:
+                base[col] = base[col].apply(formatar_moeda)
 
-        if "Previsão" in pedidos_view.columns:
-            pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
+        if "Previsão" in base.columns:
+            base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR FILTROS
+        # SIDEBAR FILTROS (CASCADE)
         # =========================
         st.sidebar.header("🔎 Filtros")
 
         # ---- MOTIVO ----
-        if "Motivo" in pedidos_view.columns:
-            motivos = pedidos_view["Motivo"].dropna().unique().tolist()
+        motivos_disp = sorted(base["Motivo"].dropna().unique()) if "Motivo" in base.columns else []
+        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivos_disp)
 
-            motivo_selecionado = st.sidebar.selectbox(
-                "Motivo",
-                ["Todos"] + motivos
-            )
-        else:
-            motivo_selecionado = "Todos"
+        df1 = base.copy()
+        if motivo != "Todos":
+            df1 = df1[df1["Motivo"] == motivo]
 
-        # ---- STATUS ----
-        if "Status" in pedidos_view.columns:
-            status_lista = pedidos_view["Status"].dropna().unique().tolist()
+        # ---- STATUS (DEPENDE DO MOTIVO) ----
+        status_disp = sorted(df1["Status"].dropna().unique()) if "Status" in df1.columns else []
+        status = st.sidebar.selectbox("Status", ["Todos"] + status_disp)
 
-            status_selecionado = st.sidebar.selectbox(
-                "Status",
-                ["Todos"] + status_lista
-            )
-        else:
-            status_selecionado = "Todos"
+        df2 = df1.copy()
+        if status != "Todos":
+            df2 = df2[df2["Status"] == status]
 
-        # ---- CLIENTE (BUSCA LIVRE) ----
-        if "Cliente" in pedidos_view.columns:
-            cliente_input = st.sidebar.text_input("Cliente (digite para buscar)")
-        else:
-            cliente_input = ""
+        # ---- CLIENTE (DEPENDE DOS DOIS) ----
+        cliente = st.sidebar.text_input("Cliente (buscar)")
+
+        df3 = df2.copy()
+        if cliente:
+            df3 = df3[df3["Cliente"].str.contains(cliente, case=False, na=False)]
 
         # =========================
-        # APLICAR FILTROS
+        # RESULTADO FINAL
         # =========================
-        if motivo_selecionado != "Todos":
-            pedidos_view = pedidos_view[pedidos_view["Motivo"] == motivo_selecionado]
+        pedidos_view = df3
 
-        if status_selecionado != "Todos":
-            pedidos_view = pedidos_view[pedidos_view["Status"] == status_selecionado]
-
-        if cliente_input:
-            pedidos_view = pedidos_view[
-                pedidos_view["Cliente"].str.contains(cliente_input, case=False, na=False)
-            ]
-
-        # =========================
-        # PEDIDOS FILTRADOS
-        # =========================
         st.subheader("🧾 Seus Pedidos")
 
         st.dataframe(
@@ -168,14 +129,11 @@ if rc_input:
         )
 
         # =========================
-        # PEDIDOS (AGORA RESPEITANDO FILTROS)
+        # PEDIDOS (AGORA CORRETO)
         # =========================
-        lista_pedidos = pedidos_view['Pedido'].astype(str).unique()
+        lista_pedidos = pedidos_view["Pedido"].astype(str).unique()
 
-        pedido_selecionado = st.selectbox(
-            "📌 Selecione um pedido:",
-            lista_pedidos
-        )
+        pedido_selecionado = st.selectbox("📌 Selecione um pedido:", lista_pedidos)
 
         if pedido_selecionado:
 
@@ -198,14 +156,10 @@ if rc_input:
 
             st.subheader("📦 Itens do Pedido")
 
-            st.dataframe(
-                itens_pedido,
-                use_container_width=True,
-                hide_index=True
-            )
+            st.dataframe(itens_pedido, use_container_width=True, hide_index=True)
 
             # =========================
-            # AÇÃO RECOMENDADA
+            # AÇÃO
             # =========================
             acoes_pedido = acoes[
                 (acoes['Pedido'].astype(str) == pedido_selecionado) &
