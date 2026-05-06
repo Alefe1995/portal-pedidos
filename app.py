@@ -150,7 +150,7 @@ if rc_input:
 
                 texto = limpar_texto(acoes_pedido.iloc[0]["Texto"])
 
-                st.subheader("📌 Ação Recomendada")
+                st.subheader("🚨 Ação Recomendada")
 
                 st.markdown(
                     f"""
