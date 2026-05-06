@@ -29,7 +29,6 @@ def formatar_moeda(valor):
             valor_float = float(valor_str)
 
         return f"R$ {valor_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
     except:
         return valor
 
@@ -77,7 +76,7 @@ acoes = pd.read_excel("Ação.xlsx")
 
 
 # =========================
-# ENTRADA RC (PRINCIPAL)
+# ENTRADA RC
 # =========================
 rc_input = st.text_input("🔎 Digite seu código RC:")
 
@@ -111,25 +110,54 @@ if rc_input:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR (FILTROS)
+        # SIDEBAR FILTROS
         # =========================
         st.sidebar.header("🔎 Filtros")
 
-        # filtro por motivo
+        # ---- MOTIVO ----
         if "Motivo" in pedidos_view.columns:
-
             motivos = pedidos_view["Motivo"].dropna().unique().tolist()
 
             motivo_selecionado = st.sidebar.selectbox(
                 "Motivo",
                 ["Todos"] + motivos
             )
+        else:
+            motivo_selecionado = "Todos"
 
-            if motivo_selecionado != "Todos":
-                pedidos_view = pedidos_view[pedidos_view["Motivo"] == motivo_selecionado]
+        # ---- STATUS ----
+        if "Status" in pedidos_view.columns:
+            status_lista = pedidos_view["Status"].dropna().unique().tolist()
+
+            status_selecionado = st.sidebar.selectbox(
+                "Status",
+                ["Todos"] + status_lista
+            )
+        else:
+            status_selecionado = "Todos"
+
+        # ---- CLIENTE (BUSCA LIVRE) ----
+        if "Cliente" in pedidos_view.columns:
+            cliente_input = st.sidebar.text_input("Cliente (digite para buscar)")
+        else:
+            cliente_input = ""
 
         # =========================
-        # SEÇÃO PEDIDOS
+        # APLICAR FILTROS
+        # =========================
+        if motivo_selecionado != "Todos":
+            pedidos_view = pedidos_view[pedidos_view["Motivo"] == motivo_selecionado]
+
+        if status_selecionado != "Todos":
+            pedidos_view = pedidos_view[pedidos_view["Status"] == status_selecionado]
+
+        if cliente_input:
+            pedidos_view = pedidos_view[
+                pedidos_view["Cliente"].str.contains(cliente_input, case=False, na=False)
+            ]
+
+        # =========================
+        # PEDIDOS FILTRADOS
         # =========================
         st.subheader("🧾 Seus Pedidos")
 
@@ -140,9 +168,9 @@ if rc_input:
         )
 
         # =========================
-        # SELEÇÃO DE PEDIDO
+        # PEDIDOS (AGORA RESPEITANDO FILTROS)
         # =========================
-        lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
+        lista_pedidos = pedidos_view['Pedido'].astype(str).unique()
 
         pedido_selecionado = st.selectbox(
             "📌 Selecione um pedido:",
@@ -156,17 +184,11 @@ if rc_input:
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
-            # =========================
-            # RENOMEAR ITENS
-            # =========================
             itens_pedido = itens_pedido.rename(columns={
                 "Pedido2": "Qtde",
                 "Soma de Valor": "Valor (R$)"
             })
 
-            # =========================
-            # FORMATAÇÃO ITENS
-            # =========================
             for col in ["Valor (R$)", "Soma de Valores"]:
                 if col in itens_pedido.columns:
                     itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
