@@ -13,7 +13,8 @@ st.title("Portal de Pedidos")
 # =========================
 def formatar_moeda(valor):
     try:
-        return f"R$ {float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        valor = float(valor)
+        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     except:
         return valor
 
@@ -46,11 +47,18 @@ if rc_input:
         if "Valores" in pedidos_view.columns:
             pedidos_view["Valores"] = pedidos_view["Valores"].apply(formatar_moeda)
 
+        # Formatar data
+        if "Previsão" in pedidos_view.columns:
+            pedidos_view["Previsão"] = pd.to_datetime(
+                pedidos_view["Previsão"], errors="coerce"
+            ).dt.strftime("%d/%m/%Y")
+
         st.subheader("📋 Seus Pedidos")
 
         st.dataframe(
             pedidos_view,
             use_container_width=True,
+            hide_index=True,  # 🔥 REMOVE COLUNA FANTASMA
             column_config={
                 "Pedido": st.column_config.TextColumn(width="small"),
                 "Cliente": st.column_config.TextColumn(width="large"),
@@ -86,11 +94,18 @@ if rc_input:
             if "Soma de Valores" in itens_pedido.columns:
                 itens_pedido["Soma de Valores"] = itens_pedido["Soma de Valores"].apply(formatar_moeda)
 
+            # Formatar data
+            if "Previsão Final" in itens_pedido.columns:
+                itens_pedido["Previsão Final"] = pd.to_datetime(
+                    itens_pedido["Previsão Final"], errors="coerce"
+                ).dt.strftime("%d/%m/%Y")
+
             st.subheader("📦 Itens do Pedido")
 
             st.dataframe(
                 itens_pedido,
                 use_container_width=True,
+                hide_index=True,  # 🔥 REMOVE COLUNA FANTASMA
                 column_config={
                     "Pedido": st.column_config.TextColumn(width="small"),
                     "Produto": st.column_config.TextColumn(width="large"),
