@@ -1,7 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-st.title("📦 Portal de Pedidos")
+st.image("download.png", width=200)
+st.title("Portal de Pedidos")
 
 # Carregar arquivos
 pedidos = pd.read_excel("Pedidos.xlsx")
