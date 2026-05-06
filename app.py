@@ -32,6 +32,7 @@ def formatar_moeda(valor):
     except:
         return valor
 
+
 # =========================
 # FUNÇÃO FORMATAÇÃO DATA
 # =========================
@@ -40,27 +41,33 @@ def formatar_data(valor):
         data = pd.to_datetime(valor, errors="coerce")
         if pd.notna(data):
             return data.strftime("%d/%m/%Y")
-        else:
-            return valor
+        return valor
     except:
         return valor
 
+
 # =========================
-# FUNÇÃO LIMPAR TEXTO AÇÃO
+# FUNÇÃO LIMPAR TEXTO AÇÃO (CORRIGIDA)
 # =========================
 def limpar_texto(texto):
     if pd.isna(texto):
         return ""
-    
+
     texto = str(texto)
 
-    # Corrigir quebra de linha do Excel
-    texto = texto.replace("_x000D_", "\n")
+    # Corrigir quebras vindas do Excel/SharePoint
+    texto = (
+        texto.replace("_x000D_", "\n")
+             .replace("\r\n", "\n")
+             .replace("\r", "\n")
+    )
 
-    # Remover espaços duplicados
-    texto = texto.replace("\n\n", "\n")
+    # Remover múltiplas quebras exageradas
+    while "\n\n\n" in texto:
+        texto = texto.replace("\n\n\n", "\n\n")
 
     return texto.strip()
+
 
 # =========================
 # CARREGAR DADOS
@@ -68,6 +75,7 @@ def limpar_texto(texto):
 pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
 acoes = pd.read_excel("Ação.xlsx")
+
 
 # =========================
 # ENTRADA RC
@@ -96,18 +104,7 @@ if rc_input:
         st.dataframe(
             pedidos_view,
             use_container_width=True,
-            hide_index=True,
-            column_config={
-                "Pedido": st.column_config.TextColumn("Pedido", width="small"),
-                "Cliente": st.column_config.TextColumn("Cliente", width="large"),
-                "UF": st.column_config.TextColumn("UF", width=50),
-                "Status": st.column_config.TextColumn("Status", width="medium"),
-                "Motivo": st.column_config.TextColumn("Motivo", width="medium"),
-                "Previsão": st.column_config.TextColumn("Previsão", width="medium"),
-                "Valor (R$)": st.column_config.TextColumn("Valor (R$)", width="medium"),
-                "Soma de Valor": st.column_config.TextColumn("Valor Total", width="medium"),
-                "Soma de Valores": st.column_config.TextColumn("Valor Total", width="medium"),
-            }
+            hide_index=True
         )
 
         lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
@@ -135,20 +132,11 @@ if rc_input:
             st.dataframe(
                 itens_pedido,
                 use_container_width=True,
-                hide_index=True,
-                column_config={
-                    "Pedido": st.column_config.TextColumn("Pedido", width="small"),
-                    "Produto": st.column_config.TextColumn("Produto", width="large"),
-                    "Status Reserva": st.column_config.TextColumn("Status Reserva", width="medium"),
-                    "Pedido2": st.column_config.TextColumn("Qtde", width=60),
-                    "Soma de Valor": st.column_config.TextColumn("Valor (R$)", width="medium"),
-                    "Soma de Valores": st.column_config.TextColumn("Valor (R$)", width="medium"),
-                    "Previsão Final": st.column_config.TextColumn("Previsão Final", width="medium"),
-                }
+                hide_index=True
             )
 
             # =========================
-            # AÇÃO (EM TEXTO)
+            # AÇÃO RECOMENDADA (CORRIGIDA)
             # =========================
             acoes_pedido = acoes[
                 (acoes['Pedido'].astype(str) == pedido_selecionado) &
@@ -161,7 +149,21 @@ if rc_input:
 
                 st.subheader("📌 Ação Recomendada")
 
-                st.info(texto)
+                st.markdown(
+                    f"""
+                    <div style="
+                        background-color:#f0f8ff;
+                        padding:15px;
+                        border-radius:10px;
+                        border:1px solid #d0e7ff;
+                        white-space:pre-wrap;
+                        font-family:inherit;
+                    ">
+                    {texto}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
             else:
                 st.info("Nenhuma ação cadastrada para este pedido.")
