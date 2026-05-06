@@ -9,6 +9,22 @@ st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
 # =========================
+# ESTILO (CAIXAS SUAVES)
+# =========================
+st.markdown("""
+<style>
+.box {
+    background-color: #f5f7fa;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
 # FUNÇÃO FORMATAÇÃO MOEDA
 # =========================
 def formatar_moeda(valor):
@@ -52,9 +68,10 @@ pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
 
 # =========================
-# ENTRADA RC
+# ENTRADA RC (COM DESTAQUE)
 # =========================
-rc_input = st.text_input("Digite seu código RC:")
+st.markdown('<div class="box">🔎 Digite seu código RC:</div>', unsafe_allow_html=True)
+rc_input = st.text_input("", placeholder="Ex: 12345")
 
 if rc_input:
     pedidos_rc = pedidos[pedidos['RC'].astype(str) == rc_input]
@@ -85,7 +102,7 @@ if rc_input:
             column_config={
                 "Pedido": st.column_config.TextColumn("Pedido", width="small"),
                 "Cliente": st.column_config.TextColumn("Cliente", width="large"),
-                "UF": st.column_config.TextColumn("UF", width=50),  # 👈 AJUSTADO
+                "UF": st.column_config.TextColumn("UF", width=50),
                 "Status": st.column_config.TextColumn("Status", width="medium"),
                 "Motivo": st.column_config.TextColumn("Motivo", width="medium"),
                 "Previsão": st.column_config.TextColumn("Previsão", width="medium"),
@@ -96,12 +113,14 @@ if rc_input:
         )
 
         # =========================
-        # SELEÇÃO DE PEDIDO
+        # SELEÇÃO DE PEDIDO (COM DESTAQUE)
         # =========================
         lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
 
+        st.markdown('<div class="box">📌 Selecione um pedido para ver os itens:</div>', unsafe_allow_html=True)
+
         pedido_selecionado = st.selectbox(
-            "Selecione um pedido para ver os itens:",
+            "",
             lista_pedidos
         )
 
@@ -134,7 +153,7 @@ if rc_input:
                     "Pedido": st.column_config.TextColumn("Pedido", width="small"),
                     "Produto": st.column_config.TextColumn("Produto", width="large"),
                     "Status Reserva": st.column_config.TextColumn("Status Reserva", width="medium"),
-                    "Pedido2": st.column_config.TextColumn("Qtde", width=60),  # 👈 AJUSTADO
+                    "Pedido2": st.column_config.TextColumn("Qtde", width=60),
                     "Soma de Valor": st.column_config.TextColumn("Valor (R$)", width="medium"),
                     "Soma de Valores": st.column_config.TextColumn("Valor (R$)", width="medium"),
                     "Previsão Final": st.column_config.TextColumn("Previsão Final", width="medium"),
