@@ -9,9 +9,8 @@ st.set_page_config(layout="wide")
 st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
-
 # =========================
-# CONVERSÃO PARA NÚMERO
+# CONVERSÕES
 # =========================
 def para_float(valor):
     try:
@@ -29,9 +28,6 @@ def para_float(valor):
         return 0
 
 
-# =========================
-# FORMATAÇÃO MOEDA
-# =========================
 def formatar_moeda(valor):
     try:
         if pd.isna(valor):
@@ -66,7 +62,8 @@ def limpar_texto(texto):
     if pd.isna(texto):
         return ""
 
-    texto = str(texto).replace("_x000D_", "\n").replace("\r\n", "\n").replace("\r", "\n")
+    texto = str(texto)
+    texto = texto.replace("_x000D_", "\n").replace("\r\n", "\n").replace("\r", "\n")
 
     linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
     return "\n".join(linhas)
@@ -87,7 +84,7 @@ rc_input = st.text_input("🔎 Digite seu código RC:")
 
 if rc_input:
 
-    base = pedidos[pedidos['RC'].astype(str) == rc_input].copy()
+    base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
 
     if not base.empty:
 
@@ -110,21 +107,21 @@ if rc_input:
             base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR
+        # SIDEBAR FILTROS (CASCADE)
         # =========================
         st.sidebar.header("🔎 Filtros")
 
-        # ---- STATUS ----
-        status_disp = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
-        status = st.sidebar.selectbox("Status", ["Todos"] + status_disp)
+        # ---- STATUS (PRINCIPAL) ----
+        status_list = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
+        status = st.sidebar.selectbox("Status", ["Todos"] + status_list)
 
         df1 = base.copy()
         if status != "Todos":
             df1 = df1[df1["Status"] == status]
 
         # ---- MOTIVO ----
-        motivo_disp = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
-        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_disp)
+        motivo_list = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
+        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_list)
 
         df2 = df1.copy()
         if motivo != "Todos":
@@ -137,38 +134,13 @@ if rc_input:
         if cliente:
             df3 = df3[df3["Cliente"].str.contains(cliente, case=False, na=False)]
 
+        # =========================
+        # RESULTADO FINAL
+        # =========================
         pedidos_view = df3
 
-        # =========================
-        # 🔥 CARD VALOR TOTAL
-        # =========================
         pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
 
-        valor_total = pedidos_view["Valor_num"].sum()
-
-        st.sidebar.markdown("---")
-        st.sidebar.subheader("💰 Valor Total")
-
-        st.sidebar.markdown(
-            f"""
-            <div style="
-                background-color:#e8f4ff;
-                padding:15px;
-                border-radius:10px;
-                text-align:center;
-                font-size:20px;
-                font-weight:bold;
-                border:1px solid #b3daff;
-            ">
-                R$ {valor_total:,.2f}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        # =========================
-        # TABELA
-        # =========================
         st.subheader("🧾 Seus Pedidos")
 
         st.dataframe(
@@ -186,7 +158,7 @@ if rc_input:
 
         if pedido_selecionado:
 
-            itens_pedido = itens[itens['Pedido'].astype(str) == pedido_selecionado].copy()
+            itens_pedido = itens[itens["Pedido"].astype(str) == pedido_selecionado].copy()
 
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
@@ -211,8 +183,8 @@ if rc_input:
             # AÇÃO
             # =========================
             acoes_pedido = acoes[
-                (acoes['Pedido'].astype(str) == pedido_selecionado) &
-                (acoes['RC'].astype(str) == rc_input)
+                (acoes["Pedido"].astype(str) == pedido_selecionado) &
+                (acoes["RC"].astype(str) == rc_input)
             ]
 
             if not acoes_pedido.empty:
@@ -239,6 +211,33 @@ if rc_input:
 
             else:
                 st.info("Nenhuma ação cadastrada para este pedido.")
+
+        # =========================
+        # 🔥 SIDEBAR - VALOR TOTAL (COM ESPAÇO VISUAL)
+        # =========================
+        st.sidebar.markdown("<br><br><br>", unsafe_allow_html=True)
+
+        valor_total = pedidos_view["Valor_num"].sum()
+
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("💰 Valor Total")
+
+        st.sidebar.markdown(
+            f"""
+            <div style="
+                background-color:#e8f4ff;
+                padding:15px;
+                border-radius:10px;
+                text-align:center;
+                font-size:20px;
+                font-weight:bold;
+                border:1px solid #b3daff;
+            ">
+                R$ {valor_total:,.2f}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     else:
         st.error("Nenhum pedido encontrado para este RC.")
