@@ -5,7 +5,6 @@ st.title("📦 Portal de Pedidos")
 
 # Carregar arquivos
 pedidos = pd.read_excel("Pedidos.xlsx")
-itens = pd.read_excel("Itens.xlsx")
 
 # Entrada do RC
 rc_input = st.text_input("Digite seu código RC:")
@@ -15,20 +14,13 @@ if rc_input:
 
     if not pedidos_rc.empty:
         st.subheader("📋 Seus Pedidos")
-        st.dataframe(pedidos_rc)
 
-        # Selecionar pedido
-        lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
-        pedido_selecionado = st.selectbox(
-            "Selecione um pedido para ver os itens:",
-            lista_pedidos
-        )
+        for _, row in pedidos_rc.iterrows():
+            st.write(f"Pedido: {row['Pedido']} | Cliente: {row['Cliente']} | Status: {row['Status']}")
 
-        # Mostrar itens do pedido
-        if pedido_selecionado:
-            st.subheader("📦 Itens do Pedido")
-            itens_pedido = itens[itens['Pedido'].astype(str) == pedido_selecionado]
-            st.dataframe(itens_pedido)
-
+            # Botão para acessar detalhes
+            if st.button(f"Ver itens do pedido {row['Pedido']}"):
+                st.query_params["pedido"] = str(row['Pedido'])
+                st.switch_page("pages/detalhe_pedido.py")
     else:
         st.error("Nenhum pedido encontrado para este RC.")
