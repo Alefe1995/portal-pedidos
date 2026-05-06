@@ -49,7 +49,6 @@ def limpar_texto(texto):
     texto = str(texto).replace("_x000D_", "\n").replace("\r\n", "\n").replace("\r", "\n")
 
     linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
-
     return "\n".join(linhas)
 
 
@@ -88,25 +87,25 @@ if rc_input:
             base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR FILTROS (CASCADE)
+        # SIDEBAR FILTROS (STATUS PRIMEIRO)
         # =========================
         st.sidebar.header("🔎 Filtros")
 
-        # ---- MOTIVO ----
-        motivos_disp = sorted(base["Motivo"].dropna().unique()) if "Motivo" in base.columns else []
-        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivos_disp)
-
-        df1 = base.copy()
-        if motivo != "Todos":
-            df1 = df1[df1["Motivo"] == motivo]
-
-        # ---- STATUS (DEPENDE DO MOTIVO) ----
-        status_disp = sorted(df1["Status"].dropna().unique()) if "Status" in df1.columns else []
+        # ---- STATUS (PRINCIPAL) ----
+        status_disp = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
         status = st.sidebar.selectbox("Status", ["Todos"] + status_disp)
 
-        df2 = df1.copy()
+        df1 = base.copy()
         if status != "Todos":
-            df2 = df2[df2["Status"] == status]
+            df1 = df1[df1["Status"] == status]
+
+        # ---- MOTIVO (DEPENDE DO STATUS) ----
+        motivo_disp = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
+        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_disp)
+
+        df2 = df1.copy()
+        if motivo != "Todos":
+            df2 = df2[df2["Motivo"] == motivo]
 
         # ---- CLIENTE (DEPENDE DOS DOIS) ----
         cliente = st.sidebar.text_input("Cliente (buscar)")
@@ -129,7 +128,7 @@ if rc_input:
         )
 
         # =========================
-        # PEDIDOS (AGORA CORRETO)
+        # PEDIDOS
         # =========================
         lista_pedidos = pedidos_view["Pedido"].astype(str).unique()
 
