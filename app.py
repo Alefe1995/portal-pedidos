@@ -9,24 +9,19 @@ st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
 # =========================
-# FUNÇÃO FORMATAÇÃO MOEDA (ROBUSTA)
+# FUNÇÃO FORMATAÇÃO MOEDA
 # =========================
 def formatar_moeda(valor):
     try:
         if pd.isna(valor):
             return ""
 
-        # Se já for número (padrão pandas)
         if isinstance(valor, (int, float)):
             valor_float = float(valor)
-
         else:
             valor_str = str(valor)
-
-            # Remove símbolo e espaços
             valor_str = valor_str.replace("R$", "").strip()
 
-            # Se tiver vírgula, assume padrão BR
             if "," in valor_str:
                 valor_str = valor_str.replace(".", "").replace(",", ".")
 
@@ -46,7 +41,7 @@ def formatar_data(valor):
         if pd.notna(data):
             return data.strftime("%d/%m/%Y")
         else:
-            return valor  # mantém texto original
+            return valor
     except:
         return valor
 
@@ -66,20 +61,22 @@ if rc_input:
 
     if not pedidos_rc.empty:
 
-        # =========================
-        # TRATAMENTO PEDIDOS
-        # =========================
         pedidos_view = pedidos_rc.copy()
 
-        # Remover coluna RC
+        # Remover RC
         if "RC" in pedidos_view.columns:
             pedidos_view = pedidos_view.drop(columns=["RC"])
 
-        # Formatar moeda (AGORA CORRETO)
-        if "Valor (R$)" in pedidos_view.columns:
-            pedidos_view["Valor (R$)"] = pedidos_view["Valor (R$)"].apply(formatar_moeda)
+        # =========================
+        # FORMATAR MOEDAS (PEDIDOS)
+        # =========================
+        for col in ["Valor (R$)", "Soma de Valor", "Soma de Valores"]:
+            if col in pedidos_view.columns:
+                pedidos_view[col] = pedidos_view[col].apply(formatar_moeda)
 
-        # Formatar data mantendo texto
+        # =========================
+        # FORMATAR DATA
+        # =========================
         if "Previsão" in pedidos_view.columns:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
@@ -97,6 +94,8 @@ if rc_input:
                 "Motivo": st.column_config.TextColumn(width="medium"),
                 "Previsão": st.column_config.TextColumn(width="medium"),
                 "Valor (R$)": st.column_config.TextColumn(width="medium"),
+                "Soma de Valor": st.column_config.TextColumn(width="medium"),
+                "Soma de Valores": st.column_config.TextColumn(width="medium"),
             }
         )
 
@@ -116,15 +115,20 @@ if rc_input:
         if pedido_selecionado:
             itens_pedido = itens[itens['Pedido'].astype(str) == pedido_selecionado].copy()
 
-            # Remover coluna RC
+            # Remover RC
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
-            # Formatar moeda
-            if "Soma de Valores" in itens_pedido.columns:
-                itens_pedido["Soma de Valores"] = itens_pedido["Soma de Valores"].apply(formatar_moeda)
+            # =========================
+            # FORMATAR MOEDAS (ITENS)
+            # =========================
+            for col in ["Soma de Valor", "Soma de Valores"]:
+                if col in itens_pedido.columns:
+                    itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
 
-            # Formatar data
+            # =========================
+            # FORMATAR DATA
+            # =========================
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
@@ -138,6 +142,7 @@ if rc_input:
                     "Pedido": st.column_config.TextColumn(width="small"),
                     "Produto": st.column_config.TextColumn(width="large"),
                     "Status Reserva": st.column_config.TextColumn(width="medium"),
+                    "Soma de Valor": st.column_config.TextColumn(width="medium"),
                     "Soma de Valores": st.column_config.TextColumn(width="medium"),
                     "Previsão Final": st.column_config.TextColumn(width="medium"),
                 }
