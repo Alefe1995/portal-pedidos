@@ -48,7 +48,7 @@ def formatar_data(valor):
 
 
 # =========================
-# LIMPEZA DE TEXTO (VERSÃO FINAL)
+# LIMPAR TEXTO (VERSÃO FINAL DEFINITIVA)
 # =========================
 def limpar_texto(texto):
     if pd.isna(texto):
@@ -56,7 +56,7 @@ def limpar_texto(texto):
 
     texto = str(texto)
 
-    # Corrigir quebras do Excel / SharePoint
+    # Corrigir quebras do Excel/SharePoint
     texto = (
         texto.replace("_x000D_", "\n")
              .replace("\r\n", "\n")
@@ -67,7 +67,6 @@ def limpar_texto(texto):
     linhas = [linha.strip() for linha in texto.split("\n")]
     linhas = [linha for linha in linhas if linha != ""]
 
-    # Reunir de forma limpa (SEM linhas fantasma)
     return "\n".join(linhas).strip()
 
 
@@ -140,7 +139,7 @@ if rc_input:
             )
 
             # =========================
-            # AÇÃO RECOMENDADA
+            # AÇÃO RECOMENDADA (CARD AZUL FINAL)
             # =========================
             acoes_pedido = acoes[
                 (acoes['Pedido'].astype(str) == pedido_selecionado) &
@@ -153,8 +152,22 @@ if rc_input:
 
                 st.subheader("📌 Ação Recomendada")
 
-                # EXIBIÇÃO LIMPA E CONTROLADA (SEM ESPAÇAMENTO FANTASMA)
-                st.text(texto)
+                st.markdown(
+                    f"""
+                    <div style="
+                        background-color:#e8f4ff;
+                        border:1px solid #b3daff;
+                        padding:16px;
+                        border-radius:10px;
+                        font-family:inherit;
+                        white-space:pre-line;
+                        line-height:1.5;
+                    ">
+                        {texto}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
             else:
                 st.info("Nenhuma ação cadastrada para este pedido.")
