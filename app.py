@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-st.image("download.png", width=100)
+st.image("download.png", width=50)
 st.title("Portal de Pedidos")
 
 # Carregar arquivos
