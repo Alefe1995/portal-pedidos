@@ -85,7 +85,7 @@ if rc_input:
             column_config={
                 "Pedido": st.column_config.TextColumn("Pedido", width="small"),
                 "Cliente": st.column_config.TextColumn("Cliente", width="large"),
-                "UF": st.column_config.TextColumn("UF", width="small"),  # 👈 MENOR AGORA
+                "UF": st.column_config.TextColumn("UF", width=50),  # 👈 AJUSTADO
                 "Status": st.column_config.TextColumn("Status", width="medium"),
                 "Motivo": st.column_config.TextColumn("Motivo", width="medium"),
                 "Previsão": st.column_config.TextColumn("Previsão", width="medium"),
@@ -134,8 +134,8 @@ if rc_input:
                     "Pedido": st.column_config.TextColumn("Pedido", width="small"),
                     "Produto": st.column_config.TextColumn("Produto", width="large"),
                     "Status Reserva": st.column_config.TextColumn("Status Reserva", width="medium"),
-                    "Pedido2": st.column_config.TextColumn("Qtde", width="small"),  # 👈 RENOMEADO
-                    "Soma de Valor": st.column_config.TextColumn("Valor (R$)", width="medium"),  # 👈 RENOMEADO
+                    "Pedido2": st.column_config.TextColumn("Qtde", width=60),  # 👈 AJUSTADO
+                    "Soma de Valor": st.column_config.TextColumn("Valor (R$)", width="medium"),
                     "Soma de Valores": st.column_config.TextColumn("Valor (R$)", width="medium"),
                     "Previsão Final": st.column_config.TextColumn("Previsão Final", width="medium"),
                 }
