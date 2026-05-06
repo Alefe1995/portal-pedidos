@@ -1,15 +1,16 @@
 import pandas as pd
 import streamlit as st
 
+# =========================
 # CONFIGURAÇÃO DA PÁGINA
+# =========================
 st.set_page_config(layout="wide")
 
-# LOGO + TÍTULO
 st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
 # =========================
-# FUNÇÃO FORMATAÇÃO MOEDA
+# FORMATAÇÃO MOEDA
 # =========================
 def formatar_moeda(valor):
     try:
@@ -34,7 +35,7 @@ def formatar_moeda(valor):
 
 
 # =========================
-# FUNÇÃO FORMATAÇÃO DATA
+# FORMATAÇÃO DATA
 # =========================
 def formatar_data(valor):
     try:
@@ -47,7 +48,7 @@ def formatar_data(valor):
 
 
 # =========================
-# FUNÇÃO LIMPAR TEXTO AÇÃO (CORRIGIDA)
+# LIMPEZA DE TEXTO (VERSÃO FINAL)
 # =========================
 def limpar_texto(texto):
     if pd.isna(texto):
@@ -55,18 +56,19 @@ def limpar_texto(texto):
 
     texto = str(texto)
 
-    # Corrigir quebras vindas do Excel/SharePoint
+    # Corrigir quebras do Excel / SharePoint
     texto = (
         texto.replace("_x000D_", "\n")
              .replace("\r\n", "\n")
              .replace("\r", "\n")
     )
 
-    # Remover múltiplas quebras exageradas
-    while "\n\n\n" in texto:
-        texto = texto.replace("\n\n\n", "\n\n")
+    # Separar linhas, limpar espaços e remover vazias
+    linhas = [linha.strip() for linha in texto.split("\n")]
+    linhas = [linha for linha in linhas if linha != ""]
 
-    return texto.strip()
+    # Reunir de forma limpa (SEM linhas fantasma)
+    return "\n".join(linhas).strip()
 
 
 # =========================
@@ -83,6 +85,7 @@ acoes = pd.read_excel("Ação.xlsx")
 rc_input = st.text_input("🔎 Digite seu código RC:")
 
 if rc_input:
+
     pedidos_rc = pedidos[pedidos['RC'].astype(str) == rc_input]
 
     if not pedidos_rc.empty:
@@ -115,6 +118,7 @@ if rc_input:
         )
 
         if pedido_selecionado:
+
             itens_pedido = itens[itens['Pedido'].astype(str) == pedido_selecionado].copy()
 
             if "RC" in itens_pedido.columns:
@@ -136,7 +140,7 @@ if rc_input:
             )
 
             # =========================
-            # AÇÃO RECOMENDADA (CORRIGIDA)
+            # AÇÃO RECOMENDADA
             # =========================
             acoes_pedido = acoes[
                 (acoes['Pedido'].astype(str) == pedido_selecionado) &
@@ -149,21 +153,8 @@ if rc_input:
 
                 st.subheader("📌 Ação Recomendada")
 
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color:#f0f8ff;
-                        padding:15px;
-                        border-radius:10px;
-                        border:1px solid #d0e7ff;
-                        white-space:pre-wrap;
-                        font-family:inherit;
-                    ">
-                    {texto}
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                # EXIBIÇÃO LIMPA E CONTROLADA (SEM ESPAÇAMENTO FANTASMA)
+                st.text(texto)
 
             else:
                 st.info("Nenhuma ação cadastrada para este pedido.")
