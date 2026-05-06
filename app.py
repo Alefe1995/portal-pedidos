@@ -11,11 +11,24 @@ itens = pd.read_excel("Itens.xlsx")
 rc_input = st.text_input("Digite seu código RC:")
 
 if rc_input:
-    # Filtrar pedidos do RC
     pedidos_rc = pedidos[pedidos['RC'].astype(str) == rc_input]
 
     if not pedidos_rc.empty:
         st.subheader("📋 Seus Pedidos")
         st.dataframe(pedidos_rc)
+
+        # Selecionar pedido
+        lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
+        pedido_selecionado = st.selectbox(
+            "Selecione um pedido para ver os itens:",
+            lista_pedidos
+        )
+
+        # Mostrar itens do pedido
+        if pedido_selecionado:
+            st.subheader("📦 Itens do Pedido")
+            itens_pedido = itens[itens['Pedido'].astype(str) == pedido_selecionado]
+            st.dataframe(itens_pedido)
+
     else:
         st.error("Nenhum pedido encontrado para este RC.")
