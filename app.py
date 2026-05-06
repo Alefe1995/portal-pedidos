@@ -50,6 +50,7 @@ def formatar_data(valor):
 # =========================
 pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
+acoes = pd.read_excel("Ação.xlsx")  # 👈 NOVO ARQUIVO
 
 # =========================
 # ENTRADA RC
@@ -140,6 +141,30 @@ if rc_input:
                     "Previsão Final": st.column_config.TextColumn("Previsão Final", width="medium"),
                 }
             )
+
+            # =========================
+            # AÇÕES
+            # =========================
+            acoes_pedido = acoes[
+                (acoes['Pedido'].astype(str) == pedido_selecionado) &
+                (acoes['RC'].astype(str) == rc_input)
+            ].copy()
+
+            if not acoes_pedido.empty:
+
+                # remover RC (não precisa mostrar)
+                if "RC" in acoes_pedido.columns:
+                    acoes_pedido = acoes_pedido.drop(columns=["RC"])
+
+                st.subheader("📌 Ações do Pedido")
+
+                st.dataframe(
+                    acoes_pedido,
+                    use_container_width=True,
+                    hide_index=True
+                )
+            else:
+                st.info("Nenhuma ação cadastrada para este pedido.")
 
     else:
         st.error("Nenhum pedido encontrado para este RC.")
