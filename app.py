@@ -33,7 +33,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # =========================
 # CONVERSÕES
 # =========================
@@ -101,7 +100,6 @@ pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
 acoes = pd.read_excel("Ação.xlsx")
 
-
 # =========================
 # RC
 # =========================
@@ -138,7 +136,7 @@ if rc_input:
 
         st.sidebar.header("🔎 Filtros")
 
-        # ---- STATUS ----
+        # STATUS
         status_list = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
         status = st.sidebar.selectbox("Status", ["Todos"] + status_list)
 
@@ -146,7 +144,7 @@ if rc_input:
         if status != "Todos":
             df1 = df1[df1["Status"] == status]
 
-        # ---- MOTIVO ----
+        # MOTIVO
         motivo_list = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
         motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_list)
 
@@ -154,7 +152,7 @@ if rc_input:
         if motivo != "Todos":
             df2 = df2[df2["Motivo"] == motivo]
 
-        # ---- CLIENTE ----
+        # CLIENTE
         cliente = st.sidebar.text_input("Cliente (buscar)")
 
         df3 = df2.copy()
@@ -167,7 +165,6 @@ if rc_input:
         # VALOR TOTAL
         # =========================
         pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
-
         valor_total = pedidos_view["Valor_num"].sum()
 
         st.sidebar.markdown("---")
@@ -202,15 +199,27 @@ if rc_input:
         )
 
         # =========================
-        # PEDIDOS
+        # 📌 PEDIDOS (ATUALIZADO)
         # =========================
-        lista_pedidos = pedidos_view["Pedido"].astype(str).unique()
+        pedidos_view["Pedido_Exibicao"] = (
+            pedidos_view["Pedido"].astype(str)
+            + " - "
+            + pedidos_view["Cliente"].astype(str)
+        )
+
+        lista_pedidos = pedidos_view["Pedido_Exibicao"].unique()
 
         pedido_selecionado = st.selectbox("📌 Selecione um pedido:", lista_pedidos)
 
         if pedido_selecionado:
 
-            itens_pedido = itens[itens["Pedido"].astype(str) == pedido_selecionado].copy()
+            # 🔧 extrai apenas número do pedido
+            pedido_numero = pedido_selecionado.split(" - ")[0]
+
+            # =========================
+            # ITENS
+            # =========================
+            itens_pedido = itens[itens["Pedido"].astype(str) == pedido_numero].copy()
 
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
@@ -235,7 +244,7 @@ if rc_input:
             # AÇÃO
             # =========================
             acoes_pedido = acoes[
-                (acoes["Pedido"].astype(str) == pedido_selecionado) &
+                (acoes["Pedido"].astype(str) == pedido_numero) &
                 (acoes["RC"].astype(str) == rc_input)
             ]
 
