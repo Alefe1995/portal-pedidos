@@ -110,7 +110,22 @@ if rc_input:
         if "Previsão" in pedidos_view.columns:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
+        # =========================
+        # TÍTULO + FILTRO MOTIVO
+        # =========================
         st.subheader("🧾 Seus Pedidos")
+
+        if "Motivo" in pedidos_view.columns:
+
+            motivos_disponiveis = pedidos_view["Motivo"].dropna().unique().tolist()
+
+            motivo_selecionado = st.selectbox(
+                "📌 Filtrar por Motivo:",
+                options=["Todos"] + motivos_disponiveis
+            )
+
+            if motivo_selecionado != "Todos":
+                pedidos_view = pedidos_view[pedidos_view["Motivo"] == motivo_selecionado]
 
         st.dataframe(
             pedidos_view,
