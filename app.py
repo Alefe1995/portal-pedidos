@@ -9,25 +9,6 @@ st.image("download.png", width=80)
 st.title("Portal de Pedidos")
 
 # =========================
-# ESTILO (CAIXAS SUAVES)
-# =========================
-st.markdown("""
-<style>
-.box {
-    background-color: #f5f7fa;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    margin-bottom: 10px;
-}
-.label {
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# =========================
 # FUNÇÃO FORMATAÇÃO MOEDA
 # =========================
 def formatar_moeda(valor):
@@ -71,13 +52,9 @@ pedidos = pd.read_excel("Pedidos.xlsx")
 itens = pd.read_excel("Itens.xlsx")
 
 # =========================
-# BLOCO RC (ALINHADO)
+# ENTRADA RC
 # =========================
-with st.container():
-    st.markdown('<div class="box">', unsafe_allow_html=True)
-    st.markdown('<div class="label">🔎 Digite seu código RC:</div>', unsafe_allow_html=True)
-    rc_input = st.text_input("", placeholder="Ex: 12345")
-    st.markdown('</div>', unsafe_allow_html=True)
+rc_input = st.text_input("Digite seu código RC:")
 
 if rc_input:
     pedidos_rc = pedidos[pedidos['RC'].astype(str) == rc_input]
@@ -108,7 +85,7 @@ if rc_input:
             column_config={
                 "Pedido": st.column_config.TextColumn("Pedido", width="small"),
                 "Cliente": st.column_config.TextColumn("Cliente", width="large"),
-                "UF": st.column_config.TextColumn("UF", width=50),
+                "UF": st.column_config.TextColumn("UF", width=50),  # 👈 AJUSTADO
                 "Status": st.column_config.TextColumn("Status", width="medium"),
                 "Motivo": st.column_config.TextColumn("Motivo", width="medium"),
                 "Previsão": st.column_config.TextColumn("Previsão", width="medium"),
@@ -119,20 +96,14 @@ if rc_input:
         )
 
         # =========================
-        # BLOCO SELEÇÃO PEDIDO (ALINHADO)
+        # SELEÇÃO DE PEDIDO
         # =========================
         lista_pedidos = pedidos_rc['Pedido'].astype(str).unique()
 
-        with st.container():
-            st.markdown('<div class="box">', unsafe_allow_html=True)
-            st.markdown('<div class="label">📌 Selecione um pedido para ver os itens:</div>', unsafe_allow_html=True)
-
-            pedido_selecionado = st.selectbox(
-                "",
-                lista_pedidos
-            )
-
-            st.markdown('</div>', unsafe_allow_html=True)
+        pedido_selecionado = st.selectbox(
+            "Selecione um pedido para ver os itens:",
+            lista_pedidos
+        )
 
         # =========================
         # ITENS
@@ -163,7 +134,7 @@ if rc_input:
                     "Pedido": st.column_config.TextColumn("Pedido", width="small"),
                     "Produto": st.column_config.TextColumn("Produto", width="large"),
                     "Status Reserva": st.column_config.TextColumn("Status Reserva", width="medium"),
-                    "Pedido2": st.column_config.TextColumn("Qtde", width=60),
+                    "Pedido2": st.column_config.TextColumn("Qtde", width=60),  # 👈 AJUSTADO
                     "Soma de Valor": st.column_config.TextColumn("Valor (R$)", width="medium"),
                     "Soma de Valores": st.column_config.TextColumn("Valor (R$)", width="medium"),
                     "Previsão Final": st.column_config.TextColumn("Previsão Final", width="medium"),
