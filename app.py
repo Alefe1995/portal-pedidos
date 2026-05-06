@@ -76,7 +76,7 @@ if rc_input:
         if "Previsão" in pedidos_view.columns:
             pedidos_view["Previsão"] = pedidos_view["Previsão"].apply(formatar_data)
 
-        st.subheader("📋 Seus Pedidos")
+        st.subheader("🧾 Seus Pedidos")
 
         st.dataframe(
             pedidos_view,
