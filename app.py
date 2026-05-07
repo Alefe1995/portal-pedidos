@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 # =========================
 # CONFIGURAÇÃO
@@ -66,90 +67,6 @@ div[data-baseweb="select"] > div {
 /* ALERTAS */
 .stAlert {
     border-radius:12px;
-}
-
-/* TABELA */
-.tabela-container {
-    background:white;
-    border:1px solid #e5e7eb;
-    border-radius:14px;
-    overflow:hidden;
-    margin-bottom:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.04);
-}
-
-.tabela-pedidos {
-    width:100%;
-    border-collapse:collapse;
-    font-family:Arial, sans-serif;
-}
-
-.tabela-pedidos thead {
-    background:#f8fafc;
-}
-
-.tabela-pedidos th {
-    padding:14px;
-    text-align:left;
-    font-size:12px;
-    text-transform:uppercase;
-    color:#6b7280;
-    border-bottom:1px solid #e5e7eb;
-}
-
-.tabela-pedidos td {
-    padding:14px;
-    border-bottom:1px solid #f1f5f9;
-    font-size:14px;
-    color:#111827;
-}
-
-.tabela-pedidos tbody tr:hover {
-    background:#f9fafb;
-}
-
-/* PEDIDO */
-.pedido-highlight {
-    color:#dc2626;
-    font-weight:700;
-}
-
-/* STATUS */
-.badge-liberado {
-    background:#dcfce7;
-    color:#166534;
-    padding:5px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-}
-
-.badge-conferido {
-    background:#dbeafe;
-    color:#1d4ed8;
-    padding:5px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-}
-
-.badge-pendente {
-    background:#fef3c7;
-    color:#92400e;
-    padding:5px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-}
-
-/* MOTIVO */
-.motivo-highlight {
-    font-weight:600;
-}
-
-/* VALOR */
-.valor-highlight {
-    font-weight:700;
 }
 
 </style>
@@ -364,38 +281,38 @@ if rc_input:
         )
 
         # =========================
-        # TABELA HTML
+        # HTML TABELA
         # =========================
         html = """
+        <html>
 
-        html = """
+        <head>
+
         <style>
-        
+
         body{
+            font-family:Arial;
+            background:white;
             margin:0;
             padding:0;
-            background:white;
-            font-family:Arial, sans-serif;
         }
-        
-        .tabela-container{
-            width:100%;
+
+        .table-box{
             border:1px solid #e5e7eb;
             border-radius:14px;
             overflow:hidden;
-            background:white;
         }
-        
-        .tabela-pedidos{
+
+        table{
             width:100%;
             border-collapse:collapse;
         }
-        
-        .tabela-pedidos thead{
+
+        thead{
             background:#f8fafc;
         }
-        
-        .tabela-pedidos th{
+
+        th{
             padding:14px;
             text-align:left;
             font-size:12px;
@@ -403,24 +320,32 @@ if rc_input:
             color:#6b7280;
             border-bottom:1px solid #e5e7eb;
         }
-        
-        .tabela-pedidos td{
+
+        td{
             padding:14px;
             border-bottom:1px solid #f1f5f9;
             font-size:14px;
             color:#111827;
         }
-        
-        .tabela-pedidos tbody tr:hover{
+
+        tr:hover{
             background:#f9fafb;
         }
-        
-        .pedido-highlight{
+
+        .pedido{
             color:#dc2626;
             font-weight:700;
         }
-        
-        .badge-liberado{
+
+        .motivo{
+            font-weight:600;
+        }
+
+        .valor{
+            font-weight:700;
+        }
+
+        .liberado{
             background:#dcfce7;
             color:#166534;
             padding:5px 12px;
@@ -428,8 +353,8 @@ if rc_input:
             font-size:12px;
             font-weight:600;
         }
-        
-        .badge-conferido{
+
+        .conferido{
             background:#dbeafe;
             color:#1d4ed8;
             padding:5px 12px;
@@ -437,8 +362,8 @@ if rc_input:
             font-size:12px;
             font-weight:600;
         }
-        
-        .badge-pendente{
+
+        .pendente{
             background:#fef3c7;
             color:#92400e;
             padding:5px 12px;
@@ -446,21 +371,17 @@ if rc_input:
             font-size:12px;
             font-weight:600;
         }
-        
-        .motivo-highlight{
-            font-weight:600;
-        }
-        
-        .valor-highlight{
-            font-weight:700;
-        }
-        
+
         </style>
-        
-        <div class="tabela-container">
-        
-        <table class="tabela-pedidos">
-        
+
+        </head>
+
+        <body>
+
+        <div class="table-box">
+
+        <table>
+
         <thead>
         <tr>
             <th>Pedido</th>
@@ -472,7 +393,7 @@ if rc_input:
             <th>Valor (R$)</th>
         </tr>
         </thead>
-        
+
         <tbody>
         """
 
@@ -481,18 +402,18 @@ if rc_input:
             status = str(row["Status"]).lower()
 
             if "liberado" in status:
-                status_html = f"<span class='badge-liberado'>{row['Status']}</span>"
+                badge = f"<span class='liberado'>{row['Status']}</span>"
 
             elif "conferido" in status:
-                status_html = f"<span class='badge-conferido'>{row['Status']}</span>"
+                badge = f"<span class='conferido'>{row['Status']}</span>"
 
             else:
-                status_html = f"<span class='badge-pendente'>{row['Status']}</span>"
+                badge = f"<span class='pendente'>{row['Status']}</span>"
 
             html += f"""
             <tr>
 
-                <td class="pedido-highlight">
+                <td class="pedido">
                     {row['Pedido']}
                 </td>
 
@@ -505,10 +426,10 @@ if rc_input:
                 </td>
 
                 <td>
-                    {status_html}
+                    {badge}
                 </td>
 
-                <td class="motivo-highlight">
+                <td class="motivo">
                     {row['Motivo']}
                 </td>
 
@@ -516,7 +437,7 @@ if rc_input:
                     {row['Previsão']}
                 </td>
 
-                <td class="valor-highlight">
+                <td class="valor">
                     {row['Valor (R$)']}
                 </td>
 
@@ -525,11 +446,17 @@ if rc_input:
 
         html += """
         </tbody>
+
         </table>
+
         </div>
+
+        </body>
+
+        </html>
         """
 
-        st.components.v1.html(
+        components.html(
             html,
             height=500,
             scrolling=True
@@ -625,17 +552,11 @@ margin-top:6px;
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
-            # =========================
-            # TITULO ITENS
-            # =========================
             st.markdown(
                 "<div class='section-title'>📦 Itens do Pedido</div>",
                 unsafe_allow_html=True
             )
 
-            # =========================
-            # TABELA ITENS
-            # =========================
             st.dataframe(
                 itens_pedido,
                 use_container_width=True,
