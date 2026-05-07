@@ -169,6 +169,7 @@ acoes = pd.read_excel("Ação.xlsx")
 # RC
 # =========================
 rc_input = st.text_input("🔎 Digite seu código RC:")
+
 # =========================
 # PROCESSAMENTO
 # =========================
@@ -475,7 +476,10 @@ if rc_input:
             + pedidos_view["Cliente"].astype(str)
         )
 
-        lista_pedidos = pedidos_view["Pedido_Exibicao"].unique()
+        lista_pedidos = pedidos_view["Pedido_Exibicao"].unique().tolist()
+
+        # PRIMEIRO ITEM VAZIO
+        lista_pedidos.insert(0, "Selecione um pedido")
 
         pedido_selecionado = st.selectbox(
             "📌 Selecione um pedido:",
@@ -483,9 +487,9 @@ if rc_input:
         )
 
         # =========================
-        # PEDIDO SELECIONADO
+        # SOMENTE APÓS SELEÇÃO
         # =========================
-        if pedido_selecionado:
+        if pedido_selecionado != "Selecione um pedido":
 
             pedido_numero = pedido_selecionado.split(" - ")[0]
 
@@ -721,7 +725,7 @@ margin-top:6px;
             </html>
             """
 
-            # AUTO AJUSTE SEM ESPAÇO
+            # AUTO AJUSTE
             altura_itens = (len(itens_pedido) * 45) + 75
 
             components.html(
