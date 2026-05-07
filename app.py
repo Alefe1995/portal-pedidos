@@ -456,12 +456,11 @@ if rc_input:
         </html>
         """
 
-        altura_pedidos = (len(pedidos_view) * 45) + 120
-
+        # FIXO
         components.html(
             html,
-            height=altura_pedidos,
-            scrolling=False
+            height=500,
+            scrolling=True
         )
 
         # =========================
@@ -719,7 +718,8 @@ margin-top:6px;
             </html>
             """
 
-            altura_itens = (len(itens_pedido) * 45) + 120
+            # AUTO AJUSTE SOMENTE ITENS
+            altura_itens = (len(itens_pedido) * 42) + 95
 
             components.html(
                 html_itens,
