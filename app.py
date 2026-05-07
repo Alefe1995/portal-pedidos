@@ -717,7 +717,6 @@ margin-top:6px;
             </html>
             """
 
-            # ORIGINAL
             components.html(
                 html_itens,
                 height=500,
