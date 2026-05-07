@@ -456,11 +456,11 @@ if rc_input:
         </html>
         """
 
-        altura_tabela = (len(itens_pedido) * 45) + 120
-        
+        altura_pedidos = (len(pedidos_view) * 45) + 120
+
         components.html(
-            html_itens,
-            height=altura_tabela,
+            html,
+            height=altura_pedidos,
             scrolling=False
         )
 
@@ -719,10 +719,12 @@ margin-top:6px;
             </html>
             """
 
+            altura_itens = (len(itens_pedido) * 45) + 120
+
             components.html(
                 html_itens,
-                height=500,
-                scrolling=True
+                height=altura_itens,
+                scrolling=False
             )
 
             # =========================
