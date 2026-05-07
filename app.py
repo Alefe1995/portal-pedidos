@@ -2,172 +2,276 @@ import pandas as pd
 import streamlit as st
 
 # =========================
-# 1. CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÃO
 # =========================
-st.set_page_config(layout="wide", page_title="Portal de Pedidos Adere")
-
-# CSS para customização avançada (Estilo Base44 / Adere)
-st.markdown("""
-    <style>
-    /* Fundo da Sidebar cinza claro */
-    [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
-        border-right: 1px solid #e0e0e0;
-    }
-    
-    /* Títulos da Sidebar em vermelho Adere */
-    [data-testid="stSidebar"] h3 {
-        color: #c00000 !important;
-        font-size: 1.1rem;
-        font-weight: bold;
-    }
-
-    /* Botão Buscar Vermelho */
-    div.stButton > button {
-        background-color: #c00000;
-        color: white;
-        border-radius: 5px;
-        width: 100%;
-        border: none;
-        height: 45px;
-        font-weight: bold;
-    }
-    div.stButton > button:hover {
-        background-color: #a00000;
-        color: white;
-    }
-
-    /* Faixa Superior (Header) */
-    .main-header {
-        background-color: #c00000;
-        padding: 15px 25px;
-        border-radius: 8px;
-        color: white;
-        font-weight: bold;
-        font-size: 22px;
-        margin-bottom: 25px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+st.set_page_config(layout="wide")
 
 # =========================
-# 2. FUNÇÕES DE SUPORTE
+# 🎨 HEADER (FAIXA VERMELHA + TÍTULO)
+# =========================
+st.markdown(
+    """
+    <div style="
+        background-color:#c00000;
+        height:55px;
+        width:100%;
+        margin-bottom:15px;
+        border-radius:5px;
+        display:flex;
+        align-items:center;
+        padding-left:20px;
+    ">
+        <span style="
+            color:white;
+            font-size:22px;
+            font-weight:bold;
+        ">
+            Portal de Pedidos
+        </span>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# =========================
+# CONVERSÕES
 # =========================
 def para_float(valor):
     try:
-        if pd.isna(valor): return 0.0
-        if isinstance(valor, (int, float)): return float(valor)
-        valor = str(valor).replace("R$", "").strip().replace(".", "").replace(",", ".")
+        if pd.isna(valor):
+            return 0
+
+        if isinstance(valor, (int, float)):
+            return float(valor)
+
+        valor = str(valor).replace("R$", "").strip()
+        valor = valor.replace(".", "").replace(",", ".")
+
         return float(valor)
-    except: return 0.0
+    except:
+        return 0
+
 
 def formatar_moeda(valor):
-    return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
-# =========================
-# 3. CARGA DE DADOS
-# =========================
-@st.cache_data
-def carregar_dados():
     try:
-        ped_df = pd.read_excel("Pedidos.xlsx")
-        ite_df = pd.read_excel("Itens.xlsx")
-        aco_df = pd.read_excel("Ação.xlsx")
-        return ped_df, ite_df, aco_df
-    except Exception as e:
-        st.error(f"Erro ao carregar arquivos Excel: {e}")
-        return None, None, None
+        if pd.isna(valor):
+            return ""
 
-pedidos_raw, itens_raw, acoes_raw = carregar_dados()
+        if isinstance(valor, (int, float)):
+            valor_float = float(valor)
+        else:
+            valor_str = str(valor).replace("R$", "").strip()
+
+            if "," in valor_str:
+                valor_str = valor_str.replace(".", "").replace(",", ".")
+
+            valor_float = float(valor_str)
+
+        return f"R$ {valor_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except:
+        return valor
+
+
+def formatar_data(valor):
+    try:
+        data = pd.to_datetime(valor, errors="coerce")
+        if pd.notna(data):
+            return data.strftime("%d/%m/%Y")
+        return valor
+    except:
+        return valor
+
+
+def limpar_texto(texto):
+    if pd.isna(texto):
+        return ""
+
+    texto = str(texto)
+    texto = texto.replace("_x000D_", "\n").replace("\r\n", "\n").replace("\r", "\n")
+
+    linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
+    return "\n".join(linhas)
+
 
 # =========================
-# 4. HEADER E BUSCA INICIAL
+# DADOS
 # =========================
-st.markdown('<div class="main-header">Portal de Pedidos</div>', unsafe_allow_html=True)
-
-# Layout de busca superior (Correção da linha que deu erro)
-col_rc1, col_rc2 = st.columns([4, 1])
-with col_rc1:
-    rc_input = st.text_input("Código RC", placeholder="Digite o código RC...", label_visibility="collapsed")
-with col_rc2:
-    btn_buscar = st.button("BUSCAR")
+pedidos = pd.read_excel("Pedidos.xlsx")
+itens = pd.read_excel("Itens.xlsx")
+acoes = pd.read_excel("Ação.xlsx")
 
 # =========================
-# 5. LÓGICA PRINCIPAL
+# RC
 # =========================
+rc_input = st.text_input("🔎 Digite seu código RC:")
+
 if rc_input:
-    # Filtrar base pelo RC
-    base = pedidos_raw[pedidos_raw["RC"].astype(str) == rc_input].copy()
+
+    base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
 
     if not base.empty:
-        # --- SIDEBAR (FILTROS) ---
-        with st.sidebar:
-            st.image("download.png", width=150)
-            st.markdown("### 🔎 Filtros")
-            
-            status_list = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
-            status_sel = st.selectbox("Status", ["Todos"] + status_list)
-            
-            motivo_list = sorted(base["Motivo"].dropna().unique()) if "Motivo" in base.columns else []
-            motivo_sel = st.selectbox("Motivo", ["Todos"] + motivo_list)
-            
-            cliente_input = st.text_input("Buscar Cliente")
 
-            # Aplicar Filtros
-            df_view = base.copy()
-            if status_sel != "Todos":
-                df_view = df_view[df_view["Status"] == status_sel]
-            if motivo_sel != "Todos":
-                df_view = df_view[df_view["Motivo"] == motivo_sel]
-            if cliente_input:
-                df_view = df_view[df_view["Cliente"].str.contains(cliente_input, case=False, na=False)]
+        if "RC" in base.columns:
+            base = base.drop(columns=["RC"])
 
-            # Resumo Financeiro
-            st.markdown("---")
-            st.markdown("### 💰 Resumo Financeiro")
-            # Ajuste dinâmico da coluna de valor
-            col_valor = "Soma de Valor" if "Soma de Valor" in df_view.columns else df_view.columns[-1]
-            valor_total_num = df_view[col_valor].apply(para_float).sum()
-            st.metric("Total Filtrado", formatar_moeda(valor_total_num))
+        base = base.rename(columns={
+            "Pedido2": "Qtde",
+            "Soma de Valor": "Valor (R$)"
+        })
 
-        # --- TABELA PRINCIPAL ---
-        st.markdown(f"### 🧾 Seus Pedidos ({len(df_view)})")
-        
-        display_df = df_view.copy()
-        # Tratamento de Data Seguro
-        if "Previsão" in display_df.columns:
-            display_df["Previsão"] = pd.to_datetime(display_df["Previsão"], errors='coerce')
-            display_df["Previsão"] = display_df["Previsão"].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else "")
+        # =========================
+        # FORMATAÇÃO
+        # =========================
+        for col in ["Valor (R$)", "Soma de Valores"]:
+            if col in base.columns:
+                base[col] = base[col].apply(formatar_moeda)
+
+        if "Previsão" in base.columns:
+            base["Previsão"] = base["Previsão"].apply(formatar_data)
+
+        # =========================
+        # SIDEBAR
+        # =========================
+        st.sidebar.image("download.png", width=100)
+
+        st.sidebar.header("🔎 Filtros")
+
+        # STATUS
+        status_list = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
+        status = st.sidebar.selectbox("Status", ["Todos"] + status_list)
+
+        df1 = base.copy()
+        if status != "Todos":
+            df1 = df1[df1["Status"] == status]
+
+        # MOTIVO
+        motivo_list = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
+        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_list)
+
+        df2 = df1.copy()
+        if motivo != "Todos":
+            df2 = df2[df2["Motivo"] == motivo]
+
+        # CLIENTE
+        cliente = st.sidebar.text_input("Cliente (buscar)")
+
+        df3 = df2.copy()
+        if cliente:
+            df3 = df3[df3["Cliente"].str.contains(cliente, case=False, na=False)]
+
+        pedidos_view = df3
+
+        # =========================
+        # VALOR TOTAL
+        # =========================
+        pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
+        valor_total = pedidos_view["Valor_num"].sum()
+
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("💰 Valor Total")
+
+        st.sidebar.markdown(
+            f"""
+            <div style="
+                background-color:#e8f4ff;
+                padding:15px;
+                border-radius:10px;
+                text-align:center;
+                font-size:20px;
+                font-weight:bold;
+                border:1px solid #b3daff;
+            ">
+                R$ {valor_total:,.2f}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # =========================
+        # TABELA
+        # =========================
+        st.subheader("🧾 Seus Pedidos")
 
         st.dataframe(
-            display_df.drop(columns=["RC"], errors='ignore'),
+            pedidos_view.drop(columns=["Valor_num"]),
             use_container_width=True,
             hide_index=True
         )
 
-        # --- SELEÇÃO E DETALHES ---
-        st.markdown("---")
-        if "Pedido" in display_df.columns and "Cliente" in display_df.columns:
-            display_df["Label"] = display_df["Pedido"].astype(str) + " - " + display_df["Cliente"].astype(str)
-            pedido_selecionado = st.selectbox("📌 Selecione um pedido para detalhes:", display_df["Label"].unique())
+        # =========================
+        # 📌 PEDIDOS (ATUALIZADO)
+        # =========================
+        pedidos_view["Pedido_Exibicao"] = (
+            pedidos_view["Pedido"].astype(str)
+            + " - "
+            + pedidos_view["Cliente"].astype(str)
+        )
 
-            if pedido_selecionado:
-                id_pedido = pedido_selecionado.split(" - ")[0]
-                
-                # Itens
-                df_itens = itens_raw[itens_raw["Pedido"].astype(str) == id_pedido].copy()
-                st.markdown("#### 📦 Itens do Pedido")
-                if "Previsão Final" in df_itens.columns:
-                    df_itens["Previsão Final"] = pd.to_datetime(df_itens["Previsão Final"], errors='coerce').apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else "")
-                
-                st.dataframe(df_itens.drop(columns=["RC"], errors='ignore'), use_container_width=True, hide_index=True)
+        lista_pedidos = pedidos_view["Pedido_Exibicao"].unique()
 
-                # Ação
-                st.markdown("#### 🚨 Ação Recomendada")
-                df_acao = acoes_raw[(acoes_raw["Pedido"].astype(str) == id_pedido) & (acoes_raw["RC"].astype(str) == rc_input)]
-                if not df_acao.empty:
-                    st.info(df_acao.iloc[0]["Texto"])
-                else:
-                    st.warning("Nenhuma ação cadastrada.")
+        pedido_selecionado = st.selectbox("📌 Selecione um pedido:", lista_pedidos)
+
+        if pedido_selecionado:
+
+            # 🔧 extrai apenas número do pedido
+            pedido_numero = pedido_selecionado.split(" - ")[0]
+
+            # =========================
+            # ITENS
+            # =========================
+            itens_pedido = itens[itens["Pedido"].astype(str) == pedido_numero].copy()
+
+            if "RC" in itens_pedido.columns:
+                itens_pedido = itens_pedido.drop(columns=["RC"])
+
+            itens_pedido = itens_pedido.rename(columns={
+                "Pedido2": "Qtde",
+                "Soma de Valor": "Valor (R$)"
+            })
+
+            for col in ["Valor (R$)", "Soma de Valores"]:
+                if col in itens_pedido.columns:
+                    itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
+
+            if "Previsão Final" in itens_pedido.columns:
+                itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
+
+            st.subheader("📦 Itens do Pedido")
+
+            st.dataframe(itens_pedido, use_container_width=True, hide_index=True)
+
+            # =========================
+            # AÇÃO
+            # =========================
+            acoes_pedido = acoes[
+                (acoes["Pedido"].astype(str) == pedido_numero) &
+                (acoes["RC"].astype(str) == rc_input)
+            ]
+
+            if not acoes_pedido.empty:
+
+                texto = limpar_texto(acoes_pedido.iloc[0]["Texto"])
+
+                st.subheader("🚨 Ação Recomendada")
+
+                st.markdown(
+                    f"""
+                    <div style="
+                        background-color:#e8f4ff;
+                        border:1px solid #b3daff;
+                        padding:16px;
+                        border-radius:10px;
+                        white-space:pre-line;
+                        line-height:1.5;
+                    ">
+                        {texto}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            else:
+                st.info("Nenhuma ação cadastrada para este pedido.")
+
     else:
         st.error("Nenhum pedido encontrado para este RC.")
