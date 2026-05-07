@@ -439,9 +439,10 @@ if rc_input:
         </div>
         """
 
-        st.markdown(
+        st.components.v1.html(
             html,
-            unsafe_allow_html=True
+            height=500,
+            scrolling=True
         )
 
         # =========================
