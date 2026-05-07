@@ -456,7 +456,6 @@ if rc_input:
         </html>
         """
 
-        # FIXO
         components.html(
             html,
             height=500,
@@ -718,13 +717,11 @@ margin-top:6px;
             </html>
             """
 
-            # AUTO AJUSTE SOMENTE ITENS
-            altura_itens = (len(itens_pedido) * 42) + 95
-
+            # ORIGINAL
             components.html(
                 html_itens,
-                height=altura_itens,
-                scrolling=False
+                height=500,
+                scrolling=True
             )
 
             # =========================
