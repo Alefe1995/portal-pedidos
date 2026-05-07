@@ -47,15 +47,20 @@ section[data-testid="stSidebar"] {
     margin-top:10px;
 }
 
-/* INPUTS */
+/* INPUT TEXTO */
 .stTextInput input {
     border-radius:10px !important;
-    border:1px solid #d1d5db !important;
+    border:1px solid #cbd5e1 !important;
     padding:10px !important;
+    background:white !important;
 }
 
-.stSelectbox div[data-baseweb="select"] {
+/* SELECTBOX */
+div[data-baseweb="select"] > div {
     border-radius:10px !important;
+    border:1px solid #cbd5e1 !important;
+    background:white !important;
+    min-height:42px;
 }
 
 /* DATAFRAME */
@@ -66,40 +71,9 @@ div[data-testid="stDataFrame"] {
     background:white;
 }
 
-/* ALERTA */
+/* ALERTAS */
 .stAlert {
     border-radius:12px;
-}
-
-/* BOX PEDIDO */
-.pedido-box {
-    background:white;
-    border:1px solid #dfe3eb;
-    border-radius:14px;
-    padding:20px;
-    margin-top:10px;
-    margin-bottom:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.05);
-}
-
-.pedido-label {
-    font-size:12px;
-    color:#6b7280;
-    font-weight:600;
-    text-transform:uppercase;
-    margin-bottom:8px;
-}
-
-.pedido-numero {
-    font-size:30px;
-    font-weight:700;
-    color:#111827;
-}
-
-.pedido-cliente {
-    font-size:15px;
-    color:#6b7280;
-    margin-top:6px;
 }
 
 </style>
@@ -185,7 +159,7 @@ def limpar_texto(texto):
 
     texto = texto.replace("_x000D_", "\n")
     texto = texto.replace("\r\n", "\n")
-    texto = texto.replace("\r", "\n")
+    texto = textო.replace("\r", "\n")
 
     linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
 
@@ -349,26 +323,46 @@ if rc_input:
                 pedidos_view["Pedido"].astype(str) == pedido_numero
             ].iloc[0]
 
-            st.markdown(
-                f"""
-                <div class='pedido-box'>
+            # BOX VISUAL
+            st.markdown(f"""
+<div style="
+background:white;
+border:1px solid #dfe3eb;
+border-radius:14px;
+padding:20px;
+margin-top:15px;
+margin-bottom:25px;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+">
 
-                    <div class='pedido-label'>
-                        Pedido Selecionado
-                    </div>
+<div style="
+font-size:12px;
+color:#6b7280;
+font-weight:600;
+text-transform:uppercase;
+margin-bottom:8px;
+">
+Pedido Selecionado
+</div>
 
-                    <div class='pedido-numero'>
-                        #{pedido_numero}
-                    </div>
+<div style="
+font-size:30px;
+font-weight:700;
+color:#111827;
+">
+#{pedido_numero}
+</div>
 
-                    <div class='pedido-cliente'>
-                        {pedido_info['Cliente']}
-                    </div>
+<div style="
+font-size:15px;
+color:#6b7280;
+margin-top:6px;
+">
+{pedido_info['Cliente']}
+</div>
 
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+</div>
+""", unsafe_allow_html=True)
 
             # =========================
             # ITENS
@@ -385,7 +379,7 @@ if rc_input:
                 "Soma de Valor": "Valor (R$)"
             })
 
-            # FORMATAÇÃO
+            # FORMATAÇÕES
             for col in ["Valor (R$)", "Soma de Valores"]:
 
                 if col in itens_pedido.columns:
@@ -421,7 +415,7 @@ if rc_input:
             ]
 
             # =========================
-            # AÇÃO RECOMENDADA
+            # TÍTULO AÇÃO
             # =========================
             st.markdown(
                 "<div class='section-title'>🚨 Ação Recomendada</div>",
