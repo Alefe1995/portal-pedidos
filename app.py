@@ -367,10 +367,100 @@ if rc_input:
         # TABELA HTML
         # =========================
         html = """
+
+        html = """
+        <style>
+        
+        body{
+            margin:0;
+            padding:0;
+            background:white;
+            font-family:Arial, sans-serif;
+        }
+        
+        .tabela-container{
+            width:100%;
+            border:1px solid #e5e7eb;
+            border-radius:14px;
+            overflow:hidden;
+            background:white;
+        }
+        
+        .tabela-pedidos{
+            width:100%;
+            border-collapse:collapse;
+        }
+        
+        .tabela-pedidos thead{
+            background:#f8fafc;
+        }
+        
+        .tabela-pedidos th{
+            padding:14px;
+            text-align:left;
+            font-size:12px;
+            text-transform:uppercase;
+            color:#6b7280;
+            border-bottom:1px solid #e5e7eb;
+        }
+        
+        .tabela-pedidos td{
+            padding:14px;
+            border-bottom:1px solid #f1f5f9;
+            font-size:14px;
+            color:#111827;
+        }
+        
+        .tabela-pedidos tbody tr:hover{
+            background:#f9fafb;
+        }
+        
+        .pedido-highlight{
+            color:#dc2626;
+            font-weight:700;
+        }
+        
+        .badge-liberado{
+            background:#dcfce7;
+            color:#166534;
+            padding:5px 12px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:600;
+        }
+        
+        .badge-conferido{
+            background:#dbeafe;
+            color:#1d4ed8;
+            padding:5px 12px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:600;
+        }
+        
+        .badge-pendente{
+            background:#fef3c7;
+            color:#92400e;
+            padding:5px 12px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:600;
+        }
+        
+        .motivo-highlight{
+            font-weight:600;
+        }
+        
+        .valor-highlight{
+            font-weight:700;
+        }
+        
+        </style>
+        
         <div class="tabela-container">
-
+        
         <table class="tabela-pedidos">
-
+        
         <thead>
         <tr>
             <th>Pedido</th>
@@ -382,7 +472,7 @@ if rc_input:
             <th>Valor (R$)</th>
         </tr>
         </thead>
-
+        
         <tbody>
         """
 
