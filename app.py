@@ -169,7 +169,6 @@ acoes = pd.read_excel("Ação.xlsx")
 # RC
 # =========================
 rc_input = st.text_input("🔎 Digite seu código RC:")
-
 # =========================
 # PROCESSAMENTO
 # =========================
@@ -310,6 +309,8 @@ if rc_input:
 
         thead{
             background:#f8fafc;
+            position:sticky;
+            top:0;
         }
 
         th{
@@ -456,9 +457,12 @@ if rc_input:
         </html>
         """
 
+        # 5 LINHAS FIXAS
+        altura_pedidos = 320
+
         components.html(
             html,
-            height=500,
+            height=altura_pedidos,
             scrolling=True
         )
 
@@ -717,10 +721,13 @@ margin-top:6px;
             </html>
             """
 
+            # AUTO AJUSTE SEM ESPAÇO
+            altura_itens = (len(itens_pedido) * 45) + 75
+
             components.html(
                 html_itens,
-                height=500,
-                scrolling=True
+                height=altura_itens,
+                scrolling=False
             )
 
             # =========================
