@@ -12,129 +12,107 @@ st.set_page_config(
 # =========================
 # CSS GLOBAL
 # =========================
-st.markdown(
-    """
-    <style>
+st.markdown("""
+<style>
 
-    /* FUNDO */
-    .stApp {
-        background-color: #f5f7fb;
-    }
+/* FUNDO */
+.stApp {
+    background-color: #f5f7fb;
+}
 
-    /* HEADER */
-    .top-header {
-        background-color:#c00000;
-        padding:14px 20px;
-        border-radius:0px;
-        margin-bottom:25px;
-        color:white;
-        font-size:26px;
-        font-weight:700;
-        box-shadow:0 2px 8px rgba(0,0,0,0.15);
-    }
+/* HEADER */
+.top-header {
+    background-color:#c00000;
+    padding:16px 24px;
+    border-radius:12px;
+    margin-bottom:25px;
+    color:white;
+    font-size:30px;
+    font-weight:700;
+    box-shadow:0 3px 10px rgba(0,0,0,0.10);
+}
 
-    /* CARDS */
-    .card {
-        background:white;
-        padding:18px;
-        border-radius:14px;
-        border:1px solid #e6e9ef;
-        box-shadow:0 2px 10px rgba(0,0,0,0.04);
-        margin-bottom:18px;
-    }
+/* SIDEBAR */
+section[data-testid="stSidebar"] {
+    background:#ffffff;
+    border-right:1px solid #e5e7eb;
+}
 
-    /* TITULOS */
-    .section-title {
-        font-size:18px;
-        font-weight:700;
-        color:#1f2937;
-        margin-bottom:12px;
-    }
+/* TITULOS */
+.section-title {
+    font-size:22px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:15px;
+    margin-top:10px;
+}
 
-    /* PEDIDO SELECIONADO */
-    .pedido-box {
-        background:white;
-        border:1px solid #e5e7eb;
-        border-radius:14px;
-        padding:18px;
-        margin-top:10px;
-        margin-bottom:20px;
-        box-shadow:0 2px 10px rgba(0,0,0,0.04);
-    }
+/* INPUTS */
+.stTextInput input {
+    border-radius:10px !important;
+    border:1px solid #d1d5db !important;
+    padding:10px !important;
+}
 
-    .pedido-label {
-        font-size:12px;
-        color:#6b7280;
-        font-weight:600;
-        text-transform:uppercase;
-        margin-bottom:4px;
-    }
+.stSelectbox div[data-baseweb="select"] {
+    border-radius:10px !important;
+}
 
-    .pedido-numero {
-        font-size:28px;
-        font-weight:700;
-        color:#111827;
-    }
+/* DATAFRAME */
+div[data-testid="stDataFrame"] {
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    overflow:hidden;
+    background:white;
+}
 
-    .pedido-cliente {
-        font-size:15px;
-        color:#6b7280;
-        margin-top:5px;
-    }
+/* ALERTA */
+.stAlert {
+    border-radius:12px;
+}
 
-    /* STATUS */
-    .status-liberado {
-        background:#d1fae5;
-        color:#065f46;
-        padding:5px 12px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:600;
-        display:inline-block;
-    }
+/* BOX PEDIDO */
+.pedido-box {
+    background:white;
+    border:1px solid #dfe3eb;
+    border-radius:14px;
+    padding:20px;
+    margin-top:10px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
 
-    .status-conferido {
-        background:#dbeafe;
-        color:#1d4ed8;
-        padding:5px 12px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:600;
-        display:inline-block;
-    }
+.pedido-label {
+    font-size:12px;
+    color:#6b7280;
+    font-weight:600;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
 
-    .status-pendente {
-        background:#fef3c7;
-        color:#92400e;
-        padding:5px 12px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:600;
-        display:inline-block;
-    }
+.pedido-numero {
+    font-size:30px;
+    font-weight:700;
+    color:#111827;
+}
 
-    /* SIDEBAR */
-    section[data-testid="stSidebar"] {
-        background:#ffffff;
-        border-right:1px solid #e5e7eb;
-    }
+.pedido-cliente {
+    font-size:15px;
+    color:#6b7280;
+    margin-top:6px;
+}
 
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+</style>
+""", unsafe_allow_html=True)
 
 # =========================
 # HEADER
 # =========================
-st.markdown(
-    """
-    <div class='top-header'>
-        Portal de Pedidos
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class='top-header'>
+    Portal de Pedidos
+</div>
+""", unsafe_allow_html=True)
 
 # =========================
 # FUNÇÕES
@@ -213,7 +191,6 @@ def limpar_texto(texto):
 
     return "\n".join(linhas)
 
-
 # =========================
 # DADOS
 # =========================
@@ -222,13 +199,9 @@ itens = pd.read_excel("Itens.xlsx")
 acoes = pd.read_excel("Ação.xlsx")
 
 # =========================
-# CARD BUSCA RC
+# RC
 # =========================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-
 rc_input = st.text_input("🔎 Digite seu código RC:")
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # PROCESSAMENTO
@@ -243,7 +216,7 @@ if rc_input:
         if "RC" in base.columns:
             base = base.drop(columns=["RC"])
 
-        # RENOMEIA COLUNAS
+        # RENOMEIA
         base = base.rename(columns={
             "Pedido2": "Qtde",
             "Soma de Valor": "Valor (R$)"
@@ -263,7 +236,7 @@ if rc_input:
         # =========================
         # SIDEBAR
         # =========================
-        st.sidebar.image("download.png", width=120)
+        st.sidebar.image("download.png", width=150)
 
         st.sidebar.markdown("## 🔎 Filtros")
 
@@ -307,6 +280,7 @@ if rc_input:
         df3 = df2.copy()
 
         if cliente:
+
             df3 = df3[
                 df3["Cliente"].str.contains(
                     cliente,
@@ -332,22 +306,21 @@ if rc_input:
         )
 
         # =========================
-        # CARD PEDIDOS
+        # TÍTULO PEDIDOS
         # =========================
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-
         st.markdown(
             "<div class='section-title'>🧾 Seus Pedidos</div>",
             unsafe_allow_html=True
         )
 
+        # =========================
+        # TABELA PEDIDOS
+        # =========================
         st.dataframe(
             pedidos_view.drop(columns=["Valor_num"]),
             use_container_width=True,
             hide_index=True
         )
-
-        st.markdown("</div>", unsafe_allow_html=True)
 
         # =========================
         # SELECT PEDIDO
@@ -366,7 +339,7 @@ if rc_input:
         )
 
         # =========================
-        # PEDIDO
+        # PEDIDO SELECIONADO
         # =========================
         if pedido_selecionado:
 
@@ -376,9 +349,6 @@ if rc_input:
                 pedidos_view["Pedido"].astype(str) == pedido_numero
             ].iloc[0]
 
-            # =========================
-            # BOX PEDIDO
-            # =========================
             st.markdown(
                 f"""
                 <div class='pedido-box'>
@@ -415,7 +385,7 @@ if rc_input:
                 "Soma de Valor": "Valor (R$)"
             })
 
-            # FORMATAÇÕES
+            # FORMATAÇÃO
             for col in ["Valor (R$)", "Soma de Valores"]:
 
                 if col in itens_pedido.columns:
@@ -425,22 +395,21 @@ if rc_input:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
             # =========================
-            # CARD ITENS
+            # TÍTULO ITENS
             # =========================
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-
             st.markdown(
                 "<div class='section-title'>📦 Itens do Pedido</div>",
                 unsafe_allow_html=True
             )
 
+            # =========================
+            # TABELA ITENS
+            # =========================
             st.dataframe(
                 itens_pedido,
                 use_container_width=True,
                 hide_index=True
             )
-
-            st.markdown("</div>", unsafe_allow_html=True)
 
             # =========================
             # AÇÕES
@@ -451,17 +420,18 @@ if rc_input:
                 (acoes["RC"].astype(str) == rc_input)
             ]
 
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
+            # =========================
+            # AÇÃO RECOMENDADA
+            # =========================
+            st.markdown(
+                "<div class='section-title'>🚨 Ação Recomendada</div>",
+                unsafe_allow_html=True
+            )
 
             if not acoes_pedido.empty:
 
                 texto = limpar_texto(
                     acoes_pedido.iloc[0]["Texto"]
-                )
-
-                st.markdown(
-                    "<div class='section-title'>🚨 Ação Recomendada</div>",
-                    unsafe_allow_html=True
                 )
 
                 st.info(texto)
@@ -471,8 +441,6 @@ if rc_input:
                 st.info(
                     "Nenhuma ação cadastrada para este pedido."
                 )
-
-            st.markdown("</div>", unsafe_allow_html=True)
 
     else:
 
