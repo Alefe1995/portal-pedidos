@@ -281,7 +281,7 @@ if rc_input:
         )
 
         # =========================
-        # HTML TABELA
+        # HTML TABELA PEDIDOS
         # =========================
         html = """
         <html>
@@ -536,6 +536,10 @@ margin-top:6px;
                 itens["Pedido"].astype(str) == pedido_numero
             ].copy()
 
+            # REMOVE COLUNA PEDIDO
+            if "Pedido" in itens_pedido.columns:
+                itens_pedido = itens_pedido.drop(columns=["Pedido"])
+
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
 
@@ -552,15 +556,171 @@ margin-top:6px;
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
+            # =========================
+            # TITULO ITENS
+            # =========================
             st.markdown(
                 "<div class='section-title'>📦 Itens do Pedido</div>",
                 unsafe_allow_html=True
             )
 
-            st.dataframe(
-                itens_pedido,
-                use_container_width=True,
-                hide_index=True
+            # =========================
+            # HTML ITENS
+            # =========================
+            html_itens = """
+            <html>
+
+            <head>
+
+            <style>
+
+            body{
+                font-family:Arial;
+                background:white;
+                margin:0;
+                padding:0;
+            }
+
+            .table-box{
+                border:1px solid #e5e7eb;
+                border-radius:14px;
+                overflow:hidden;
+            }
+
+            table{
+                width:100%;
+                border-collapse:collapse;
+            }
+
+            thead{
+                background:#f8fafc;
+            }
+
+            th{
+                padding:14px;
+                text-align:left;
+                font-size:12px;
+                text-transform:uppercase;
+                color:#6b7280;
+                border-bottom:1px solid #e5e7eb;
+            }
+
+            td{
+                padding:14px;
+                border-bottom:1px solid #f1f5f9;
+                font-size:14px;
+                color:#111827;
+            }
+
+            tr:hover{
+                background:#f9fafb;
+            }
+
+            .valor{
+                font-weight:700;
+            }
+
+            .reservado{
+                background:#dcfce7;
+                color:#166534;
+                padding:5px 12px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:600;
+            }
+
+            .parcial{
+                background:#fef3c7;
+                color:#92400e;
+                padding:5px 12px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:600;
+            }
+
+            .semreserva{
+                background:#fee2e2;
+                color:#991b1b;
+                padding:5px 12px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:600;
+            }
+
+            </style>
+
+            </head>
+
+            <body>
+
+            <div class="table-box">
+
+            <table>
+
+            <thead>
+            <tr>
+            """
+
+            for coluna in itens_pedido.columns:
+                html_itens += f"<th>{coluna}</th>"
+
+            html_itens += """
+            </tr>
+            </thead>
+
+            <tbody>
+            """
+
+            for _, row in itens_pedido.iterrows():
+
+                html_itens += "<tr>"
+
+                for coluna in itens_pedido.columns:
+
+                    valor = row[coluna]
+
+                    # STATUS RESERVA
+                    if coluna == "Status Reserva":
+
+                        status_reserva = str(valor).lower()
+
+                        if "reservado" in status_reserva:
+
+                            valor = f"<span class='reservado'>{valor}</span>"
+
+                        elif "parcial" in status_reserva:
+
+                            valor = f"<span class='parcial'>{valor}</span>"
+
+                        else:
+
+                            valor = f"<span class='semreserva'>{valor}</span>"
+
+                    # VALOR
+                    elif "Valor" in coluna:
+
+                        valor = f"<span class='valor'>{valor}</span>"
+
+                    html_itens += f"<td>{valor}</td>"
+
+                html_itens += "</tr>"
+
+            html_itens += """
+            </tbody>
+
+            </table>
+
+            </div>
+
+            </body>
+
+            </html>
+            """
+
+            components.html(
+                html_itens,
+                height=500,
+                scrolling=True
             )
 
             # =========================
