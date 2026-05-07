@@ -1,6 +1,3 @@
-# Portal de Pedidos — Layout Profissional estilo Base44
-
-```python
 import pandas as pd
 import streamlit as st
 
@@ -85,7 +82,7 @@ st.markdown(
         margin-top:5px;
     }
 
-    /* BADGES STATUS */
+    /* STATUS */
     .status-liberado {
         background:#d1fae5;
         color:#065f46;
@@ -122,12 +119,6 @@ st.markdown(
         border-right:1px solid #e5e7eb;
     }
 
-    /* INPUTS */
-    .stTextInput input,
-    .stSelectbox div[data-baseweb="select"] {
-        border-radius:10px !important;
-    }
-
     </style>
     """,
     unsafe_allow_html=True
@@ -149,7 +140,9 @@ st.markdown(
 # FUNÇÕES
 # =========================
 def para_float(valor):
+
     try:
+
         if pd.isna(valor):
             return 0
 
@@ -166,13 +159,17 @@ def para_float(valor):
 
 
 def formatar_moeda(valor):
+
     try:
+
         if pd.isna(valor):
             return ""
 
         if isinstance(valor, (int, float)):
             valor_float = float(valor)
+
         else:
+
             valor_str = str(valor).replace("R$", "").strip()
 
             if "," in valor_str:
@@ -187,7 +184,9 @@ def formatar_moeda(valor):
 
 
 def formatar_data(valor):
+
     try:
+
         data = pd.to_datetime(valor, errors="coerce")
 
         if pd.notna(data):
@@ -200,10 +199,12 @@ def formatar_data(valor):
 
 
 def limpar_texto(texto):
+
     if pd.isna(texto):
         return ""
 
     texto = str(texto)
+
     texto = texto.replace("_x000D_", "\n")
     texto = texto.replace("\r\n", "\n")
     texto = texto.replace("\r", "\n")
@@ -211,19 +212,6 @@ def limpar_texto(texto):
     linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
 
     return "\n".join(linhas)
-
-
-def badge_status(status):
-
-    status = str(status).lower()
-
-    if "liberado" in status:
-        return "<span class='status-liberado'>Liberado</span>"
-
-    if "conferido" in status:
-        return "<span class='status-conferido'>Conferido</span>"
-
-    return "<span class='status-pendente'>Pendente</span>"
 
 
 # =========================
@@ -234,7 +222,7 @@ itens = pd.read_excel("Itens.xlsx")
 acoes = pd.read_excel("Ação.xlsx")
 
 # =========================
-# INPUT RC
+# CARD BUSCA RC
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 
@@ -251,16 +239,21 @@ if rc_input:
 
     if not base.empty:
 
+        # REMOVE RC
         if "RC" in base.columns:
             base = base.drop(columns=["RC"])
 
+        # RENOMEIA COLUNAS
         base = base.rename(columns={
             "Pedido2": "Qtde",
             "Soma de Valor": "Valor (R$)"
         })
 
-        # FORMATAÇÃO
+        # =========================
+        # FORMATAÇÕES
+        # =========================
         for col in ["Valor (R$)", "Soma de Valores"]:
+
             if col in base.columns:
                 base[col] = base[col].apply(formatar_moeda)
 
@@ -275,8 +268,16 @@ if rc_input:
         st.sidebar.markdown("## 🔎 Filtros")
 
         # STATUS
-        status_list = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
-        status = st.sidebar.selectbox("Status", ["Todos"] + status_list)
+        status_list = (
+            sorted(base["Status"].dropna().unique())
+            if "Status" in base.columns
+            else []
+        )
+
+        status = st.sidebar.selectbox(
+            "Status",
+            ["Todos"] + status_list
+        )
 
         df1 = base.copy()
 
@@ -284,8 +285,16 @@ if rc_input:
             df1 = df1[df1["Status"] == status]
 
         # MOTIVO
-        motivo_list = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
-        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_list)
+        motivo_list = (
+            sorted(df1["Motivo"].dropna().unique())
+            if "Motivo" in df1.columns
+            else []
+        )
+
+        motivo = st.sidebar.selectbox(
+            "Motivo",
+            ["Todos"] + motivo_list
+        )
 
         df2 = df1.copy()
 
@@ -298,7 +307,13 @@ if rc_input:
         df3 = df2.copy()
 
         if cliente:
-            df3 = df3[df3["Cliente"].str.contains(cliente, case=False, na=False)]
+            df3 = df3[
+                df3["Cliente"].str.contains(
+                    cliente,
+                    case=False,
+                    na=False
+                )
+            ]
 
         pedidos_view = df3
 
@@ -310,8 +325,11 @@ if rc_input:
         valor_total = pedidos_view["Valor_num"].sum()
 
         st.sidebar.markdown("---")
-        st.sidebar.markdown(f"### 💰 Valor Total")
-        st.sidebar.success(formatar_moeda(valor_total))
+        st.sidebar.markdown("### 💰 Valor Total")
+
+        st.sidebar.success(
+            formatar_moeda(valor_total)
+        )
 
         # =========================
         # CARD PEDIDOS
@@ -347,6 +365,9 @@ if rc_input:
             lista_pedidos
         )
 
+        # =========================
+        # PEDIDO
+        # =========================
         if pedido_selecionado:
 
             pedido_numero = pedido_selecionado.split(" - ")[0]
@@ -356,14 +377,24 @@ if rc_input:
             ].iloc[0]
 
             # =========================
-            # PEDIDO SELECIONADO
+            # BOX PEDIDO
             # =========================
             st.markdown(
                 f"""
                 <div class='pedido-box'>
-                    <div class='pedido-label'>Pedido Selecionado</div>
-                    <div class='pedido-numero'>#{pedido_numero}</div>
-                    <div class='pedido-cliente'>{pedido_info['Cliente']}</div>
+
+                    <div class='pedido-label'>
+                        Pedido Selecionado
+                    </div>
+
+                    <div class='pedido-numero'>
+                        #{pedido_numero}
+                    </div>
+
+                    <div class='pedido-cliente'>
+                        {pedido_info['Cliente']}
+                    </div>
+
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -384,13 +415,18 @@ if rc_input:
                 "Soma de Valor": "Valor (R$)"
             })
 
+            # FORMATAÇÕES
             for col in ["Valor (R$)", "Soma de Valores"]:
+
                 if col in itens_pedido.columns:
                     itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
 
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
+            # =========================
+            # CARD ITENS
+            # =========================
             st.markdown("<div class='card'>", unsafe_allow_html=True)
 
             st.markdown(
@@ -410,7 +446,8 @@ if rc_input:
             # AÇÕES
             # =========================
             acoes_pedido = acoes[
-                (acoes["Pedido"].astype(str) == pedido_numero) &
+                (acoes["Pedido"].astype(str) == pedido_numero)
+                &
                 (acoes["RC"].astype(str) == rc_input)
             ]
 
@@ -418,7 +455,9 @@ if rc_input:
 
             if not acoes_pedido.empty:
 
-                texto = limpar_texto(acoes_pedido.iloc[0]["Texto"])
+                texto = limpar_texto(
+                    acoes_pedido.iloc[0]["Texto"]
+                )
 
                 st.markdown(
                     "<div class='section-title'>🚨 Ação Recomendada</div>",
@@ -428,68 +467,15 @@ if rc_input:
                 st.info(texto)
 
             else:
-                st.info("Nenhuma ação cadastrada para este pedido.")
+
+                st.info(
+                    "Nenhuma ação cadastrada para este pedido."
+                )
 
             st.markdown("</div>", unsafe_allow_html=True)
 
     else:
-        st.error("Nenhum pedido encontrado para este RC.")
-```
 
----
-
-# O que mudou visualmente
-
-## ✅ Cards estilo Base44
-
-Cada área agora fica dentro de um container visual:
-
-* tabela de pedidos
-* pedido selecionado
-* itens
-* ação
-
----
-
-## ✅ Fundo cinza claro moderno
-
-Mesmo estilo visual da imagem que você mostrou.
-
----
-
-## ✅ Status coloridos
-
-* Liberado → verde
-* Conferido → azul
-* Pendente → amarelo
-
----
-
-## ✅ Pedido selecionado profissional
-
-Agora aparece em destaque:
-
-* número grande
-* nome do cliente
-* box separado
-
----
-
-## ✅ Sidebar mais limpa
-
-Visual semelhante a ERP / dashboard.
-
----
-
-## Próximo upgrade recomendado
-
-Depois disso, o próximo nível seria:
-
-* substituir `st.dataframe` por tabela HTML customizada
-* aplicar cores reais nos status dentro da tabela
-* adicionar hover
-* adicionar clique direto na linha
-* adicionar métricas no topo
-* adicionar gráficos
-
-Aí seu sistema começa realmente a ficar com cara de software profissional.
+        st.error(
+            "Nenhum pedido encontrado para este RC."
+        )
