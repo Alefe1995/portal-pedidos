@@ -47,7 +47,7 @@ section[data-testid="stSidebar"] {
     margin-top:10px;
 }
 
-/* INPUT TEXTO */
+/* INPUT */
 .stTextInput input {
     border-radius:10px !important;
     border:1px solid #cbd5e1 !important;
@@ -55,7 +55,7 @@ section[data-testid="stSidebar"] {
     background:white !important;
 }
 
-/* SELECTBOX */
+/* SELECT */
 div[data-baseweb="select"] > div {
     border-radius:10px !important;
     border:1px solid #cbd5e1 !important;
@@ -69,18 +69,19 @@ div[data-baseweb="select"] > div {
 }
 
 /* TABELA */
-.tabela-wrapper {
+.tabela-container {
     background:white;
+    border:1px solid #e5e7eb;
     border-radius:14px;
     overflow:hidden;
-    border:1px solid #e5e7eb;
     margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
 }
 
 .tabela-pedidos {
     width:100%;
     border-collapse:collapse;
-    font-size:14px;
+    font-family:Arial, sans-serif;
 }
 
 .tabela-pedidos thead {
@@ -88,17 +89,19 @@ div[data-baseweb="select"] > div {
 }
 
 .tabela-pedidos th {
-    text-align:left;
     padding:14px;
-    color:#6b7280;
+    text-align:left;
     font-size:12px;
     text-transform:uppercase;
+    color:#6b7280;
     border-bottom:1px solid #e5e7eb;
 }
 
 .tabela-pedidos td {
     padding:14px;
     border-bottom:1px solid #f1f5f9;
+    font-size:14px;
+    color:#111827;
 }
 
 .tabela-pedidos tbody tr:hover {
@@ -112,28 +115,28 @@ div[data-baseweb="select"] > div {
 }
 
 /* STATUS */
-.status-liberado {
+.badge-liberado {
     background:#dcfce7;
     color:#166534;
-    padding:5px 10px;
+    padding:5px 12px;
     border-radius:999px;
     font-size:12px;
     font-weight:600;
 }
 
-.status-conferido {
+.badge-conferido {
     background:#dbeafe;
     color:#1d4ed8;
-    padding:5px 10px;
+    padding:5px 12px;
     border-radius:999px;
     font-size:12px;
     font-weight:600;
 }
 
-.status-pendente {
+.badge-pendente {
     background:#fef3c7;
     color:#92400e;
-    padding:5px 10px;
+    padding:5px 12px;
     border-radius:999px;
     font-size:12px;
     font-weight:600;
@@ -364,8 +367,9 @@ if rc_input:
         # TABELA HTML
         # =========================
         html = """
-        <div class='tabela-wrapper'>
-        <table class='tabela-pedidos'>
+        <div class="tabela-container">
+
+        <table class="tabela-pedidos">
 
         <thead>
         <tr>
@@ -387,18 +391,18 @@ if rc_input:
             status = str(row["Status"]).lower()
 
             if "liberado" in status:
-                status_html = f"<span class='status-liberado'>{row['Status']}</span>"
+                status_html = f"<span class='badge-liberado'>{row['Status']}</span>"
 
             elif "conferido" in status:
-                status_html = f"<span class='status-conferido'>{row['Status']}</span>"
+                status_html = f"<span class='badge-conferido'>{row['Status']}</span>"
 
             else:
-                status_html = f"<span class='status-pendente'>{row['Status']}</span>"
+                status_html = f"<span class='badge-pendente'>{row['Status']}</span>"
 
             html += f"""
             <tr>
 
-                <td class='pedido-highlight'>
+                <td class="pedido-highlight">
                     {row['Pedido']}
                 </td>
 
@@ -414,7 +418,7 @@ if rc_input:
                     {status_html}
                 </td>
 
-                <td class='motivo-highlight'>
+                <td class="motivo-highlight">
                     {row['Motivo']}
                 </td>
 
@@ -422,7 +426,7 @@ if rc_input:
                     {row['Previsão']}
                 </td>
 
-                <td class='valor-highlight'>
+                <td class="valor-highlight">
                     {row['Valor (R$)']}
                 </td>
 
@@ -435,10 +439,9 @@ if rc_input:
         </div>
         """
 
-        st.components.v1.html(
+        st.markdown(
             html,
-            height=500,
-            scrolling=True
+            unsafe_allow_html=True
         )
 
         # =========================
