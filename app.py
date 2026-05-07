@@ -456,10 +456,12 @@ if rc_input:
         </html>
         """
 
+        altura_tabela = (len(itens_pedido) * 45) + 120
+        
         components.html(
-            html,
-            height=500,
-            scrolling=True
+            html_itens,
+            height=altura_tabela,
+            scrolling=False
         )
 
         # =========================
