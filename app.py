@@ -757,7 +757,24 @@ margin-top:6px;
                     acoes_pedido.iloc[0]["Texto"]
                 )
 
-                st.info(texto)
+                st.markdown(
+                    f"""
+                    <div style="
+                        background:white;
+                        border:1px solid #d1d5db;
+                        border-left:5px solid #f59e0b;
+                        padding:18px;
+                        border-radius:12px;
+                        line-height:1.7;
+                        white-space:pre-line;
+                        font-size:15px;
+                        color:#111827;
+                    ">
+                        {texto}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
             else:
 
