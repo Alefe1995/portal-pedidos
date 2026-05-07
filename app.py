@@ -69,17 +69,22 @@ div[data-baseweb="select"] > div {
 }
 
 /* TABELA */
+.tabela-wrapper {
+    background:white;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid #e5e7eb;
+    margin-bottom:20px;
+}
+
 .tabela-pedidos {
     width:100%;
     border-collapse:collapse;
-    background:white;
-    border-radius:12px;
-    overflow:hidden;
     font-size:14px;
 }
 
 .tabela-pedidos thead {
-    background:#f3f4f6;
+    background:#f8fafc;
 }
 
 .tabela-pedidos th {
@@ -136,7 +141,6 @@ div[data-baseweb="select"] > div {
 
 /* MOTIVO */
 .motivo-highlight {
-    color:#111827;
     font-weight:600;
 }
 
@@ -349,7 +353,7 @@ if rc_input:
         )
 
         # =========================
-        # TÍTULO
+        # TITULO
         # =========================
         st.markdown(
             "<div class='section-title'>🧾 Seus Pedidos</div>",
@@ -360,8 +364,8 @@ if rc_input:
         # TABELA HTML
         # =========================
         html = """
-
-        <table class="tabela-pedidos">
+        <div class='tabela-wrapper'>
+        <table class='tabela-pedidos'>
 
         <thead>
         <tr>
@@ -428,9 +432,14 @@ if rc_input:
         html += """
         </tbody>
         </table>
+        </div>
         """
 
-        st.markdown(html, unsafe_allow_html=True)
+        st.components.v1.html(
+            html,
+            height=500,
+            scrolling=True
+        )
 
         # =========================
         # SELECT PEDIDO
@@ -523,7 +532,7 @@ margin-top:6px;
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
             # =========================
-            # TÍTULO ITENS
+            # TITULO ITENS
             # =========================
             st.markdown(
                 "<div class='section-title'>📦 Itens do Pedido</div>",
