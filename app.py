@@ -63,17 +63,86 @@ div[data-baseweb="select"] > div {
     min-height:42px;
 }
 
-/* DATAFRAME */
-div[data-testid="stDataFrame"] {
-    border:1px solid #e5e7eb;
-    border-radius:12px;
-    overflow:hidden;
-    background:white;
-}
-
 /* ALERTAS */
 .stAlert {
     border-radius:12px;
+}
+
+/* TABELA */
+.tabela-pedidos {
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    font-size:14px;
+}
+
+.tabela-pedidos thead {
+    background:#f3f4f6;
+}
+
+.tabela-pedidos th {
+    text-align:left;
+    padding:14px;
+    color:#6b7280;
+    font-size:12px;
+    text-transform:uppercase;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.tabela-pedidos td {
+    padding:14px;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.tabela-pedidos tbody tr:hover {
+    background:#f9fafb;
+}
+
+/* PEDIDO */
+.pedido-highlight {
+    color:#dc2626;
+    font-weight:700;
+}
+
+/* STATUS */
+.status-liberado {
+    background:#dcfce7;
+    color:#166534;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.status-conferido {
+    background:#dbeafe;
+    color:#1d4ed8;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.status-pendente {
+    background:#fef3c7;
+    color:#92400e;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+/* MOTIVO */
+.motivo-highlight {
+    color:#111827;
+    font-weight:600;
+}
+
+/* VALOR */
+.valor-highlight {
+    font-weight:700;
 }
 
 </style>
@@ -159,7 +228,7 @@ def limpar_texto(texto):
 
     texto = texto.replace("_x000D_", "\n")
     texto = texto.replace("\r\n", "\n")
-    texto = textო.replace("\r", "\n")
+    texto = texto.replace("\r", "\n")
 
     linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
 
@@ -280,7 +349,7 @@ if rc_input:
         )
 
         # =========================
-        # TÍTULO PEDIDOS
+        # TÍTULO
         # =========================
         st.markdown(
             "<div class='section-title'>🧾 Seus Pedidos</div>",
@@ -288,13 +357,80 @@ if rc_input:
         )
 
         # =========================
-        # TABELA PEDIDOS
+        # TABELA HTML
         # =========================
-        st.dataframe(
-            pedidos_view.drop(columns=["Valor_num"]),
-            use_container_width=True,
-            hide_index=True
-        )
+        html = """
+
+        <table class="tabela-pedidos">
+
+        <thead>
+        <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>UF</th>
+            <th>Status</th>
+            <th>Motivo</th>
+            <th>Previsão</th>
+            <th>Valor (R$)</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        """
+
+        for _, row in pedidos_view.iterrows():
+
+            status = str(row["Status"]).lower()
+
+            if "liberado" in status:
+                status_html = f"<span class='status-liberado'>{row['Status']}</span>"
+
+            elif "conferido" in status:
+                status_html = f"<span class='status-conferido'>{row['Status']}</span>"
+
+            else:
+                status_html = f"<span class='status-pendente'>{row['Status']}</span>"
+
+            html += f"""
+            <tr>
+
+                <td class='pedido-highlight'>
+                    {row['Pedido']}
+                </td>
+
+                <td>
+                    {row['Cliente']}
+                </td>
+
+                <td>
+                    {row['UF']}
+                </td>
+
+                <td>
+                    {status_html}
+                </td>
+
+                <td class='motivo-highlight'>
+                    {row['Motivo']}
+                </td>
+
+                <td>
+                    {row['Previsão']}
+                </td>
+
+                <td class='valor-highlight'>
+                    {row['Valor (R$)']}
+                </td>
+
+            </tr>
+            """
+
+        html += """
+        </tbody>
+        </table>
+        """
+
+        st.markdown(html, unsafe_allow_html=True)
 
         # =========================
         # SELECT PEDIDO
@@ -323,7 +459,6 @@ if rc_input:
                 pedidos_view["Pedido"].astype(str) == pedido_numero
             ].iloc[0]
 
-            # BOX VISUAL
             st.markdown(f"""
 <div style="
 background:white;
@@ -379,7 +514,6 @@ margin-top:6px;
                 "Soma de Valor": "Valor (R$)"
             })
 
-            # FORMATAÇÕES
             for col in ["Valor (R$)", "Soma de Valores"]:
 
                 if col in itens_pedido.columns:
@@ -406,7 +540,7 @@ margin-top:6px;
             )
 
             # =========================
-            # AÇÕES
+            # AÇÃO
             # =========================
             acoes_pedido = acoes[
                 (acoes["Pedido"].astype(str) == pedido_numero)
@@ -414,9 +548,6 @@ margin-top:6px;
                 (acoes["RC"].astype(str) == rc_input)
             ]
 
-            # =========================
-            # TÍTULO AÇÃO
-            # =========================
             st.markdown(
                 "<div class='section-title'>🚨 Ação Recomendada</div>",
                 unsafe_allow_html=True
