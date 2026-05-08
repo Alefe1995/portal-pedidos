@@ -769,7 +769,6 @@ margin-top:6px;
                         white-space:pre-line;
                         font-size:15px;
                         color:#111827;
-
                     ">
                         {texto}
                     </div>
