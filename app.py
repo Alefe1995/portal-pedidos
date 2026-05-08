@@ -137,13 +137,15 @@ def formatar_data(valor):
 
         data = pd.to_datetime(valor, errors="coerce")
 
+        # SE FOR DATA
         if pd.notna(data):
             return data.strftime("%d/%m/%Y")
 
-        return ""
+        # SE FOR TEXTO
+        return str(valor)
 
     except:
-        return ""
+        return str(valor)
 
 
 def limpar_texto(texto):
