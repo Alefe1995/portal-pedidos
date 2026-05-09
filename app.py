@@ -21,26 +21,16 @@ st.markdown("""
     background-color: #f5f7fb;
 }
 
-/* REMOVE ESPAÇAMENTO PADRÃO */
-.block-container {
-    padding-top: 0rem !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-}
-
-/* HEADER FULL */
-.full-header {
-    position:relative;
-    left:-2rem;
-    top:-1rem;
-    width:calc(100% + 4rem);
-    height:74px;
-    background:#c00000;
-    display:flex;
-    align-items:center;
-    padding-left:34px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.15);
-    z-index:999;
+/* HEADER */
+.top-header {
+    background-color:#c00000;
+    padding:16px 24px;
+    border-radius:12px;
+    margin-bottom:25px;
+    color:white;
+    font-size:30px;
+    font-weight:700;
+    box-shadow:0 3px 10px rgba(0,0,0,0.10);
 }
 
 /* SIDEBAR */
@@ -86,16 +76,8 @@ div[data-baseweb="select"] > div {
 # HEADER
 # =========================
 st.markdown("""
-<div class="full-header">
-
-<div style="
-color:white;
-font-size:28px;
-font-weight:700;
-">
-Portal de Pedidos
-</div>
-
+<div class='top-header'>
+    Portal de Pedidos
 </div>
 """, unsafe_allow_html=True)
 
