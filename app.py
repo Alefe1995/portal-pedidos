@@ -278,6 +278,161 @@ if rc_input:
         )
 
         # =========================
+# CARDS RESUMO
+# =========================
+
+total_pedidos = len(pedidos_view)
+
+valor_total_cards = pedidos_view["Valor_num"].sum()
+
+liberados = len(
+    pedidos_view[
+        pedidos_view["Status"].astype(str).str.lower() == "liberado"
+    ]
+)
+
+criticos = len(
+    pedidos_view[
+        pedidos_view["Motivo"].astype(str).str.lower().isin([
+            "estoque",
+            "ag retorno comercial"
+        ])
+    ]
+)
+
+col1, col2, col3, col4 = st.columns(4)
+
+# PEDIDOS
+with col1:
+
+    st.markdown(f"""
+    <div style="
+        background:white;
+        padding:18px;
+        border-radius:14px;
+        border:1px solid #e5e7eb;
+        box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size:28px;">📦</div>
+
+        <div style="
+            font-size:28px;
+            font-weight:700;
+            color:#111827;
+            margin-top:8px;
+        ">
+            {total_pedidos}
+        </div>
+
+        <div style="
+            color:#6b7280;
+            font-size:14px;
+            margin-top:4px;
+        ">
+            Pedidos
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# VALOR
+with col2:
+
+    st.markdown(f"""
+    <div style="
+        background:white;
+        padding:18px;
+        border-radius:14px;
+        border:1px solid #e5e7eb;
+        box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size:28px;">💰</div>
+
+        <div style="
+            font-size:24px;
+            font-weight:700;
+            color:#111827;
+            margin-top:8px;
+        ">
+            R$ {valor_total_cards:,.0f}
+        </div>
+
+        <div style="
+            color:#6b7280;
+            font-size:14px;
+            margin-top:4px;
+        ">
+            Valor Total
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# LIBERADOS
+with col3:
+
+    st.markdown(f"""
+    <div style="
+        background:white;
+        padding:18px;
+        border-radius:14px;
+        border:1px solid #dcfce7;
+        box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size:28px;">🟢</div>
+
+        <div style="
+            font-size:28px;
+            font-weight:700;
+            color:#166534;
+            margin-top:8px;
+        ">
+            {liberados}
+        </div>
+
+        <div style="
+            color:#6b7280;
+            font-size:14px;
+            margin-top:4px;
+        ">
+            Liberados
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# CRÍTICOS
+with col4:
+
+    st.markdown(f"""
+    <div style="
+        background:white;
+        padding:18px;
+        border-radius:14px;
+        border:1px solid #fee2e2;
+        box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size:28px;">🔴</div>
+
+        <div style="
+            font-size:28px;
+            font-weight:700;
+            color:#991b1b;
+            margin-top:8px;
+        ">
+            {criticos}
+        </div>
+
+        <div style="
+            color:#6b7280;
+            font-size:14px;
+            margin-top:4px;
+        ">
+            Críticos
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+        # =========================
         # TITULO
         # =========================
         st.markdown(
