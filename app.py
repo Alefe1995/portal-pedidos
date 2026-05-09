@@ -783,7 +783,7 @@ margin-top:6px;
                 st.markdown(
                     f"""
                     <div style="
-                        background:white;
+                        background:#fffbeb;
                         border:1px solid #d1d5db;
                         border-left:5px solid #f59e0b;
                         padding:08px;
