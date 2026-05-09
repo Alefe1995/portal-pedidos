@@ -786,7 +786,7 @@ margin-top:6px;
                         background:white;
                         border:1px solid #d1d5db;
                         border-left:5px solid #f59e0b;
-                        padding:18px;
+                        padding:12px;
                         border-radius:12px;
                         line-height:1.7;
                         white-space:pre-line;
