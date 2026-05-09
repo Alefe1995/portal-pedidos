@@ -515,7 +515,7 @@ if rc_input:
 background:white;
 border:1px solid #dfe3eb;
 border-left:5px solid #e41e26;
-border-radius:10px;
+border-radius:08px;
 padding:20px;
 margin-top:15px;
 margin-bottom:25px;
@@ -523,7 +523,7 @@ box-shadow:0 2px 8px rgba(0,0,0,0.05);
 ">
 
 <div style="
-font-size:10px;
+font-size:12px;
 color:#6b7280;
 font-weight:600;
 text-transform:uppercase;
