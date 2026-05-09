@@ -90,22 +90,6 @@ margin-right:-1rem;
 ">
 
 <div style="
-width:38px;
-height:38px;
-background:rgba(255,255,255,0.18);
-border-radius:6px;
-display:flex;
-align-items:center;
-justify-content:center;
-color:white;
-font-size:20px;
-font-weight:bold;
-margin-right:18px;
-">
-A
-</div>
-
-<div style="
 color:white;
 font-size:28px;
 font-weight:700;
