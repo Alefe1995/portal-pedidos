@@ -745,7 +745,7 @@ margin-top:6px;
             """
 
             # AUTO AJUSTE
-            altura_itens = (len(itens_pedido) * 45) + 75
+            altura_itens = (len(itens_pedido) * 45) + 60
 
             components.html(
                 html_itens,
