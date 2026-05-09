@@ -147,13 +147,23 @@ def formatar_data(valor):
     except:
         return str(valor)
 
+
+def limpar_texto(texto):
+
+    if pd.isna(texto):
+        return ""
+
     texto = str(texto)
 
     texto = texto.replace("_x000D_", "\n")
     texto = texto.replace("\r\n", "\n")
     texto = texto.replace("\r", "\n")
 
-    linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
+    linhas = [
+        l.strip()
+        for l in texto.split("\n")
+        if l.strip() != ""
+    ]
 
     return "\n".join(linhas)
 
