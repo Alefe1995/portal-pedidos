@@ -471,7 +471,7 @@ if rc_input:
         # ATÉ 5 LINHAS = AUTO AJUSTE
         if quantidade_pedidos <= 5:
         
-            altura_pedidos = (quantidade_pedidos * 52) + 30
+            altura_pedidos = (quantidade_pedidos * 52) + 25
             scroll = False
         
         # MAIS DE 5 LINHAS = SCROLL
