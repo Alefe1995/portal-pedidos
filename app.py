@@ -521,7 +521,7 @@ if rc_input:
 background:white;
 border:1px solid #dfe3eb;
 border-left:5px solid #dc2626;
-border-radius:14px;
+border-radius:8px;
 padding:20px;
 margin-top:15px;
 margin-bottom:25px;
