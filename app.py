@@ -514,7 +514,7 @@ if rc_input:
 <div style="
 background:white;
 border:1px solid #dfe3eb;
-border-left:5px solid #c2626;
+border-left:5px solid #e41e26;
 border-radius:10px;
 padding:20px;
 margin-top:15px;
