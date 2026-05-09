@@ -520,6 +520,7 @@ if rc_input:
 <div style="
 background:white;
 border:1px solid #dfe3eb;
+border-left:5px solid #dc2626;
 border-radius:14px;
 padding:20px;
 margin-top:15px;
