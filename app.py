@@ -463,13 +463,27 @@ if rc_input:
         </html>
         """
 
-        # 5 LINHAS FIXAS
-        altura_pedidos = 320
-
+        # =========================
+        # ALTURA DINÂMICA
+        # =========================
+        quantidade_pedidos = len(pedidos_view)
+        
+        # ATÉ 5 LINHAS = AUTO AJUSTE
+        if quantidade_pedidos <= 5:
+        
+            altura_pedidos = (quantidade_pedidos * 52) + 70
+            scroll = False
+        
+        # MAIS DE 5 LINHAS = SCROLL
+        else:
+        
+            altura_pedidos = 330
+            scroll = True
+        
         components.html(
             html,
             height=altura_pedidos,
-            scrolling=True
+            scrolling=scroll
         )
 
         # =========================
