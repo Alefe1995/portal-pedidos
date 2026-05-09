@@ -523,7 +523,7 @@ box-shadow:0 2px 8px rgba(0,0,0,0.05);
 ">
 
 <div style="
-font-size:12px;
+font-size:10px;
 color:#6b7280;
 font-weight:600;
 text-transform:uppercase;
