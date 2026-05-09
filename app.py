@@ -137,19 +137,15 @@ def formatar_data(valor):
 
         data = pd.to_datetime(valor, errors="coerce")
 
+        # SE FOR DATA
         if pd.notna(data):
             return data.strftime("%d/%m/%Y")
 
+        # SE FOR TEXTO
         return str(valor)
 
     except:
         return str(valor)
-
-
-def limpar_texto(texto):
-
-    if pd.isna(texto):
-        return ""
 
     texto = str(texto)
 
@@ -157,14 +153,9 @@ def limpar_texto(texto):
     texto = texto.replace("\r\n", "\n")
     texto = texto.replace("\r", "\n")
 
-    linhas = [
-        l.strip()
-        for l in texto.split("\n")
-        if l.strip() != ""
-    ]
+    linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
 
     return "\n".join(linhas)
-
 
 # =========================
 # DADOS
@@ -178,17 +169,20 @@ acoes = pd.read_excel("Ação.xlsx")
 # =========================
 rc_input = st.text_input("🔎 Digite seu código RC:")
 
+# =========================
+# PROCESSAMENTO
+# =========================
 if rc_input:
 
-    base = pedidos[
-        pedidos["RC"].astype(str) == rc_input
-    ].copy()
+    base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
 
     if not base.empty:
 
+        # REMOVE RC
         if "RC" in base.columns:
             base = base.drop(columns=["RC"])
 
+        # RENOMEIA
         base = base.rename(columns={
             "Pedido2": "Qtde",
             "Soma de Valor": "Valor (R$)"
@@ -208,14 +202,16 @@ if rc_input:
         # =========================
         # SIDEBAR
         # =========================
-        st.sidebar.image("download.png", width=100)
+        st.sidebar.image("download.png", width=150)
 
-        st.sidebar.header("🔎 Filtros")
+        st.sidebar.markdown("## 🔎 Filtros")
 
         # STATUS
-        status_list = sorted(
-            base["Status"].dropna().unique()
-        ) if "Status" in base.columns else []
+        status_list = (
+            sorted(base["Status"].dropna().unique())
+            if "Status" in base.columns
+            else []
+        )
 
         status = st.sidebar.selectbox(
             "Status",
@@ -228,9 +224,11 @@ if rc_input:
             df1 = df1[df1["Status"] == status]
 
         # MOTIVO
-        motivo_list = sorted(
-            df1["Motivo"].dropna().unique()
-        ) if "Motivo" in df1.columns else []
+        motivo_list = (
+            sorted(df1["Motivo"].dropna().unique())
+            if "Motivo" in df1.columns
+            else []
+        )
 
         motivo = st.sidebar.selectbox(
             "Motivo",
@@ -243,7 +241,7 @@ if rc_input:
             df2 = df2[df2["Motivo"] == motivo]
 
         # CLIENTE
-        cliente = st.sidebar.text_input("Cliente (buscar)")
+        cliente = st.sidebar.text_input("Cliente")
 
         df3 = df2.copy()
 
@@ -257,171 +255,24 @@ if rc_input:
                 )
             ]
 
+        pedidos_view = df3
+
         # =========================
-        # CARDS RESUMO
+        # VALOR TOTAL
         # =========================
+        pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
 
-        total_pedidos = len(pedidos_view)
+        valor_total = pedidos_view["Valor_num"].sum()
 
-        valor_total_cards = pedidos_view["Valor_num"].sum()
+        st.sidebar.markdown("---")
+        st.sidebar.markdown("### 💰 Valor Total")
 
-        liberados = len(
-            pedidos_view[
-                pedidos_view["Status"].astype(str).str.lower() == "liberado"
-            ]
+        st.sidebar.success(
+            formatar_moeda(valor_total)
         )
 
-        criticos = len(
-            pedidos_view[
-                pedidos_view["Motivo"].astype(str).str.lower().isin([
-                    "estoque",
-                    "ag retorno comercial"
-                ])
-            ]
-        )
-
-        col1, col2, col3, col4 = st.columns(4)
-
         # =========================
-        # CARD PEDIDOS
-        # =========================
-        with col1:
-
-            st.markdown(f"""
-            <div style="
-                background:white;
-                padding:18px;
-                border-radius:14px;
-                border:1px solid #e5e7eb;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-                <div style="font-size:28px;">📦</div>
-
-                <div style="
-                    font-size:28px;
-                    font-weight:700;
-                    color:#111827;
-                    margin-top:8px;
-                ">
-                    {total_pedidos}
-                </div>
-
-                <div style="
-                    color:#6b7280;
-                    font-size:14px;
-                    margin-top:4px;
-                ">
-                    Pedidos
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # =========================
-        # CARD VALOR
-        # =========================
-        with col2:
-
-            st.markdown(f"""
-            <div style="
-                background:white;
-                padding:18px;
-                border-radius:14px;
-                border:1px solid #e5e7eb;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-                <div style="font-size:28px;">💰</div>
-
-                <div style="
-                    font-size:24px;
-                    font-weight:700;
-                    color:#111827;
-                    margin-top:8px;
-                ">
-                    R$ {valor_total_cards:,.0f}
-                </div>
-
-                <div style="
-                    color:#6b7280;
-                    font-size:14px;
-                    margin-top:4px;
-                ">
-                    Valor Total
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # =========================
-        # CARD LIBERADOS
-        # =========================
-        with col3:
-
-            st.markdown(f"""
-            <div style="
-                background:white;
-                padding:18px;
-                border-radius:14px;
-                border:1px solid #dcfce7;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-                <div style="font-size:28px;">🟢</div>
-
-                <div style="
-                    font-size:28px;
-                    font-weight:700;
-                    color:#166534;
-                    margin-top:8px;
-                ">
-                    {liberados}
-                </div>
-
-                <div style="
-                    color:#6b7280;
-                    font-size:14px;
-                    margin-top:4px;
-                ">
-                    Liberados
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # =========================
-        # CARD CRÍTICOS
-        # =========================
-        with col4:
-
-            st.markdown(f"""
-            <div style="
-                background:white;
-                padding:18px;
-                border-radius:14px;
-                border:1px solid #fee2e2;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-                <div style="font-size:28px;">🔴</div>
-
-                <div style="
-                    font-size:28px;
-                    font-weight:700;
-                    color:#991b1b;
-                    margin-top:8px;
-                ">
-                    {criticos}
-                </div>
-
-                <div style="
-                    color:#6b7280;
-                    font-size:14px;
-                    margin-top:4px;
-                ">
-                    Críticos
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # =========================
-        # TÍTULO
+        # TITULO
         # =========================
         st.markdown(
             "<div class='section-title'>🧾 Seus Pedidos</div>",
@@ -432,100 +283,138 @@ if rc_input:
         # HTML TABELA PEDIDOS
         # =========================
         html = """
+        <html>
+
+        <head>
+
         <style>
 
-        table {
-            width:100%;
-            border-collapse:collapse;
+        body{
             font-family:Arial;
             background:white;
-            border-radius:12px;
+            margin:0;
+            padding:0;
+        }
+
+        .table-box{
+            border:1px solid #e5e7eb;
+            border-radius:14px;
             overflow:hidden;
         }
 
-        thead tr {
-            background:#f3f4f6;
+        table{
+            width:100%;
+            border-collapse:collapse;
         }
 
-        th {
+        thead{
+            background:#f8fafc;
+            position:sticky;
+            top:0;
+        }
+
+        th{
             padding:14px;
             text-align:left;
-            font-size:14px;
-            color:#374151;
+            font-size:12px;
+            text-transform:uppercase;
+            color:#6b7280;
+            border-bottom:1px solid #e5e7eb;
         }
 
-        td {
+        td{
             padding:14px;
-            border-top:1px solid #f1f5f9;
+            border-bottom:1px solid #f1f5f9;
             font-size:14px;
             color:#111827;
         }
 
-        tr:hover {
+        tr:hover{
             background:#f9fafb;
         }
 
-        .pedido-highlight {
+        .pedido{
+            color:#dc2626;
             font-weight:700;
-            color:#2563eb;
         }
 
-        .motivo-highlight {
+        .motivo{
             font-weight:600;
-            color:#b45309;
         }
 
-        .valor-highlight {
+        .valor{
             font-weight:700;
-            color:#166534;
         }
 
-        .badge-liberado {
+        .liberado{
             background:#dcfce7;
             color:#166534;
-            padding:6px 10px;
+            padding:5px 12px;
             border-radius:999px;
             font-size:12px;
-            font-weight:700;
+            font-weight:600;
         }
 
-        .badge-pendente {
-            background:#fee2e2;
-            color:#991b1b;
-            padding:6px 10px;
+        .conferido{
+            background:#dbeafe;
+            color:#1d4ed8;
+            padding:5px 12px;
             border-radius:999px;
             font-size:12px;
-            font-weight:700;
+            font-weight:600;
+        }
+
+        .pendente{
+            background:#fef3c7;
+            color:#92400e;
+            padding:5px 12px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:600;
         }
 
         </style>
 
+        </head>
+
+        <body>
+
+        <div class="table-box">
+
         <table>
+
         <thead>
         <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>UF</th>
+            <th>Status</th>
+            <th>Motivo</th>
+            <th>Previsão</th>
+            <th>Valor (R$)</th>
+        </tr>
+        </thead>
+
+        <tbody>
         """
 
-        # CABEÇALHO
-        for col in pedidos_view.drop(columns=["Valor_num"]).columns:
-            html += f"<th>{col}</th>"
+        for _, row in pedidos_view.iterrows():
 
-        html += "</tr></thead><tbody>"
+            status = str(row["Status"]).lower()
 
-        # LINHAS
-        for _, row in pedidos_view.drop(columns=["Valor_num"]).iterrows():
+            if "liberado" in status:
+                badge = f"<span class='liberado'>{row['Status']}</span>"
 
-            status = str(row["Status"]).strip().lower()
-
-            if status == "liberado":
-                badge = f"<span class='badge-liberado'>{row['Status']}</span>"
+            elif "conferido" in status:
+                badge = f"<span class='conferido'>{row['Status']}</span>"
 
             else:
-                badge = f"<span class='badge-pendente'>{row['Status']}</span>"
+                badge = f"<span class='pendente'>{row['Status']}</span>"
 
             html += f"""
             <tr>
 
-                <td class="pedido-highlight">
+                <td class="pedido">
                     {row['Pedido']}
                 </td>
 
@@ -541,7 +430,7 @@ if rc_input:
                     {badge}
                 </td>
 
-                <td class="motivo-highlight">
+                <td class="motivo">
                     {row['Motivo']}
                 </td>
 
@@ -549,115 +438,134 @@ if rc_input:
                     {row['Previsão']}
                 </td>
 
-                <td class="valor-highlight">
+                <td class="valor">
                     {row['Valor (R$)']}
                 </td>
 
             </tr>
             """
 
-        html += "</tbody></table>"
+        html += """
+        </tbody>
 
-        # =========================
-        # ALTURA DINÂMICA
-        # =========================
-        quantidade_pedidos = len(pedidos_view)
+        </table>
 
-        if quantidade_pedidos <= 5:
+        </div>
 
-            altura_pedidos = (quantidade_pedidos * 52) + 50
-            scroll = False
+        </body>
 
-        else:
+        </html>
+        """
 
-            altura_pedidos = 330
-            scroll = True
+# =========================
+# ALTURA DINÂMICA
+# =========================
+quantidade_pedidos = len(pedidos_view)
 
-        components.html(
-            html,
-            height=altura_pedidos,
-            scrolling=scroll
-        )
+# ATÉ 5 LINHAS = AUTO AJUSTE
+if quantidade_pedidos <= 5:
+
+    altura_pedidos = (quantidade_pedidos * 52) + 23
+    scroll = False
+
+# MAIS DE 5 LINHAS = SCROLL
+else:
+
+    altura_pedidos = 330
+    scroll = True
+
+components.html(
+    html,
+    height=altura_pedidos,
+    scrolling=scroll
+)
 
         # =========================
         # SELECT PEDIDO
         # =========================
-        pedidos_view["Pedido_Cliente"] = (
+        pedidos_view["Pedido_Exibicao"] = (
             pedidos_view["Pedido"].astype(str)
             + " - "
             + pedidos_view["Cliente"].astype(str)
         )
 
-        pedido_escolha = st.selectbox(
-            "📌 Selecione um Pedido:",
-            [""] + pedidos_view["Pedido_Cliente"].tolist()
+        lista_pedidos = pedidos_view["Pedido_Exibicao"].unique().tolist()
+
+        # PRIMEIRO ITEM VAZIO
+        lista_pedidos.insert(0, "Selecione um pedido")
+
+        pedido_selecionado = st.selectbox(
+            "📌 Selecione um pedido:",
+            lista_pedidos
         )
 
-        if pedido_escolha != "":
+        # =========================
+        # SOMENTE APÓS SELEÇÃO
+        # =========================
+        if pedido_selecionado != "Selecione um pedido":
 
-            pedido_selecionado = pedido_escolha.split(" - ")[0]
+            pedido_numero = pedido_selecionado.split(" - ")[0]
 
             pedido_info = pedidos_view[
-                pedidos_view["Pedido"].astype(str) == pedido_selecionado
+                pedidos_view["Pedido"].astype(str) == pedido_numero
             ].iloc[0]
 
-            # =========================
-            # CARD PEDIDO
-            # =========================
             st.markdown(f"""
-            <div style="
-            background:white;
-            border:1px solid #dfe3eb;
-            border-left:5px solid #f59e0b;
-            border-radius:14px;
-            padding:20px;
-            margin-top:15px;
-            margin-bottom:25px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.05);
-            ">
+<div style="
+background:white;
+border:1px solid #dfe3eb;
+border-left:5px solid #c2626;
+border-radius:10px;
+padding:20px;
+margin-top:15px;
+margin-bottom:25px;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+">
 
-            <div style="
-            font-size:14px;
-            color:#6b7280;
-            font-weight:600;
-            ">
-            Pedido Selecionado
-            </div>
+<div style="
+font-size:12px;
+color:#6b7280;
+font-weight:600;
+text-transform:uppercase;
+margin-bottom:8px;
+">
+Pedido Selecionado
+</div>
 
-            <div style="
-            font-size:28px;
-            font-weight:700;
-            color:#111827;
-            margin-top:5px;
-            ">
-            #{pedido_selecionado}
-            </div>
+<div style="
+font-size:30px;
+font-weight:700;
+color:#111827;
+">
+#{pedido_numero}
+</div>
 
-            <div style="
-            font-size:15px;
-            color:#6b7280;
-            margin-top:6px;
-            ">
-            <b>Cliente:</b> {pedido_info['Cliente']}
-            &nbsp;&nbsp; | &nbsp;&nbsp;
-            <b>Valor:</b> {pedido_info['Valor (R$)']}
-            </div>
+<div style="
+font-size:15px;
+color:#6b7280;
+margin-top:6px;
+">
+</b> {pedido_info['Cliente']} 
+&nbsp;&nbsp; | &nbsp;&nbsp;
+</b> {pedido_info['Valor (R$)']}
+</div>
 
-            </div>
-            """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
             # =========================
             # ITENS
             # =========================
             itens_pedido = itens[
-                itens["Pedido"].astype(str) == pedido_selecionado
+                itens["Pedido"].astype(str) == pedido_numero
             ].copy()
+
+            # REMOVE COLUNA PEDIDO
+            if "Pedido" in itens_pedido.columns:
+                itens_pedido = itens_pedido.drop(columns=["Pedido"])
 
             if "RC" in itens_pedido.columns:
                 itens_pedido = itens_pedido.drop(columns=["RC"])
-
-            if "Pedido" in itens_pedido.columns:
-                itens_pedido = itens_pedido.drop(columns=["Pedido"])
 
             itens_pedido = itens_pedido.rename(columns={
                 "Pedido2": "Qtde",
@@ -672,35 +580,194 @@ if rc_input:
             if "Previsão Final" in itens_pedido.columns:
                 itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
 
+            # =========================
+            # TITULO ITENS
+            # =========================
             st.markdown(
                 "<div class='section-title'>📦 Itens do Pedido</div>",
                 unsafe_allow_html=True
             )
 
-            st.dataframe(
-                itens_pedido,
-                use_container_width=True,
-                hide_index=True
+            # =========================
+            # HTML ITENS
+            # =========================
+            html_itens = """
+            <html>
+
+            <head>
+
+            <style>
+
+            body{
+                font-family:Arial;
+                background:white;
+                margin:0;
+                padding:0;
+            }
+
+            .table-box{
+                border:1px solid #e5e7eb;
+                border-radius:14px;
+                overflow:hidden;
+            }
+
+            table{
+                width:100%;
+                border-collapse:collapse;
+            }
+
+            thead{
+                background:#f8fafc;
+            }
+
+            th{
+                padding:14px;
+                text-align:left;
+                font-size:12px;
+                text-transform:uppercase;
+                color:#6b7280;
+                border-bottom:1px solid #e5e7eb;
+            }
+
+            td{
+                padding:14px;
+                border-bottom:1px solid #f1f5f9;
+                font-size:14px;
+                color:#111827;
+            }
+
+            tr:hover{
+                background:#f9fafb;
+            }
+
+            .valor{
+                font-weight:700;
+            }
+
+            .reservado{
+                background:#dcfce7;
+                color:#166534;
+                padding:5px 12px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:600;
+            }
+
+            .parcial{
+                background:#fef3c7;
+                color:#92400e;
+                padding:5px 12px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:600;
+            }
+
+            .semreserva{
+                background:#fee2e2;
+                color:#991b1b;
+                padding:5px 12px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:600;
+            }
+
+            </style>
+
+            </head>
+
+            <body>
+
+            <div class="table-box">
+
+            <table>
+
+            <thead>
+            <tr>
+            """
+
+            for coluna in itens_pedido.columns:
+                html_itens += f"<th>{coluna}</th>"
+
+            html_itens += """
+            </tr>
+            </thead>
+
+            <tbody>
+            """
+
+            for _, row in itens_pedido.iterrows():
+
+                html_itens += "<tr>"
+
+                for coluna in itens_pedido.columns:
+
+                    valor = row[coluna]
+
+                    # STATUS RESERVA
+                    if coluna == "Status Reserva":
+
+                        status_reserva = str(valor).lower()
+
+                        if "reservado" in status_reserva:
+
+                            valor = f"<span class='reservado'>{valor}</span>"
+
+                        elif "parcial" in status_reserva:
+
+                            valor = f"<span class='parcial'>{valor}</span>"
+
+                        else:
+
+                            valor = f"<span class='semreserva'>{valor}</span>"
+
+                    # VALOR
+                    elif "Valor" in coluna:
+
+                        valor = f"<span class='valor'>{valor}</span>"
+
+                    html_itens += f"<td>{valor}</td>"
+
+                html_itens += "</tr>"
+
+            html_itens += """
+            </tbody>
+
+            </table>
+
+            </div>
+
+            </body>
+
+            </html>
+            """
+
+            # AUTO AJUSTE
+            altura_itens = (len(itens_pedido) * 45) + 75
+
+            components.html(
+                html_itens,
+                height=altura_itens,
+                scrolling=False
             )
 
             # =========================
             # AÇÃO
             # =========================
             acoes_pedido = acoes[
-                (acoes["Pedido"].astype(str) == pedido_selecionado)
+                (acoes["Pedido"].astype(str) == pedido_numero)
                 &
                 (acoes["RC"].astype(str) == rc_input)
             ]
+
+            st.markdown(
+                "<div class='section-title'>🚨 Ação Recomendada</div>",
+                unsafe_allow_html=True
+            )
 
             if not acoes_pedido.empty:
 
                 texto = limpar_texto(
                     acoes_pedido.iloc[0]["Texto"]
-                )
-
-                st.markdown(
-                    "<div class='section-title'>🚨 Ação Recomendada</div>",
-                    unsafe_allow_html=True
                 )
 
                 st.markdown(
@@ -733,6 +800,4 @@ if rc_input:
         st.error(
             "Nenhum pedido encontrado para este RC."
         )
-        pedidos_view = df3
-
-        pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
+        
