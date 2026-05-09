@@ -76,8 +76,43 @@ div[data-baseweb="select"] > div {
 # HEADER
 # =========================
 st.markdown("""
-<div class='top-header'>
-    Portal de Pedidos
+<div style="
+background:#c00000;
+height:70px;
+width:100%;
+display:flex;
+align-items:center;
+padding-left:35px;
+box-shadow:0 2px 10px rgba(0,0,0,0.15);
+margin-top:-1rem;
+margin-left:-1rem;
+margin-right:-1rem;
+">
+
+<div style="
+width:38px;
+height:38px;
+background:rgba(255,255,255,0.18);
+border-radius:6px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-size:20px;
+font-weight:bold;
+margin-right:18px;
+">
+A
+</div>
+
+<div style="
+color:white;
+font-size:28px;
+font-weight:700;
+">
+Portal de Pedidos
+</div>
+
 </div>
 """, unsafe_allow_html=True)
 
