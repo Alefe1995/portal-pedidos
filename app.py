@@ -551,7 +551,9 @@ font-size:15px;
 color:#6b7280;
 margin-top:6px;
 ">
-{pedido_info['Cliente']}
+<b>Cliente:</b> {pedido_info['Cliente']} 
+&nbsp;&nbsp; | &nbsp;&nbsp;
+<b>Valor:</b> {pedido_info['Valor (R$)']}
 </div>
 
 </div>
