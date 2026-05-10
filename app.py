@@ -231,9 +231,9 @@ st.markdown("""
 <div class='top-header'>
     <div>
         <div>📋 Portal de Pedidos</div>
-        <div class='subtitle'>ADERE · Colou, tá colado.</div>
+        <div class='subtitle'>ADERE Produto Auto Adesivos</div>
     </div>
-    <div style="margin-left:auto;font-size:13px;opacity:0.8;">Admin</div>
+    <div style="margin-left:auto;font-size:13px;opacity:0.8;">Comercial</div>
 </div>
 """, unsafe_allow_html=True)
 
