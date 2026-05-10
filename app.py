@@ -662,7 +662,7 @@ if rc_input:
 
         pedido_escolha = st.selectbox(
             "📌 Selecione um Pedido:",
-            ["Escolha um Pedido"] + pedidos_view["Pedido_Cliente"].tolist()
+            [""] + pedidos_view["Pedido_Cliente"].tolist()
         )
 
         # =========================
