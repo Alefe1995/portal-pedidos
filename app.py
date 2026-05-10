@@ -621,7 +621,7 @@ if rc_input:
                     )
                     fig_prev.update_traces(marker_line_width=0, textposition="outside", textfont_size=10)
                     st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-                    st.markdown("<div class='chart-card-title'>Previsão de Entrega por Mês</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='chart-card-title'>Previsão de Produção por Mês</div>", unsafe_allow_html=True)
                     st.plotly_chart(fig_prev, use_container_width=True)
                     st.markdown("</div>", unsafe_allow_html=True)
 
