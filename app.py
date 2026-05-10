@@ -560,6 +560,15 @@ if rc_input:
             font-weight:700;
         }
 
+        .badge-conferido {
+            background:#dbeafe;
+            color:#1d4ed8;
+            padding:6px 10px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:700;
+        }    
+
         </style>
 
         <table>
