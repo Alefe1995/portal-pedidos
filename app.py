@@ -281,10 +281,14 @@ if rc_input:
             ])
         ]["Valor_num"].sum()
 
+        valor_pendente = pedidos_view[
+            pedidos_view["Status"].astype(str).str.lower() == "pendente"
+        ]["Valor_num"].sum()
+
         # =========================
         # CARDS RESUMO
         # =========================
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
 
         # CARD PEDIDOS
         with col1:
@@ -435,6 +439,44 @@ if rc_input:
             Estoque / Ag Retorno Comercial
             </div>
 
+            </div>
+            """, unsafe_allow_html=True)
+
+        # CARD PENDENTES
+        with col5:
+        
+            st.markdown(f"""
+            <div style="
+                background:white;
+                border:1px solid #fef3c7;
+                border-radius:14px;
+                padding:14px;
+                box-shadow:0 2px 8px rgba(0,0,0,0.04);
+            ">
+        
+            <div style="
+                font-size:24px;
+            ">
+            🟡
+            </div>
+        
+            <div style="
+                font-size:22px;
+                font-weight:700;
+                color:#b45309;
+                margin-top:5px;
+            ">
+            {formatar_moeda(valor_pendente)}
+            </div>
+        
+            <div style="
+                font-size:13px;
+                color:#6b7280;
+                margin-top:3px;
+            ">
+            Valor Pendente
+            </div>
+        
             </div>
             """, unsafe_allow_html=True)
 
