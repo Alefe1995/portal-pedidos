@@ -545,7 +545,7 @@ if rc_input:
                         paper_bgcolor="white",
                         plot_bgcolor="white",
                     )
-                    st.plotly_chart(fig_status, use_container_width=True)
+                    st.plotly_chart(fig_status, use_container_width=True, config={"displayModeBar": False})
 
             with g2:
                 with st.container():
@@ -567,9 +567,9 @@ if rc_input:
                         yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
                     )
                     fig_motivo.update_traces(marker_line_width=0)
-                    st.plotly_chart(fig_motivo, use_container_width=True)
+                    st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
 
-            # ---- LINHA 2: VALOR POR UF | PREVISÃO POR MÊS ----
+            # ---- LINHA 2: VALOR POR UF | ESTOQUE POR MÊS ----
             g3, g4 = st.columns(2)
 
             with g3:
@@ -592,48 +592,83 @@ if rc_input:
                         yaxis=dict(tickfont=dict(size=11)),
                     )
                     fig_uf.update_traces(marker_line_width=0)
-                    st.plotly_chart(fig_uf, use_container_width=True)
+                    st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
 
             with g4:
                 with st.container():
-                    if "Previsão" in pedidos_view.columns:
-                        prev_df = pedidos_view.copy()
-                        prev_df["Prev_dt"] = pd.to_datetime(prev_df["Previsão"], dayfirst=True, errors="coerce")
-                        prev_df = prev_df.dropna(subset=["Prev_dt"])
-                        prev_df["Mes"] = prev_df["Prev_dt"].dt.to_period("M").astype(str)
-                        hoje = pd.Timestamp.today()
-                        mes_atual = hoje.to_period("M").strftime("%Y-%m")
+                    # Filtra apenas pedidos com Motivo = Estoque
+                    estoque_df = pedidos_view[
+                        pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
+                    ].copy()
 
-                        def classifica_mes(row):
-                            if row["Mes"] < mes_atual:
-                                return "Vencidos"
-                            elif row["Mes"] == mes_atual:
-                                return "Mês atual"
-                            else:
+                    if not estoque_df.empty and "Previsão" in estoque_df.columns:
+
+                        def classifica_estoque(prev):
+                            """
+                            - Se o valor é uma data válida → Mês Atual
+                            - Se o valor é o texto 'Futuro' → Futuro
+                            - Qualquer outro texto → Outros
+                            """
+                            val = str(prev).strip()
+                            if val.lower() == "futuro":
                                 return "Futuro"
+                            # Tenta converter para data
+                            try:
+                                dt = pd.to_datetime(val, dayfirst=True, errors="raise")
+                                if pd.notna(dt):
+                                    return "Mês Atual"
+                            except:
+                                pass
+                            return "Outros"
 
-                        prev_df["Tipo"] = prev_df.apply(classifica_mes, axis=1)
-                        prev_group = (
-                            prev_df.groupby(["Mes", "Tipo"]).size()
-                            .reset_index(name="Qtde").sort_values("Mes")
+                        estoque_df["Tipo"] = estoque_df["Previsão"].apply(classifica_estoque)
+
+                        # Conta por tipo
+                        est_group = (
+                            estoque_df.groupby("Tipo")
+                            .size()
+                            .reset_index(name="Qtde")
                         )
-                        color_tipo = {"Mês atual": "#f9a8d4", "Futuro": "#dc2626", "Vencidos": "#fca5a5"}
-                        fig_prev = px.bar(
-                            prev_group, x="Mes", y="Qtde", color="Tipo",
-                            color_discrete_map=color_tipo, barmode="group", text="Qtde",
+
+                        # Ordem e cores fixas
+                        ordem = ["Mês Atual", "Futuro", "Outros"]
+                        est_group["Tipo"] = pd.Categorical(est_group["Tipo"], categories=ordem, ordered=True)
+                        est_group = est_group.sort_values("Tipo")
+
+                        color_est = {
+                            "Mês Atual": "#f9a8d4",
+                            "Futuro":    "#dc2626",
+                            "Outros":    "#d1d5db",
+                        }
+
+                        fig_est = px.bar(
+                            est_group,
+                            x="Tipo",
+                            y="Qtde",
+                            color="Tipo",
+                            color_discrete_map=color_est,
+                            text="Qtde",
                         )
-                        fig_prev.update_layout(
-                            title=dict(text="PREVISÃO DE PRODUÇÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                        fig_est.update_layout(
+                            title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                             height=320,
                             margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
-                            legend=dict(orientation="h", yanchor="top", y=-0.18, xanchor="center", x=0.5, font=dict(size=10)),
+                            showlegend=False,
                             paper_bgcolor="white", plot_bgcolor="white",
-                            xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                            xaxis=dict(tickfont=dict(size=12)),
                             yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
                         )
-                        fig_prev.update_traces(marker_line_width=0, textposition="outside", textfont_size=10)
-                        st.plotly_chart(fig_prev, use_container_width=True)
+                        fig_est.update_traces(
+                            marker_line_width=0,
+                            textposition="outside",
+                            textfont_size=13,
+                            textfont_color="#374151",
+                        )
+                        st.plotly_chart(fig_est, use_container_width=True, config={"displayModeBar": False})
+
+                    else:
+                        st.info("Nenhum pedido com Motivo 'Estoque' encontrado.")
 
             # ---- LINHA 3: TOP CLIENTES (largura total, HTML puro) ----
             top_clientes = (
