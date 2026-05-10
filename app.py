@@ -18,6 +18,14 @@ st.set_page_config(
 st.markdown("""
 <style>
 
+header {
+    visibility:hidden;
+}
+
+.top-header {
+    margin-top:10px;
+}
+
 /* FUNDO */
 .stApp {
     background-color: #f4f5f7;
