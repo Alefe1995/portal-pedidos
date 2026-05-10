@@ -1044,32 +1044,43 @@ if rc_input:
 
                 st.markdown(f"""
                 <div style="
-                background:white;
-                border:1px solid #dfe3eb;
-                border-left:5px solid #f59e0b;
-                border-radius:14px;
-                padding:20px;
-                margin-top:15px;
-                margin-bottom:25px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.05);
+                background:#fff7f7;
+                border:1px solid #f3dede;
+                border-left:5px solid #c00000;
+                border-radius:12px;
+                padding:18px;
+                margin-top:10px;
+                margin-bottom:20px;
+                box-shadow:0 2px 8px rgba(0,0,0,0.04);
                 ">
                 
                 <div style="
-                font-size:28px;
-                font-weight:700;
-                color:#111827;
+                font-size:13px;
+                font-weight:600;
+                color:#6b7280;
+                margin-bottom:8px;
                 ">
-                Pedido {pedido_info['Pedido']}
+                Pedido Selecionado
                 </div>
                 
                 <div style="
-                font-size:15px;
-                color:#6b7280;
-                margin-top:6px;
+                font-size:34px;
+                font-weight:800;
+                color:#111827;
+                line-height:1;
                 ">
-                Cliente: {pedido_info['Cliente']}
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                Valor: {pedido_info['Valor (R$)']}
+                #{pedido_info['Pedido']}
+                </div>
+                
+                <div style="
+                font-size:14px;
+                color:#6b7280;
+                margin-top:16px;
+                ">
+                <b>Cliente:</b> {pedido_info['Cliente']}
+                &nbsp;&nbsp;&nbsp; |
+                &nbsp;&nbsp;&nbsp;
+                <b>Valor:</b> {pedido_info['Valor (R$)']}
                 </div>
                 
                 </div>
