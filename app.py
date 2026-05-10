@@ -799,7 +799,7 @@ if rc_input:
             # ---- SELECT PEDIDO ----
             pedidos_view["Pedido_Cliente"] = (
                 pedidos_view["Pedido"].astype(str)
-                + " — "
+                + " - "
                 + pedidos_view["Cliente"].astype(str)
             )
 
