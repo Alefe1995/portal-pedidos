@@ -1089,41 +1089,170 @@ if rc_input:
                 📦 Itens do Pedido
                 </div>
                 """, unsafe_allow_html=True)
-
+                
                 itens_pedido = itens[
                     itens["Pedido"].astype(str) == pedido_numero
                 ].copy()
-
+                
                 if not itens_pedido.empty:
-
+                
+                    # =========================
+                    # RENOMEIA COLUNAS
+                    # =========================
+                    itens_pedido = itens_pedido.rename(columns={
+                
+                        "Codigo": "Código",
+                        "Descricao": "Descrição",
+                        "Qtd Ped": "Qtde",
+                        "Valor Total": "Valor Total (R$)"
+                
+                    })
+                
+                    # =========================
+                    # FORMATAÇÕES
+                    # =========================
                     if "Previsão Final" in itens_pedido.columns:
-
+                
                         itens_pedido["Previsão Final"] = (
                             itens_pedido["Previsão Final"]
                             .apply(formatar_data)
                             .replace("NaT", "")
                         )
-
-                    # ALTURA AUTOMÁTICA
+                
+                    if "Valor Total (R$)" in itens_pedido.columns:
+                
+                        itens_pedido["Valor Total (R$)"] = (
+                            itens_pedido["Valor Total (R$)"]
+                            .apply(formatar_moeda)
+                        )
+                
+                    # =========================
+                    # HTML
+                    # =========================
+                    html_itens = """
+                    <style>
+                
+                    table {
+                        width:100%;
+                        border-collapse:collapse;
+                        font-family:Arial;
+                        background:white;
+                        border-radius:12px;
+                        overflow:hidden;
+                    }
+                
+                    thead tr {
+                        background:#f3f4f6;
+                    }
+                
+                    th {
+                        padding:14px;
+                        text-align:left;
+                        font-size:14px;
+                        color:#374151;
+                    }
+                
+                    td {
+                        padding:14px;
+                        border-top:1px solid #f1f5f9;
+                        font-size:14px;
+                        color:#111827;
+                    }
+                
+                    tr:hover {
+                        background:#f9fafb;
+                    }
+                
+                    .status-reservado {
+                        background:#dcfce7;
+                        color:#166534;
+                        padding:6px 10px;
+                        border-radius:999px;
+                        font-size:12px;
+                        font-weight:700;
+                    }
+                
+                    .status-saldo {
+                        background:#fee2e2;
+                        color:#991b1b;
+                        padding:6px 10px;
+                        border-radius:999px;
+                        font-size:12px;
+                        font-weight:700;
+                    }
+                
+                    </style>
+                
+                    <table>
+                    <thead>
+                    <tr>
+                    """
+                
+                    # CABEÇALHO
+                    for col in itens_pedido.columns:
+                        html_itens += f"<th>{col}</th>"
+                
+                    html_itens += "</tr></thead><tbody>"
+                
+                    # LINHAS
+                    for _, row in itens_pedido.iterrows():
+                
+                        html_itens += "<tr>"
+                
+                        for col in itens_pedido.columns:
+                
+                            valor = row[col]
+                
+                            # STATUS RESERVA
+                            if col == "Status Reserva":
+                
+                                status = str(valor).strip().lower()
+                
+                                if status == "reservado":
+                
+                                    valor = f"""
+                                    <span class='status-reservado'>
+                                        {row[col]}
+                                    </span>
+                                    """
+                
+                                else:
+                
+                                    valor = f"""
+                                    <span class='status-saldo'>
+                                        {row[col]}
+                                    </span>
+                                    """
+                
+                            html_itens += f"<td>{valor}</td>"
+                
+                        html_itens += "</tr>"
+                
+                    html_itens += "</tbody></table>"
+                
+                    # =========================
+                    # ALTURA DINÂMICA
+                    # =========================
                     quantidade_itens = len(itens_pedido)
-
-                    altura_itens = (quantidade_itens * 35) + 38
-
-                    st.dataframe(
-                        itens_pedido,
-                        use_container_width=True,
-                        hide_index=True,
+                
+                    if quantidade_itens <= 8:
+                
+                        altura_itens = (quantidade_itens * 52) + 55
+                        scroll_itens = False
+                
+                    else:
+                
+                        altura_itens = 450
+                        scroll_itens = True
+                
+                    components.html(
+                        html_itens,
                         height=altura_itens,
-                        column_config={
-                    
-                            "Status Reserva": st.column_config.TextColumn(
-                                "Status Reserva"
-                            )
-                        }
+                        scrolling=scroll_itens
                     )
-
+                
                 else:
-
+                
                     st.info(
                         "Nenhum item encontrado para este pedido."
                     )
