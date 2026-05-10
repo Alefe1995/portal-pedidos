@@ -239,12 +239,31 @@ acoes   = pd.read_excel("Ação.xlsx")
 # =========================
 # BUSCA RC — ESTILO BASE44
 # =========================
-col_rc, col_btn = st.columns([3, 1])
+
+# Botão Buscar vermelho via CSS
+st.markdown("""
+<style>
+div[data-testid="stButton"] button {
+    background-color: #c00000 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    padding: 8px 20px !important;
+}
+div[data-testid="stButton"] button:hover {
+    background-color: #a00000 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+col_rc, col_btn, col_espaco = st.columns([2, 1, 5])
 with col_rc:
-    rc_input = st.text_input("CÓDIGO RC", placeholder="Digite o código RC...", label_visibility="visible")
+    rc_input = st.text_input("CÓDIGO RC", placeholder="Ex: 614", label_visibility="visible", max_chars=5)
 with col_btn:
     st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
-    buscar = st.button("🔎 Buscar", use_container_width=True)
+    buscar = st.button("Buscar", use_container_width=True)
 
 # =========================
 # PROCESSAMENTO
@@ -317,15 +336,14 @@ if rc_input:
 
         # =========================
         # KPI CARDS — ESTILO BASE44
-        # (logo abaixo da busca, antes das abas)
         # =========================
         k1, k2, k3, k4, k5 = st.columns(5)
 
         with k1:
             st.markdown(f"""
             <div class='kpi-card'>
-                <div style='font-size:28px;margin-bottom:4px;'>📦</div>
-                <div style='font-size:28px;font-weight:700;color:#111827;line-height:1;'>{total_pedidos}</div>
+                <div style='font-size:18px;margin-bottom:4px;'>📦</div>
+                <div style='font-size:20px;font-weight:700;color:#111827;line-height:1;'>{total_pedidos}</div>
                 <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Pedido(s)</div>
             </div>
             """, unsafe_allow_html=True)
@@ -333,7 +351,7 @@ if rc_input:
         with k2:
             st.markdown(f"""
             <div class='kpi-card'>
-                <div style='font-size:22px;margin-bottom:4px;'>🏅</div>
+                <div style='font-size:18px;margin-bottom:4px;'>🏅</div>
                 <div style='font-size:20px;font-weight:700;color:#111827;line-height:1;'>{formatar_moeda(valor_total)}</div>
                 <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Total</div>
             </div>
@@ -342,9 +360,7 @@ if rc_input:
         with k3:
             st.markdown(f"""
             <div class='kpi-card'>
-                <div style='font-size:14px;font-weight:700;margin-bottom:4px;'>
-                    <span style='color:#16a34a;font-size:18px;'>●</span>
-                </div>
+                <div style='font-size:18px;margin-bottom:4px;'><span style='color:#16a34a;'>●</span></div>
                 <div style='font-size:20px;font-weight:700;color:#16a34a;line-height:1;'>{formatar_moeda(valor_liberado)}</div>
                 <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Liberado</div>
             </div>
@@ -353,9 +369,7 @@ if rc_input:
         with k4:
             st.markdown(f"""
             <div class='kpi-card'>
-                <div style='font-size:14px;font-weight:700;margin-bottom:4px;'>
-                    <span style='color:#dc2626;font-size:18px;'>●</span>
-                </div>
+                <div style='font-size:18px;margin-bottom:4px;'><span style='color:#dc2626;'>●</span></div>
                 <div style='font-size:20px;font-weight:700;color:#dc2626;line-height:1;'>{formatar_moeda(valor_critico)}</div>
                 <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Estoque / Ag. Retorno Comercial</div>
             </div>
@@ -364,9 +378,7 @@ if rc_input:
         with k5:
             st.markdown(f"""
             <div class='kpi-card'>
-                <div style='font-size:14px;font-weight:700;margin-bottom:4px;'>
-                    <span style='color:#d97706;font-size:18px;'>●</span>
-                </div>
+                <div style='font-size:18px;margin-bottom:4px;'><span style='color:#d97706;'>●</span></div>
                 <div style='font-size:20px;font-weight:700;color:#d97706;line-height:1;'>{formatar_moeda(valor_pendente)}</div>
                 <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Aguardando Atendimento</div>
             </div>
@@ -426,23 +438,16 @@ if rc_input:
                 </div>
                 """, unsafe_allow_html=True)
 
-            # ---- GRÁFICOS LINHA 1: STATUS | VALOR POR MOTIVO | VALOR POR UF ----
-            g1, g2, g3 = st.columns(3)
+            # ---- LINHA 1: STATUS | VALOR POR MOTIVO ----
+            g1, g2 = st.columns(2)
 
-            # STATUS — donut com legenda embaixo estilo Base44
             with g1:
                 status_chart = (
                     pedidos_view.groupby("Status")
                     .size()
                     .reset_index(name="Quantidade")
                 )
-
-                # Cores fixas por status
-                color_map = {
-                    "Pendente":  "#f59e0b",
-                    "Conferido": "#3b82f6",
-                    "Liberado":  "#22c55e",
-                }
+                color_map = {"Pendente": "#f59e0b", "Conferido": "#3b82f6", "Liberado": "#22c55e"}
                 cores = [color_map.get(s, "#9ca3af") for s in status_chart["Status"]]
 
                 fig_status = go.Figure(go.Pie(
@@ -454,107 +459,73 @@ if rc_input:
                     textfont_size=12,
                 ))
                 fig_status.update_layout(
-                    height=280,
-                    margin=dict(l=0, r=0, t=0, b=0),
+                    height=300,
+                    margin=dict(l=0, r=0, t=10, b=0),
                     showlegend=True,
-                    legend=dict(
-                        orientation="h",
-                        yanchor="top",
-                        y=-0.05,
-                        xanchor="center",
-                        x=0.5,
-                        font=dict(size=11)
-                    ),
+                    legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
                 )
-
                 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
                 st.markdown("<div class='chart-card-title'>Distribuição por Status</div>", unsafe_allow_html=True)
                 st.plotly_chart(fig_status, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            # VALOR POR MOTIVO — barras verticais coloridas
             with g2:
                 motivo_chart = (
                     pedidos_view.groupby("Motivo")["Valor_num"]
-                    .sum()
-                    .reset_index()
-                    .sort_values("Valor_num", ascending=False)
+                    .sum().reset_index().sort_values("Valor_num", ascending=False)
                 )
-
-                paleta_motivo = px.colors.qualitative.Bold
                 fig_motivo = px.bar(
-                    motivo_chart,
-                    x="Motivo",
-                    y="Valor_num",
-                    color="Motivo",
-                    color_discrete_sequence=paleta_motivo,
+                    motivo_chart, x="Motivo", y="Valor_num",
+                    color="Motivo", color_discrete_sequence=px.colors.qualitative.Bold,
                 )
                 fig_motivo.update_layout(
-                    height=280,
-                    margin=dict(l=0, r=0, t=0, b=60),
-                    xaxis_title="",
-                    yaxis_title="",
-                    showlegend=False,
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    plot_bgcolor="rgba(0,0,0,0)",
-                    xaxis=dict(tickfont=dict(size=10)),
+                    height=300,
+                    margin=dict(l=0, r=0, t=10, b=80),
+                    xaxis_title="", yaxis_title="", showlegend=False,
+                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                    xaxis=dict(tickfont=dict(size=10), tickangle=-30),
                     yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
                 )
                 fig_motivo.update_traces(marker_line_width=0)
-
                 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
                 st.markdown("<div class='chart-card-title'>Valor por Motivo</div>", unsafe_allow_html=True)
                 st.plotly_chart(fig_motivo, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            # VALOR POR UF — barras horizontais
+            # ---- LINHA 2: VALOR POR UF | PREVISÃO POR MÊS ----
+            g3, g4 = st.columns(2)
+
             with g3:
                 uf_chart = (
                     pedidos_view.groupby("UF")["Valor_num"]
-                    .sum()
-                    .reset_index()
-                    .sort_values("Valor_num", ascending=True)
+                    .sum().reset_index().sort_values("Valor_num", ascending=True)
                 )
-
                 fig_uf = px.bar(
-                    uf_chart,
-                    x="Valor_num",
-                    y="UF",
-                    orientation="h",
-                    color="Valor_num",
-                    color_continuous_scale=["#fca5a5", "#dc2626", "#7f1d1d"],
+                    uf_chart, x="Valor_num", y="UF", orientation="h",
+                    color="Valor_num", color_continuous_scale=["#fca5a5", "#dc2626", "#7f1d1d"],
                 )
                 fig_uf.update_layout(
-                    height=280,
-                    margin=dict(l=0, r=0, t=0, b=0),
-                    xaxis_title="",
-                    yaxis_title="",
-                    coloraxis_showscale=False,
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    plot_bgcolor="rgba(0,0,0,0)",
+                    height=300,
+                    margin=dict(l=0, r=0, t=10, b=0),
+                    xaxis_title="", yaxis_title="", coloraxis_showscale=False,
+                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                     xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
                     yaxis=dict(tickfont=dict(size=11)),
                 )
                 fig_uf.update_traces(marker_line_width=0)
-
                 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
                 st.markdown("<div class='chart-card-title'>Valor por Estado (UF)</div>", unsafe_allow_html=True)
                 st.plotly_chart(fig_uf, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            # ---- GRÁFICOS LINHA 2: PREVISÃO POR MÊS | TOP CLIENTES ----
-            g4, g5 = st.columns(2)
-
-            # PREVISÃO DE ENTREGA POR MÊS
             with g4:
                 if "Previsão" in pedidos_view.columns:
                     prev_df = pedidos_view.copy()
                     prev_df["Prev_dt"] = pd.to_datetime(prev_df["Previsão"], dayfirst=True, errors="coerce")
                     prev_df = prev_df.dropna(subset=["Prev_dt"])
                     prev_df["Mes"] = prev_df["Prev_dt"].dt.to_period("M").astype(str)
-
                     hoje = pd.Timestamp.today()
                     mes_atual = hoje.to_period("M").strftime("%Y-%m")
 
@@ -567,95 +538,66 @@ if rc_input:
                             return "Futuro"
 
                     prev_df["Tipo"] = prev_df.apply(classifica_mes, axis=1)
-
                     prev_group = (
-                        prev_df.groupby(["Mes", "Tipo"])
-                        .size()
-                        .reset_index(name="Qtde")
-                        .sort_values("Mes")
+                        prev_df.groupby(["Mes", "Tipo"]).size()
+                        .reset_index(name="Qtde").sort_values("Mes")
                     )
-
-                    color_tipo = {
-                        "Mês atual": "#f9a8d4",
-                        "Futuro":    "#dc2626",
-                        "Vencidos":  "#fca5a5",
-                    }
-
+                    color_tipo = {"Mês atual": "#f9a8d4", "Futuro": "#dc2626", "Vencidos": "#fca5a5"}
                     fig_prev = px.bar(
-                        prev_group,
-                        x="Mes",
-                        y="Qtde",
-                        color="Tipo",
-                        color_discrete_map=color_tipo,
-                        barmode="group",
-                        text="Qtde",
+                        prev_group, x="Mes", y="Qtde", color="Tipo",
+                        color_discrete_map=color_tipo, barmode="group", text="Qtde",
                     )
                     fig_prev.update_layout(
                         height=300,
-                        margin=dict(l=0, r=0, t=0, b=0),
-                        xaxis_title="",
-                        yaxis_title="",
-                        legend=dict(
-                            orientation="h",
-                            yanchor="top",
-                            y=-0.15,
-                            xanchor="center",
-                            x=0.5,
-                            font=dict(size=10)
-                        ),
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        plot_bgcolor="rgba(0,0,0,0)",
+                        margin=dict(l=0, r=0, t=10, b=0),
+                        xaxis_title="", yaxis_title="",
+                        legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5, font=dict(size=10)),
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                         xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
                         yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
                     )
                     fig_prev.update_traces(marker_line_width=0, textposition="outside", textfont_size=10)
-
                     st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
                     st.markdown("<div class='chart-card-title'>Previsão de Entrega por Mês</div>", unsafe_allow_html=True)
                     st.plotly_chart(fig_prev, use_container_width=True)
                     st.markdown("</div>", unsafe_allow_html=True)
 
-            # TOP CLIENTES — lista ranqueada estilo Base44
-            with g5:
-                top_clientes = (
-                    pedidos_view.groupby("Cliente")
-                    .agg(
-                        Valor=("Valor_num", "sum"),
-                        Pedidos=("Pedido", "count")
+            # ---- LINHA 3: TOP CLIENTES (largura total) ----
+            top_clientes = (
+                pedidos_view.groupby("Cliente")
+                .agg(Valor=("Valor_num", "sum"), Pedidos=("Pedido", "count"))
+                .sort_values("Valor", ascending=False)
+                .head(8)
+                .reset_index()
+            )
+
+            st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='chart-card-title'>👤 Top Clientes por Valor</div>", unsafe_allow_html=True)
+
+            if not top_clientes.empty:
+                max_val = top_clientes["Valor"].max()
+                for idx, row in top_clientes.reset_index(drop=True).iterrows():
+                    pct        = int((row["Valor"] / max_val) * 100) if max_val > 0 else 0
+                    nome_curto = str(row["Cliente"])[:42] + "..." if len(str(row["Cliente"])) > 42 else str(row["Cliente"])
+                    valor_fmt  = formatar_moeda_curto(row["Valor"])
+                    pedidos_qt = int(row["Pedidos"])
+                    st.markdown(
+                        f'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;">'
+                        f'<div style="font-size:12px;font-weight:700;color:#9ca3af;width:20px;text-align:right;">{idx+1}</div>'
+                        f'<div style="flex:1;min-width:0;">'
+                        f'<div style="font-size:13px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nome_curto}</div>'
+                        f'<div style="margin-top:3px;background:#fee2e2;border-radius:999px;height:5px;width:100%;">'
+                        f'<div style="background:#dc2626;border-radius:999px;height:5px;width:{pct}%;"></div></div></div>'
+                        f'<div style="text-align:right;min-width:90px;">'
+                        f'<div style="font-size:12px;color:#6b7280;">{pedidos_qt} ped.</div>'
+                        f'<div style="font-size:13px;font-weight:700;color:#111827;">{valor_fmt}</div>'
+                        f'</div></div>',
+                        unsafe_allow_html=True
                     )
-                    .sort_values("Valor", ascending=False)
-                    .head(8)
-                    .reset_index()
-                )
+            else:
+                st.info("Sem dados de clientes.")
 
-                max_val = top_clientes["Valor"].max() if len(top_clientes) > 0 else 1
-
-                rows_html = ""
-                for i, row in top_clientes.iterrows():
-                    pct = (row["Valor"] / max_val) * 100
-                    nome_curto = row["Cliente"][:35] + "..." if len(row["Cliente"]) > 35 else row["Cliente"]
-                    rows_html += f"""
-                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                        <div style="font-size:12px;font-weight:700;color:#9ca3af;width:18px;text-align:right;">{i+1}</div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-size:13px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nome_curto}</div>
-                            <div style="margin-top:3px;background:#fee2e2;border-radius:999px;height:5px;width:100%;">
-                                <div style="background:#dc2626;border-radius:999px;height:5px;width:{pct:.0f}%;"></div>
-                            </div>
-                        </div>
-                        <div style="text-align:right;min-width:80px;">
-                            <div style="font-size:12px;color:#6b7280;">{row['Pedidos']} ped.</div>
-                            <div style="font-size:13px;font-weight:700;color:#111827;">{formatar_moeda_curto(row['Valor'])}</div>
-                        </div>
-                    </div>
-                    """
-
-                st.markdown(f"""
-                <div class='chart-card'>
-                    <div class='chart-card-title'>👤 Top Clientes por Valor</div>
-                    {rows_html}
-                </div>
-                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # =====================================================
         # ABA 2 — PEDIDOS (LAYOUT BASE44)
