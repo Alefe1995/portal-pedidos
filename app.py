@@ -724,7 +724,7 @@ if rc_input:
                         <td>{row.get('UF','')}</td>
                         <td>{badge}</td>
                         <td class='mot'>{row.get('Motivo','')}</td>
-                        <td>{row.get('Previsão','')}</td>
+                        <td class='prev'>{row.get('Previsão','')}</td>
                         <td class='val'>{row.get('Valor (R$)','')}</td>
                     </tr>
                     """
