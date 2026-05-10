@@ -695,8 +695,9 @@ if rc_input:
                 td { padding:10px 14px; border-bottom:1px solid #f3f4f6; font-size:13px; color:#111827; vertical-align:middle; }
                 tr:hover td { background:#f9fafb; }
                 .ped { font-weight:700; color:#c00000; }
-                .val { font-weight:600; color:#374151; }
+                .val { font-weight:600; color:#166534;; }
                 .mot { font-weight:600; color:#d97706; }
+                .prev { font-weight:700; color:#374151; }
                 .badge-lib  { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
                 .badge-conf { background:#dbeafe; color:#1d4ed8; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
                 .badge-pend { background:#fef9c3; color:#92400e; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
