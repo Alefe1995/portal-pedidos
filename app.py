@@ -26,19 +26,40 @@ header {
     margin-top:10px;
 }
 
-/* ESCONDE HEADER STREAMLIT */
-header {
-    visibility:hidden;
-}
-
-/* ESCONDE FOOTER STREAMLIT */
-footer {
-    visibility:hidden;
-}
-
 /* ESCONDE MENU SUPERIOR */
 #MainMenu {
-    visibility:hidden;
+    visibility: hidden;
+}
+
+/* ESCONDE HEADER */
+header {
+    visibility: hidden;
+}
+
+/* ESCONDE FOOTER */
+footer {
+    visibility: hidden;
+}
+
+/* ESCONDE BOTÕES FLUTUANTES STREAMLIT */
+[data-testid="stToolbar"] {
+    display: none;
+}
+
+[data-testid="stDecoration"] {
+    display: none;
+}
+
+[data-testid="stStatusWidget"] {
+    display: none;
+}
+
+[data-testid="stFloatingButton"] {
+    display: none;
+}
+
+.stDeployButton {
+    display: none;
 }
 
 /* FUNDO */
