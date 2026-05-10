@@ -1093,6 +1093,13 @@ if rc_input:
                 itens_pedido = itens[
                     itens["Pedido"].astype(str) == pedido_numero
                 ].copy()
+
+                # REMOVE COLUNAS
+                colunas_remover = ["RC", "Pedido"]
+                
+                itens_pedido = itens_pedido.drop(
+                    columns=[c for c in colunas_remover if c in itens_pedido.columns]
+                )
                 
                 if not itens_pedido.empty:
                 
@@ -1100,12 +1107,12 @@ if rc_input:
                     # RENOMEIA COLUNAS
                     # =========================
                     itens_pedido = itens_pedido.rename(columns={
-                
+                    
                         "Codigo": "Código",
                         "Descricao": "Descrição",
-                        "Qtd Ped": "Qtde",
-                        "Valor Total": "Valor Total (R$)"
-                
+                        "Pedido2": "Qtde",
+                        "Soma de Valor": "Valor (R$)"
+                    
                     })
                 
                     # =========================
@@ -1119,10 +1126,10 @@ if rc_input:
                             .replace("NaT", "")
                         )
                 
-                    if "Valor Total (R$)" in itens_pedido.columns:
+                    if "Valor (R$)" in itens_pedido.columns:
                 
-                        itens_pedido["Valor Total (R$)"] = (
-                            itens_pedido["Valor Total (R$)"]
+                        itens_pedido["Valor (R$)"] = (
+                            itens_pedido["Valor (R$)"]
                             .apply(formatar_moeda)
                         )
                 
