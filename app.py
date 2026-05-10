@@ -681,7 +681,7 @@ if rc_input:
             # =========================
             st.markdown(f"""
             <div style="
-            background:#fffbeb;
+            background:#fef2f2;
             border:1px solid #dfe3eb;
             border-left:5px solid #c00000;
             border-radius:08px;
