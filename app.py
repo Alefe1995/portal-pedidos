@@ -74,6 +74,7 @@ div[data-baseweb="select"] > div {
 /* ABAS */
 .stTabs [data-baseweb="tab-list"] {
     gap: 12px;
+    border-bottom:none !important;
 }
 
 .stTabs [data-baseweb="tab"] {
