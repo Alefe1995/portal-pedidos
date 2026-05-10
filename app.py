@@ -474,7 +474,7 @@ if rc_input:
                 color:#6b7280;
                 margin-top:3px;
             ">
-            Valor Ag Atendimento
+            Aguardando Atendimento
             </div>
         
             </div>
