@@ -13,236 +13,257 @@ st.set_page_config(
 )
 
 # =========================
-# CSS GLOBAL
+# CSS GLOBAL — ESTILO BASE44
 # =========================
 st.markdown("""
 <style>
 
 /* FUNDO */
 .stApp {
-    background-color: #f5f7fb;
+    background-color: #f4f5f7;
+}
+
+/* REMOVE PADDING TOPO */
+.block-container {
+    padding-top: 0rem !important;
+    padding-bottom: 2rem !important;
 }
 
 /* HEADER */
 .top-header {
-    background-color:#c00000;
-    padding:16px 24px;
-    border-radius:12px;
-    margin-bottom:25px;
-    color:white;
-    font-size:30px;
-    font-weight:700;
-    box-shadow:0 3px 10px rgba(0,0,0,0.10);
+    background-color: #c00000;
+    padding: 14px 24px;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: -1rem;
+    margin-right: -1rem;
+}
+
+.top-header .subtitle {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.85;
 }
 
 /* SIDEBAR */
 section[data-testid="stSidebar"] {
-    background:#ffffff;
-    border-right:1px solid #e5e7eb;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
 }
 
-/* TITULOS */
-.section-title {
-    font-size:22px;
-    font-weight:700;
-    color:#111827;
-    margin-bottom:15px;
-    margin-top:10px;
-}
-
-/* INPUT */
+/* INPUT BUSCA */
 .stTextInput input {
-    border-radius:10px !important;
-    border:1px solid #cbd5e1 !important;
-    padding:10px !important;
-    background:white !important;
+    border-radius: 8px !important;
+    border: 1px solid #d1d5db !important;
+    padding: 8px 12px !important;
+    background: white !important;
+    font-size: 14px !important;
 }
 
 /* SELECT */
 div[data-baseweb="select"] > div {
-    border-radius:10px !important;
-    border:1px solid #cbd5e1 !important;
-    background:white !important;
-    min-height:42px;
+    border-radius: 8px !important;
+    border: 1px solid #d1d5db !important;
+    background: white !important;
+    min-height: 38px;
+}
+
+/* ABAS PRINCIPAIS */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 4px;
+    background: transparent;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding-bottom: 0;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: transparent;
+    border-radius: 6px 6px 0 0;
+    padding: 8px 18px;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.stTabs [aria-selected="true"] {
+    background: #c00000 !important;
+    color: white !important;
+    border-radius: 6px 6px 0 0;
+}
+
+.stTabs [data-baseweb="tab-border"] {
+    display: none;
+}
+
+/* CARDS KPI */
+.kpi-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* CARDS GRÁFICO */
+.chart-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+}
+
+.chart-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #9ca3af;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
 }
 
 /* ALERTAS */
 .stAlert {
-    border-radius:12px;
-}
-
-/* ABAS */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 12px;
-    border-bottom:none !important;
-}
-
-.stTabs [data-baseweb="tab"] {
-    background:white;
-    border-radius:10px;
-    padding:10px 18px;
-    border:1px solid #e5e7eb;
-    font-weight:600;
-}
-
-.stTabs [aria-selected="true"] {
-    background:#c00000 !important;
-    color:white !important;
-}
-
-.stTabs [data-baseweb="tab-border"] {
-    display:none;
-}
-
-/* CARDS */
-.card-geral {
-    background:white;
-    border:1px solid #e5e7eb;
-    border-radius:14px;
-    padding:18px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.04);
-}
-
-/* TITULO GRAFICO */
-.chart-title {
-    font-size:15px;
-    font-weight:700;
-    color:#6b7280;
-    margin-bottom:15px;
+    border-radius: 10px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER
-# =========================
-st.markdown("""
-<div class='top-header'>
-    Portal de Pedidos
-</div>
-""", unsafe_allow_html=True)
-
-# =========================
 # FUNÇÕES
 # =========================
 def para_float(valor):
-
     try:
-
         if pd.isna(valor):
             return 0
-
         if isinstance(valor, (int, float)):
             return float(valor)
-
         valor = str(valor).replace("R$", "").strip()
         valor = valor.replace(".", "").replace(",", ".")
-
         return float(valor)
-
     except:
         return 0
 
 
 def formatar_moeda(valor):
-
     try:
-
         if pd.isna(valor):
             return ""
-
         if isinstance(valor, (int, float)):
             valor_float = float(valor)
-
         else:
-
             valor_str = str(valor).replace("R$", "").strip()
-
             if "," in valor_str:
                 valor_str = valor_str.replace(".", "").replace(",", ".")
-
             valor_float = float(valor_str)
-
         return f"R$ {valor_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
     except:
         return valor
 
 
-def formatar_data(valor):
-
+def formatar_moeda_curto(valor):
+    """Formata valor abreviado ex: R$ 83,7k"""
     try:
+        v = float(valor)
+        if v >= 1_000_000:
+            return f"R$ {v/1_000_000:.1f}M"
+        elif v >= 1_000:
+            return f"R$ {v/1_000:.1f}k"
+        else:
+            return f"R$ {v:.0f}"
+    except:
+        return "R$ 0"
 
+
+def formatar_data(valor):
+    try:
         if pd.isna(valor):
             return ""
-
         data = pd.to_datetime(valor, errors="coerce")
-
         if pd.notna(data):
             return data.strftime("%d/%m/%Y")
-
         return str(valor)
-
     except:
         return str(valor)
 
 
 def limpar_texto(texto):
-
     if pd.isna(texto):
         return ""
-
     texto = str(texto)
-
     texto = texto.replace("_x000D_", "\n")
     texto = texto.replace("\\r\\n", "\n")
     texto = texto.replace("\\r", "\n")
-
-    linhas = [
-        l.strip()
-        for l in texto.split("\n")
-        if l.strip() != ""
-    ]
-
+    linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
     return "\n".join(linhas)
+
+
+def badge_status(status_val):
+    s = str(status_val).strip().lower()
+    if s == "liberado":
+        return f"<span style='background:#dcfce7;color:#166534;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;'>{status_val}</span>"
+    elif s == "conferido":
+        return f"<span style='background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;'>{status_val}</span>"
+    else:
+        return f"<span style='background:#fef9c3;color:#92400e;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;'>{status_val}</span>"
+
+
+# =========================
+# HEADER ESTILO BASE44
+# =========================
+st.markdown("""
+<div class='top-header'>
+    <div>
+        <div>📋 Portal de Pedidos</div>
+        <div class='subtitle'>ADERE · Colou, tá colado.</div>
+    </div>
+    <div style="margin-left:auto;font-size:13px;opacity:0.8;">Admin</div>
+</div>
+""", unsafe_allow_html=True)
 
 # =========================
 # DADOS
 # =========================
 pedidos = pd.read_excel("Pedidos.xlsx")
-itens = pd.read_excel("Itens.xlsx")
-acoes = pd.read_excel("Ação.xlsx")
+itens   = pd.read_excel("Itens.xlsx")
+acoes   = pd.read_excel("Ação.xlsx")
 
 # =========================
-# RC
+# BUSCA RC — ESTILO BASE44
 # =========================
-rc_input = st.text_input("🔎 Digite seu código RC:")
+col_rc, col_btn = st.columns([3, 1])
+with col_rc:
+    rc_input = st.text_input("CÓDIGO RC", placeholder="Digite o código RC...", label_visibility="visible")
+with col_btn:
+    st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
+    buscar = st.button("🔎 Buscar", use_container_width=True)
 
 # =========================
 # PROCESSAMENTO
 # =========================
 if rc_input:
 
-    base = pedidos[
-        pedidos["RC"].astype(str) == rc_input
-    ].copy()
+    base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
 
     if not base.empty:
 
-        # REMOVE RC
         if "RC" in base.columns:
             base = base.drop(columns=["RC"])
 
-        # RENOMEIA
         base = base.rename(columns={
             "Pedido2": "Qtde",
             "Soma de Valor": "Valor (R$)"
         })
 
-        # FORMATAÇÕES
         for col in ["Valor (R$)", "Soma de Valores"]:
-
             if col in base.columns:
                 base[col] = base[col].apply(formatar_moeda)
 
@@ -253,53 +274,24 @@ if rc_input:
         # SIDEBAR
         # =========================
         st.sidebar.image("download.png", width=100)
-
         st.sidebar.header("🔎 Filtros")
 
-        # STATUS
-        status_list = sorted(
-            base["Status"].dropna().unique()
-        ) if "Status" in base.columns else []
-
-        status = st.sidebar.selectbox(
-            "Status",
-            ["Todos"] + status_list
-        )
-
+        status_list = sorted(base["Status"].dropna().unique()) if "Status" in base.columns else []
+        status = st.sidebar.selectbox("Status", ["Todos"] + status_list)
         df1 = base.copy()
-
         if status != "Todos":
             df1 = df1[df1["Status"] == status]
 
-        # MOTIVO
-        motivo_list = sorted(
-            df1["Motivo"].dropna().unique()
-        ) if "Motivo" in df1.columns else []
-
-        motivo = st.sidebar.selectbox(
-            "Motivo",
-            ["Todos"] + motivo_list
-        )
-
+        motivo_list = sorted(df1["Motivo"].dropna().unique()) if "Motivo" in df1.columns else []
+        motivo = st.sidebar.selectbox("Motivo", ["Todos"] + motivo_list)
         df2 = df1.copy()
-
         if motivo != "Todos":
             df2 = df2[df2["Motivo"] == motivo]
 
-        # CLIENTE
         cliente = st.sidebar.text_input("Cliente (buscar)")
-
         df3 = df2.copy()
-
         if cliente:
-
-            df3 = df3[
-                df3["Cliente"].str.contains(
-                    cliente,
-                    case=False,
-                    na=False
-                )
-            ]
+            df3 = df3[df3["Cliente"].str.contains(cliente, case=False, na=False)]
 
         pedidos_view = df3.copy()
 
@@ -308,19 +300,15 @@ if rc_input:
         # =========================
         pedidos_view["Valor_num"] = pedidos_view["Valor (R$)"].apply(para_float)
 
-        total_pedidos = len(pedidos_view)
-
-        valor_total = pedidos_view["Valor_num"].sum()
+        total_pedidos  = len(pedidos_view)
+        valor_total    = pedidos_view["Valor_num"].sum()
 
         valor_liberado = pedidos_view[
             pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")
         ]["Valor_num"].sum()
 
-        valor_critico = pedidos_view[
-            pedidos_view["Motivo"].astype(str).str.lower().isin([
-                "estoque",
-                "ag retorno comercial"
-            ])
+        valor_critico  = pedidos_view[
+            pedidos_view["Motivo"].astype(str).str.lower().isin(["estoque", "ag retorno comercial"])
         ]["Valor_num"].sum()
 
         valor_pendente = pedidos_view[
@@ -328,886 +316,586 @@ if rc_input:
         ]["Valor_num"].sum()
 
         # =========================
-        # ABAS
+        # KPI CARDS — ESTILO BASE44
+        # (logo abaixo da busca, antes das abas)
         # =========================
-        tab1, tab2 = st.tabs([
-            "📊 Visão Geral",
-            f"📦 Pedidos ({total_pedidos})"
-        ])
+        k1, k2, k3, k4, k5 = st.columns(5)
 
-        # =====================================================
-        # ABA 1 — VISÃO GERAL
-        # =====================================================
-        with tab1:
-
-            # =========================
-            # INSIGHTS
-            # =========================
-            st.markdown("""
-            <div style="
-                font-size:16px;
-                font-weight:700;
-                color:#6b7280;
-                margin-top:5px;
-                margin-bottom:10px;
-            ">
-            ⚡ INSIGHTS AUTOMÁTICOS
+        with k1:
+            st.markdown(f"""
+            <div class='kpi-card'>
+                <div style='font-size:28px;margin-bottom:4px;'>📦</div>
+                <div style='font-size:28px;font-weight:700;color:#111827;line-height:1;'>{total_pedidos}</div>
+                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Pedido(s)</div>
             </div>
             """, unsafe_allow_html=True)
 
-            insight1, insight2 = st.columns(2)
+        with k2:
+            st.markdown(f"""
+            <div class='kpi-card'>
+                <div style='font-size:22px;margin-bottom:4px;'>🏅</div>
+                <div style='font-size:20px;font-weight:700;color:#111827;line-height:1;'>{formatar_moeda(valor_total)}</div>
+                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Total</div>
+            </div>
+            """, unsafe_allow_html=True)
 
+        with k3:
+            st.markdown(f"""
+            <div class='kpi-card'>
+                <div style='font-size:14px;font-weight:700;margin-bottom:4px;'>
+                    <span style='color:#16a34a;font-size:18px;'>●</span>
+                </div>
+                <div style='font-size:20px;font-weight:700;color:#16a34a;line-height:1;'>{formatar_moeda(valor_liberado)}</div>
+                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Liberado</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with k4:
+            st.markdown(f"""
+            <div class='kpi-card'>
+                <div style='font-size:14px;font-weight:700;margin-bottom:4px;'>
+                    <span style='color:#dc2626;font-size:18px;'>●</span>
+                </div>
+                <div style='font-size:20px;font-weight:700;color:#dc2626;line-height:1;'>{formatar_moeda(valor_critico)}</div>
+                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Estoque / Ag. Retorno Comercial</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with k5:
+            st.markdown(f"""
+            <div class='kpi-card'>
+                <div style='font-size:14px;font-weight:700;margin-bottom:4px;'>
+                    <span style='color:#d97706;font-size:18px;'>●</span>
+                </div>
+                <div style='font-size:20px;font-weight:700;color:#d97706;line-height:1;'>{formatar_moeda(valor_pendente)}</div>
+                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Aguardando Atendimento</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
+
+        # =========================
+        # ABAS PRINCIPAIS
+        # =========================
+        tab1, tab2 = st.tabs([
+            "📊 Visão Geral",
+            f"📦 Pedidos  {total_pedidos}"
+        ])
+
+        # =====================================================
+        # ABA 1 — VISÃO GERAL (LAYOUT BASE44)
+        # =====================================================
+        with tab1:
+
+            # ---- INSIGHTS ----
             motivo_top = (
                 pedidos_view.groupby("Motivo")["Valor_num"]
                 .sum()
                 .sort_values(ascending=False)
             )
 
-            if len(motivo_top) > 0:
+            motivo_nome = motivo_top.index[0] if len(motivo_top) > 0 else "-"
+            motivo_valor = motivo_top.iloc[0] if len(motivo_top) > 0 else 0
+            percentual_motivo   = (motivo_valor / valor_total * 100) if valor_total > 0 else 0
+            percentual_liberado = (valor_liberado / valor_total * 100) if valor_total > 0 else 0
+            n_liberados_ped     = len(pedidos_view[pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")])
 
-                motivo_nome = motivo_top.index[0]
-                motivo_valor = motivo_top.iloc[0]
+            ins1, ins2 = st.columns(2)
 
-                percentual_motivo = (
-                    motivo_valor / valor_total * 100
-                ) if valor_total > 0 else 0
-
-            else:
-
-                motivo_nome = "-"
-                percentual_motivo = 0
-
-            percentual_liberado = (
-                valor_liberado / valor_total * 100
-            ) if valor_total > 0 else 0
-
-            with insight1:
-
+            with ins1:
                 st.markdown(f"""
-                <div style="
-                    background:#eff6ff;
-                    border:1px solid #bfdbfe;
-                    border-radius:14px;
-                    padding:16px;
-                    margin-bottom:15px;
-                ">
-
-                <div style="
-                    font-size:18px;
-                    font-weight:700;
-                    color:#1d4ed8;
-                ">
-                📉 Concentração: "{motivo_nome}"
-                </div>
-
-                <div style="
-                    margin-top:8px;
-                    color:#2563eb;
-                    font-size:15px;
-                ">
-                Representa {percentual_motivo:.0f}% do valor total
-                ({formatar_moeda(motivo_valor)})
-                </div>
-
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
+                    <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:4px;">
+                        📉 Concentração: "{motivo_nome}"
+                    </div>
+                    <div style="font-size:13px;color:#2563eb;">
+                        Representa {percentual_motivo:.0f}% do valor total ({formatar_moeda(motivo_valor)})
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-            with insight2:
-
+            with ins2:
                 st.markdown(f"""
-                <div style="
-                    background:#f0fdf4;
-                    border:1px solid #86efac;
-                    border-radius:14px;
-                    padding:16px;
-                    margin-bottom:15px;
-                ">
-
-                <div style="
-                    font-size:18px;
-                    font-weight:700;
-                    color:#15803d;
-                ">
-                ✅ {percentual_liberado:.0f}% dos pedidos estão liberados
-                </div>
-
-                <div style="
-                    margin-top:8px;
-                    color:#16a34a;
-                    font-size:15px;
-                ">
-                {formatar_moeda(valor_liberado)} já disponíveis
-                </div>
-
+                <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
+                    <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">
+                        ✅ {percentual_liberado:.0f}% dos pedidos estão liberados
+                    </div>
+                    <div style="font-size:13px;color:#16a34a;">
+                        {n_liberados_ped} de {total_pedidos} pedidos prontos
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-            # =========================
-            # GRÁFICOS
-            # =========================
-            col_graf1, col_graf2, col_graf3 = st.columns(3)
+            # ---- GRÁFICOS LINHA 1: STATUS | VALOR POR MOTIVO | VALOR POR UF ----
+            g1, g2, g3 = st.columns(3)
 
-            # =========================
-            # STATUS
-            # =========================
-            with col_graf1:
-
-                st.markdown("""
-                <div class='card-geral'>
-                <div class='chart-title'>
-                DISTRIBUIÇÃO POR STATUS
-                </div>
-                """, unsafe_allow_html=True)
-
+            # STATUS — donut com legenda embaixo estilo Base44
+            with g1:
                 status_chart = (
                     pedidos_view.groupby("Status")
                     .size()
                     .reset_index(name="Quantidade")
                 )
 
-                fig_status = px.pie(
-                    status_chart,
-                    values="Quantidade",
-                    names="Status",
-                    hole=0.65
-                )
+                # Cores fixas por status
+                color_map = {
+                    "Pendente":  "#f59e0b",
+                    "Conferido": "#3b82f6",
+                    "Liberado":  "#22c55e",
+                }
+                cores = [color_map.get(s, "#9ca3af") for s in status_chart["Status"]]
 
+                fig_status = go.Figure(go.Pie(
+                    labels=status_chart["Status"],
+                    values=status_chart["Quantidade"],
+                    hole=0.6,
+                    marker_colors=cores,
+                    textinfo="percent",
+                    textfont_size=12,
+                ))
                 fig_status.update_layout(
-                    height=320,
+                    height=280,
                     margin=dict(l=0, r=0, t=0, b=0),
-                    showlegend=True
+                    showlegend=True,
+                    legend=dict(
+                        orientation="h",
+                        yanchor="top",
+                        y=-0.05,
+                        xanchor="center",
+                        x=0.5,
+                        font=dict(size=11)
+                    ),
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
                 )
 
-                st.plotly_chart(
-                    fig_status,
-                    use_container_width=True
-                )
-
+                st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
+                st.markdown("<div class='chart-card-title'>Distribuição por Status</div>", unsafe_allow_html=True)
+                st.plotly_chart(fig_status, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            # =========================
-            # MOTIVO
-            # =========================
-            with col_graf2:
-
-                st.markdown("""
-                <div class='card-geral'>
-                <div class='chart-title'>
-                VALOR POR MOTIVO
-                </div>
-                """, unsafe_allow_html=True)
-
+            # VALOR POR MOTIVO — barras verticais coloridas
+            with g2:
                 motivo_chart = (
                     pedidos_view.groupby("Motivo")["Valor_num"]
                     .sum()
                     .reset_index()
+                    .sort_values("Valor_num", ascending=False)
                 )
 
+                paleta_motivo = px.colors.qualitative.Bold
                 fig_motivo = px.bar(
                     motivo_chart,
                     x="Motivo",
-                    y="Valor_num"
+                    y="Valor_num",
+                    color="Motivo",
+                    color_discrete_sequence=paleta_motivo,
                 )
-
                 fig_motivo.update_layout(
-                    height=320,
-                    margin=dict(l=0, r=0, t=0, b=0),
+                    height=280,
+                    margin=dict(l=0, r=0, t=0, b=60),
                     xaxis_title="",
-                    yaxis_title=""
+                    yaxis_title="",
+                    showlegend=False,
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    xaxis=dict(tickfont=dict(size=10)),
+                    yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
                 )
+                fig_motivo.update_traces(marker_line_width=0)
 
-                st.plotly_chart(
-                    fig_motivo,
-                    use_container_width=True
-                )
-
+                st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
+                st.markdown("<div class='chart-card-title'>Valor por Motivo</div>", unsafe_allow_html=True)
+                st.plotly_chart(fig_motivo, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            # =========================
-            # UF
-            # =========================
-            with col_graf3:
-
-                st.markdown("""
-                <div class='card-geral'>
-                <div class='chart-title'>
-                VALOR POR ESTADO (UF)
-                </div>
-                """, unsafe_allow_html=True)
-
+            # VALOR POR UF — barras horizontais
+            with g3:
                 uf_chart = (
                     pedidos_view.groupby("UF")["Valor_num"]
                     .sum()
                     .reset_index()
+                    .sort_values("Valor_num", ascending=True)
                 )
 
                 fig_uf = px.bar(
                     uf_chart,
                     x="Valor_num",
                     y="UF",
-                    orientation="h"
+                    orientation="h",
+                    color="Valor_num",
+                    color_continuous_scale=["#fca5a5", "#dc2626", "#7f1d1d"],
                 )
-
                 fig_uf.update_layout(
-                    height=320,
+                    height=280,
                     margin=dict(l=0, r=0, t=0, b=0),
                     xaxis_title="",
-                    yaxis_title=""
+                    yaxis_title="",
+                    coloraxis_showscale=False,
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                    yaxis=dict(tickfont=dict(size=11)),
                 )
+                fig_uf.update_traces(marker_line_width=0)
 
-                st.plotly_chart(
-                    fig_uf,
-                    use_container_width=True
-                )
-
+                st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
+                st.markdown("<div class='chart-card-title'>Valor por Estado (UF)</div>", unsafe_allow_html=True)
+                st.plotly_chart(fig_uf, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            st.markdown("<br>", unsafe_allow_html=True)
+            # ---- GRÁFICOS LINHA 2: PREVISÃO POR MÊS | TOP CLIENTES ----
+            g4, g5 = st.columns(2)
 
-            # =========================
-            # TOP CLIENTES
-            # =========================
-            st.markdown("""
-            <div class='section-title'>
-            🏆 Top Clientes por Valor
-            </div>
-            """, unsafe_allow_html=True)
+            # PREVISÃO DE ENTREGA POR MÊS
+            with g4:
+                if "Previsão" in pedidos_view.columns:
+                    prev_df = pedidos_view.copy()
+                    prev_df["Prev_dt"] = pd.to_datetime(prev_df["Previsão"], dayfirst=True, errors="coerce")
+                    prev_df = prev_df.dropna(subset=["Prev_dt"])
+                    prev_df["Mes"] = prev_df["Prev_dt"].dt.to_period("M").astype(str)
 
-            top_clientes = (
-                pedidos_view.groupby("Cliente")["Valor_num"]
-                .sum()
-                .sort_values(ascending=False)
-                .head(10)
-                .reset_index()
-            )
+                    hoje = pd.Timestamp.today()
+                    mes_atual = hoje.to_period("M").strftime("%Y-%m")
 
-            fig_clientes = px.bar(
-                top_clientes,
-                x="Valor_num",
-                y="Cliente",
-                orientation="h"
-            )
+                    def classifica_mes(row):
+                        if row["Mes"] < mes_atual:
+                            return "Vencidos"
+                        elif row["Mes"] == mes_atual:
+                            return "Mês atual"
+                        else:
+                            return "Futuro"
 
-            fig_clientes.update_layout(
-                height=420,
-                margin=dict(l=0, r=0, t=0, b=0),
-                xaxis_title="",
-                yaxis_title=""
-            )
+                    prev_df["Tipo"] = prev_df.apply(classifica_mes, axis=1)
 
-            st.plotly_chart(
-                fig_clientes,
-                use_container_width=True
-            )
+                    prev_group = (
+                        prev_df.groupby(["Mes", "Tipo"])
+                        .size()
+                        .reset_index(name="Qtde")
+                        .sort_values("Mes")
+                    )
+
+                    color_tipo = {
+                        "Mês atual": "#f9a8d4",
+                        "Futuro":    "#dc2626",
+                        "Vencidos":  "#fca5a5",
+                    }
+
+                    fig_prev = px.bar(
+                        prev_group,
+                        x="Mes",
+                        y="Qtde",
+                        color="Tipo",
+                        color_discrete_map=color_tipo,
+                        barmode="group",
+                        text="Qtde",
+                    )
+                    fig_prev.update_layout(
+                        height=300,
+                        margin=dict(l=0, r=0, t=0, b=0),
+                        xaxis_title="",
+                        yaxis_title="",
+                        legend=dict(
+                            orientation="h",
+                            yanchor="top",
+                            y=-0.15,
+                            xanchor="center",
+                            x=0.5,
+                            font=dict(size=10)
+                        ),
+                        paper_bgcolor="rgba(0,0,0,0)",
+                        plot_bgcolor="rgba(0,0,0,0)",
+                        xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                    )
+                    fig_prev.update_traces(marker_line_width=0, textposition="outside", textfont_size=10)
+
+                    st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
+                    st.markdown("<div class='chart-card-title'>Previsão de Entrega por Mês</div>", unsafe_allow_html=True)
+                    st.plotly_chart(fig_prev, use_container_width=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+            # TOP CLIENTES — lista ranqueada estilo Base44
+            with g5:
+                top_clientes = (
+                    pedidos_view.groupby("Cliente")
+                    .agg(
+                        Valor=("Valor_num", "sum"),
+                        Pedidos=("Pedido", "count")
+                    )
+                    .sort_values("Valor", ascending=False)
+                    .head(8)
+                    .reset_index()
+                )
+
+                max_val = top_clientes["Valor"].max() if len(top_clientes) > 0 else 1
+
+                rows_html = ""
+                for i, row in top_clientes.iterrows():
+                    pct = (row["Valor"] / max_val) * 100
+                    nome_curto = row["Cliente"][:35] + "..." if len(row["Cliente"]) > 35 else row["Cliente"]
+                    rows_html += f"""
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;">
+                        <div style="font-size:12px;font-weight:700;color:#9ca3af;width:18px;text-align:right;">{i+1}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:13px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nome_curto}</div>
+                            <div style="margin-top:3px;background:#fee2e2;border-radius:999px;height:5px;width:100%;">
+                                <div style="background:#dc2626;border-radius:999px;height:5px;width:{pct:.0f}%;"></div>
+                            </div>
+                        </div>
+                        <div style="text-align:right;min-width:80px;">
+                            <div style="font-size:12px;color:#6b7280;">{row['Pedidos']} ped.</div>
+                            <div style="font-size:13px;font-weight:700;color:#111827;">{formatar_moeda_curto(row['Valor'])}</div>
+                        </div>
+                    </div>
+                    """
+
+                st.markdown(f"""
+                <div class='chart-card'>
+                    <div class='chart-card-title'>👤 Top Clientes por Valor</div>
+                    {rows_html}
+                </div>
+                """, unsafe_allow_html=True)
 
         # =====================================================
-        # ABA 2 — PEDIDOS
+        # ABA 2 — PEDIDOS (LAYOUT BASE44)
         # =====================================================
         with tab2:
 
-            # =========================
-            # CARDS RESUMO
-            # =========================
-            col1, col2, col3, col4, col5 = st.columns(5)
+            st.markdown("<div style='margin-top:12px;'></div>", unsafe_allow_html=True)
 
-            # CARD PEDIDOS
-            with col1:
+            # ---- FILTRO POR STATUS (ABAS TIPO BASE44) ----
+            n_todos      = len(pedidos_view)
+            n_pendentes  = len(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
+            n_liberados  = len(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
+            n_conferidos = len(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
 
-                st.markdown(f"""
-                <div style="
-                    background:white;
-                    border:1px solid #e5e7eb;
-                    border-radius:14px;
-                    padding:14px;
-                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
-                ">
-
-                <div style="
-                    font-size:24px;
-                ">
-                📦
-                </div>
-
-                <div style="
-                    font-size:24px;
-                    font-weight:700;
-                    color:#111827;
-                    margin-top:5px;
-                ">
-                {total_pedidos}
-                </div>
-
-                <div style="
-                    font-size:13px;
-                    color:#6b7280;
-                    margin-top:3px;
-                ">
-                Pedido(s)
-                </div>
-
-                </div>
-                """, unsafe_allow_html=True)
-
-            # CARD VALOR TOTAL
-            with col2:
-
-                st.markdown(f"""
-                <div style="
-                    background:white;
-                    border:1px solid #e5e7eb;
-                    border-radius:14px;
-                    padding:14px;
-                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
-                ">
-
-                <div style="
-                    font-size:24px;
-                ">
-                💰
-                </div>
-
-                <div style="
-                    font-size:22px;
-                    font-weight:700;
-                    color:#111827;
-                    margin-top:5px;
-                ">
-                {formatar_moeda(valor_total)}
-                </div>
-
-                <div style="
-                    font-size:13px;
-                    color:#6b7280;
-                    margin-top:3px;
-                ">
-                Valor Total
-                </div>
-
-                </div>
-                """, unsafe_allow_html=True)
-
-            # CARD LIBERADOS
-            with col3:
-
-                st.markdown(f"""
-                <div style="
-                    background:white;
-                    border:1px solid #dcfce7;
-                    border-radius:14px;
-                    padding:14px;
-                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
-                ">
-
-                <div style="
-                    font-size:24px;
-                ">
-                🟢
-                </div>
-
-                <div style="
-                    font-size:22px;
-                    font-weight:700;
-                    color:#166534;
-                    margin-top:5px;
-                ">
-                {formatar_moeda(valor_liberado)}
-                </div>
-
-                <div style="
-                    font-size:13px;
-                    color:#6b7280;
-                    margin-top:3px;
-                ">
-                Valor Liberado
-                </div>
-
-                </div>
-                """, unsafe_allow_html=True)
-
-            # CARD CRÍTICOS
-            with col4:
-
-                st.markdown(f"""
-                <div style="
-                    background:white;
-                    border:1px solid #fee2e2;
-                    border-radius:14px;
-                    padding:14px;
-                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
-                ">
-
-                <div style="
-                    font-size:24px;
-                ">
-                🔴
-                </div>
-
-                <div style="
-                    font-size:22px;
-                    font-weight:700;
-                    color:#991b1b;
-                    margin-top:5px;
-                ">
-                {formatar_moeda(valor_critico)}
-                </div>
-
-                <div style="
-                    font-size:13px;
-                    color:#6b7280;
-                    margin-top:3px;
-                ">
-                Estoque / Ag RC
-                </div>
-
-                </div>
-                """, unsafe_allow_html=True)
-
-            # CARD PENDENTES
-            with col5:
-
-                st.markdown(f"""
-                <div style="
-                    background:white;
-                    border:1px solid #fef3c7;
-                    border-radius:14px;
-                    padding:14px;
-                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
-                ">
-
-                <div style="
-                    font-size:24px;
-                ">
-                🟡
-                </div>
-
-                <div style="
-                    font-size:22px;
-                    font-weight:700;
-                    color:#b45309;
-                    margin-top:5px;
-                ">
-                {formatar_moeda(valor_pendente)}
-                </div>
-
-                <div style="
-                    font-size:13px;
-                    color:#6b7280;
-                    margin-top:3px;
-                ">
-                Valor Pendente
-                </div>
-
-                </div>
-                """, unsafe_allow_html=True)
-
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # =========================
-            # TÍTULO
-            # =========================
-            st.markdown(
-                "<div class='section-title'>🧾 Seus Pedidos</div>",
-                unsafe_allow_html=True
-            )
-            
-            # =========================
-            # FILTRO DE STATUS (ABAS TIPO BASE44)
-            # =========================
-            n_todos       = len(pedidos_view)
-            n_pendentes   = len(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
-            n_liberados   = len(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
-            n_conferidos  = len(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
-            
-            filtro_tab1, filtro_tab2, filtro_tab3, filtro_tab4 = st.tabs([
-                f"🟡 Todos ({n_todos})",
-                f"🔴 Pendentes ({n_pendentes})",
-                f"🟢 Liberados ({n_liberados})",
-                f"🔵 Conferidos ({n_conferidos})",
+            ft1, ft2, ft3, ft4 = st.tabs([
+                f"Todos  {n_todos}",
+                f"Pendentes  {n_pendentes}",
+                f"Liberados  {n_liberados}",
+                f"Conferidos  {n_conferidos}",
             ])
-            
+
             def renderizar_tabela(df_filtrado):
-                # =========================
-                # HTML TABELA PEDIDOS
-                # =========================
+                df_show = df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore")
+
                 html = """
                 <style>
-                table { width:100%; border-collapse:collapse; font-family:Arial; background:white; border-radius:12px; overflow:hidden; }
-                thead tr { background:#f3f4f6; }
-                th { padding:14px; text-align:left; font-size:14px; color:#374151; }
-                td { padding:14px; border-top:1px solid #f1f5f9; font-size:14px; color:#111827; }
-                tr:hover { background:#f9fafb; }
-                .badge-liberado { background:#dcfce7; color:#166534; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
-                .badge-conferido { background:#dbeafe; color:#1d4ed8; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
-                .badge-pendente { background:#fee2e2; color:#991b1b; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
-                .pedido-highlight { font-weight:700; color:#c00000; }
-                .valor-highlight { font-weight:700; color:#166534; }
+                * { box-sizing: border-box; }
+                body { margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+                table { width:100%; border-collapse:collapse; background:white; }
+                thead tr { background:#f9fafb; border-bottom: 2px solid #e5e7eb; }
+                th { padding:10px 14px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; }
+                td { padding:10px 14px; border-bottom:1px solid #f3f4f6; font-size:13px; color:#111827; vertical-align:middle; }
+                tr:hover td { background:#f9fafb; }
+                .ped { font-weight:700; color:#c00000; }
+                .val { font-weight:600; color:#374151; }
+                .mot { font-weight:600; color:#d97706; }
+                .badge-lib  { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+                .badge-conf { background:#dbeafe; color:#1d4ed8; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+                .badge-pend { background:#fef9c3; color:#92400e; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
                 </style>
-                <table><thead><tr>
+                <table>
+                <thead><tr>
+                <th>Pedido</th><th>Cliente</th><th>UF</th><th>Status</th><th>Motivo</th><th>Previsão</th><th>Valor (R$)</th>
+                </tr></thead><tbody>
                 """
-            
-                for col in df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore").columns:
-                    html += f"<th>{col}</th>"
-            
-                html += "</tr></thead><tbody>"
-            
-                for _, row in df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore").iterrows():
-            
-                    status_lower = str(row["Status"]).strip().lower()
-            
-                    if status_lower == "liberado":
-                        badge = f"<span class='badge-liberado'>{row['Status']}</span>"
-                    elif status_lower == "conferido":
-                        badge = f"<span class='badge-conferido'>{row['Status']}</span>"
+
+                for _, row in df_show.iterrows():
+                    s = str(row.get("Status", "")).strip().lower()
+                    if s == "liberado":
+                        badge = f"<span class='badge-lib'>{row['Status']}</span>"
+                    elif s == "conferido":
+                        badge = f"<span class='badge-conf'>{row['Status']}</span>"
                     else:
-                        badge = f"<span class='badge-pendente'>{row['Status']}</span>"
-            
-                    motivo_html = f"<span style='font-weight:700;color:#d97706;'>{row['Motivo']}</span>"
-            
+                        badge = f"<span class='badge-pend'>{row['Status']}</span>"
+
                     html += f"""
                     <tr>
-                        <td class="pedido-highlight">{row['Pedido']}</td>
-                        <td>{row['Cliente']}</td>
-                        <td>{row['UF']}</td>
+                        <td class='ped'>{row.get('Pedido','')}</td>
+                        <td>{row.get('Cliente','')}</td>
+                        <td>{row.get('UF','')}</td>
                         <td>{badge}</td>
-                        <td>{motivo_html}</td>
-                        <td style="font-weight:700;color:#374151;">{row['Previsão']}</td>
-                        <td class="valor-highlight">{row['Valor (R$)']}</td>
+                        <td class='mot'>{row.get('Motivo','')}</td>
+                        <td>{row.get('Previsão','')}</td>
+                        <td class='val'>{row.get('Valor (R$)','')}</td>
                     </tr>
                     """
-            
-                html += "</tbody></table>"
-            
-                qtd = len(df_filtrado)
-                altura = (qtd * 52) + 50 if qtd <= 5 else 330
-                scroll = qtd > 5
-            
-                components.html(html, height=altura, scrolling=scroll)
-            
-            with filtro_tab1:
-                renderizar_tabela(pedidos_view)
-            
-            with filtro_tab2:
-                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
-            
-            with filtro_tab3:
-                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
-            
-            with filtro_tab4:
-                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
-            
-            # Usa o df completo para o selectbox abaixo (independente da aba ativa)
 
-            # =========================
-            # SELECT PEDIDO
-            # =========================
+                html += "</tbody></table>"
+
+                qtd = len(df_filtrado)
+                altura = min((qtd * 46) + 52, 420)
+                scroll = qtd > 8
+                components.html(html, height=altura, scrolling=scroll)
+
+            with ft1:
+                renderizar_tabela(pedidos_view)
+            with ft2:
+                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
+            with ft3:
+                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
+            with ft4:
+                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
+
+            st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
+
+            # ---- SELECT PEDIDO ----
             pedidos_view["Pedido_Cliente"] = (
                 pedidos_view["Pedido"].astype(str)
-                + " - "
+                + " — "
                 + pedidos_view["Cliente"].astype(str)
             )
 
             pedido_escolha = st.selectbox(
-                "📌 Selecione um Pedido:",
+                "📌 Selecione um pedido para ver detalhes:",
                 [""] + pedidos_view["Pedido_Cliente"].tolist()
             )
 
-            # =========================
-            # SOMENTE SE ESCOLHER PEDIDO
-            # =========================
             if pedido_escolha != "":
 
-                pedido_numero = pedido_escolha.split(" - ")[0]
-
-                pedido_info = pedidos_view[
+                pedido_numero = pedido_escolha.split(" — ")[0]
+                pedido_info   = pedidos_view[
                     pedidos_view["Pedido"].astype(str) == pedido_numero
                 ].iloc[0]
 
-                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown("<div style='margin-top:12px;'></div>", unsafe_allow_html=True)
 
-                # =========================
-                # PEDIDO SELECIONADO
-                # =========================
+                # PEDIDO SELECIONADO — card estilo Base44
+                status_ped = str(pedido_info.get("Status", "")).strip().lower()
+                badge_ped  = badge_status(pedido_info.get("Status", ""))
 
                 st.markdown(f"""
                 <div style="
-                background:#fff7f7;
-                border:1px solid #f3dede;
-                border-left:5px solid #c00000;
-                border-radius:12px;
-                padding:18px;
-                margin-top:10px;
-                margin-bottom:20px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
+                    background:white;
+                    border:1px solid #e5e7eb;
+                    border-left:5px solid #c00000;
+                    border-radius:12px;
+                    padding:18px 22px;
+                    margin-bottom:18px;
+                    box-shadow:0 1px 4px rgba(0,0,0,0.05);
                 ">
-                
-                <div style="
-                font-size:13px;
-                font-weight:600;
-                color:#6b7280;
-                margin-bottom:8px;
-                ">
-                Pedido Selecionado
-                </div>
-                
-                <div style="
-                font-size:34px;
-                font-weight:800;
-                color:#111827;
-                line-height:1;
-                ">
-                #{pedido_info['Pedido']}
-                </div>
-                
-                <div style="
-                font-size:14px;
-                color:#6b7280;
-                margin-top:16px;
-                ">
-                <b>Cliente:</b> {pedido_info['Cliente']}
-                &nbsp;&nbsp;&nbsp; |
-                &nbsp;&nbsp;&nbsp;
-                <b>Valor:</b> {pedido_info['Valor (R$)']}
-                </div>
-                
+                    <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">
+                        Pedido Selecionado
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <div style="font-size:32px;font-weight:800;color:#111827;">#{pedido_info['Pedido']}</div>
+                        <div>{badge_ped}</div>
+                    </div>
+                    <div style="font-size:13px;color:#6b7280;margin-top:10px;display:flex;gap:24px;flex-wrap:wrap;">
+                        <span><b style="color:#374151;">Cliente:</b> {pedido_info['Cliente']}</span>
+                        <span><b style="color:#374151;">Valor:</b> {pedido_info['Valor (R$)']}</span>
+                        <span><b style="color:#374151;">Previsão:</b> {pedido_info.get('Previsão','')}</span>
+                        <span><b style="color:#374151;">Motivo:</b> {pedido_info.get('Motivo','')}</span>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-                # =========================
-                # ITENS
-                # =========================
+                # ---- ITENS DO PEDIDO ----
                 st.markdown("""
-                <div class='section-title'>
+                <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:10px;">
                 📦 Itens do Pedido
                 </div>
                 """, unsafe_allow_html=True)
-                
-                itens_pedido = itens[
-                    itens["Pedido"].astype(str) == pedido_numero
-                ].copy()
 
-                # REMOVE COLUNAS
+                itens_pedido = itens[itens["Pedido"].astype(str) == pedido_numero].copy()
+
                 colunas_remover = ["RC", "Pedido"]
-                
                 itens_pedido = itens_pedido.drop(
                     columns=[c for c in colunas_remover if c in itens_pedido.columns]
                 )
-                
+
                 if not itens_pedido.empty:
-                
-                    # =========================
-                    # RENOMEIA COLUNAS
-                    # =========================
+
                     itens_pedido = itens_pedido.rename(columns={
-                    
-                        "Codigo": "Código",
-                        "Descricao": "Descrição",
-                        "Pedido2": "Qtde",
+                        "Codigo":        "Código",
+                        "Descricao":     "Descrição",
+                        "Pedido2":       "Qtde",
                         "Soma de Valor": "Valor (R$)"
-                    
                     })
-                
-                    # =========================
-                    # FORMATAÇÕES
-                    # =========================
+
                     if "Previsão Final" in itens_pedido.columns:
-                
                         itens_pedido["Previsão Final"] = (
-                            itens_pedido["Previsão Final"]
-                            .apply(formatar_data)
-                            .replace("NaT", "")
+                            itens_pedido["Previsão Final"].apply(formatar_data).replace("NaT", "")
                         )
-                
+
                     if "Valor (R$)" in itens_pedido.columns:
-                
-                        itens_pedido["Valor (R$)"] = (
-                            itens_pedido["Valor (R$)"]
-                            .apply(formatar_moeda)
-                        )
-                
-                    # =========================
-                    # HTML
-                    # =========================
+                        itens_pedido["Valor (R$)"] = itens_pedido["Valor (R$)"].apply(formatar_moeda)
+
                     html_itens = """
                     <style>
-                
-                    table {
-                        width:100%;
-                        border-collapse:collapse;
-                        font-family:Arial;
-                        background:white;
-                        border-radius:12px;
-                        overflow:hidden;
-                    }
-                
-                    thead tr {
-                        background:#f3f4f6;
-                    }
-                
-                    th {
-                        padding:14px;
-                        text-align:left;
-                        font-size:14px;
-                        color:#374151;
-                    }
-                
-                    td {
-                        padding:14px;
-                        border-top:1px solid #f1f5f9;
-                        font-size:14px;
-                        color:#111827;
-                    }
-                
-                    tr:hover {
-                        background:#f9fafb;
-                    }
-                
-                    .status-reservado {
-                        background:#dcfce7;
-                        color:#166534;
-                        padding:6px 10px;
-                        border-radius:999px;
-                        font-size:12px;
-                        font-weight:700;
-                    }
-                
-                    .status-saldo {
-                        background:#fee2e2;
-                        color:#991b1b;
-                        padding:6px 10px;
-                        border-radius:999px;
-                        font-size:12px;
-                        font-weight:700;
-                    }
-                
+                    * { box-sizing:border-box; }
+                    body { margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+                    table { width:100%; border-collapse:collapse; background:white; }
+                    thead tr { background:#f9fafb; border-bottom:2px solid #e5e7eb; }
+                    th { padding:10px 14px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
+                    td { padding:10px 14px; border-bottom:1px solid #f3f4f6; font-size:13px; color:#111827; vertical-align:middle; }
+                    tr:hover td { background:#f9fafb; }
+                    .badge-res { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; }
+                    .badge-sal { background:#fee2e2; color:#991b1b; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; }
                     </style>
-                
-                    <table>
-                    <thead>
-                    <tr>
+                    <table><thead><tr>
                     """
-                
-                    # CABEÇALHO
+
                     for col in itens_pedido.columns:
                         html_itens += f"<th>{col}</th>"
-                
-                    html_itens += "</tr></thead><tbody>"
-                
-                    # LINHAS
-                    for _, row in itens_pedido.iterrows():
-                
-                        html_itens += "<tr>"
-                
-                        for col in itens_pedido.columns:
-                
-                            valor = row[col]
-                
-                            # STATUS RESERVA
-                            if col == "Status Reserva":
-                
-                                status = str(valor).strip().lower()
-                
-                                if status == "reservado":
-                
-                                    valor = f"""
-                                    <span class='status-reservado'>
-                                        {row[col]}
-                                    </span>
-                                    """
-                
-                                else:
-                
-                                    valor = f"""
-                                    <span class='status-saldo'>
-                                        {row[col]}
-                                    </span>
-                                    """
-                
-                            html_itens += f"<td>{valor}</td>"
-                
-                        html_itens += "</tr>"
-                
-                    html_itens += "</tbody></table>"
-                
-                    # =========================
-                    # ALTURA DINÂMICA
-                    # =========================
-                    quantidade_itens = len(itens_pedido)
-                
-                    if quantidade_itens <= 8:
-                
-                        altura_itens = (quantidade_itens * 52) + 55
-                        scroll_itens = False
-                
-                    else:
-                
-                        altura_itens = 450
-                        scroll_itens = True
-                
-                    components.html(
-                        html_itens,
-                        height=altura_itens,
-                        scrolling=scroll_itens
-                    )
-                
-                else:
-                
-                    st.info(
-                        "Nenhum item encontrado para este pedido."
-                    )
 
-                st.markdown("<br>", unsafe_allow_html=True)
-                
-                # =========================
-                # AÇÃO RECOMENDADA
-                # =========================
-                st.markdown(
-                    "<div style='margin-top:8px;'></div>",
-                    unsafe_allow_html=True
-                )
-                
+                    html_itens += "</tr></thead><tbody>"
+
+                    for _, row in itens_pedido.iterrows():
+                        html_itens += "<tr>"
+                        for col in itens_pedido.columns:
+                            val = row[col]
+                            if col == "Status Reserva":
+                                if str(val).strip().lower() == "reservado":
+                                    val = f"<span class='badge-res'>{val}</span>"
+                                else:
+                                    val = f"<span class='badge-sal'>{val}</span>"
+                            html_itens += f"<td>{val}</td>"
+                        html_itens += "</tr>"
+
+                    html_itens += "</tbody></table>"
+
+                    qtd_itens = len(itens_pedido)
+                    altura_itens = min((qtd_itens * 46) + 52, 420)
+                    scroll_itens = qtd_itens > 8
+
+                    components.html(html_itens, height=altura_itens, scrolling=scroll_itens)
+
+                else:
+                    st.info("Nenhum item encontrado para este pedido.")
+
+                st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
+
+                # ---- AÇÃO RECOMENDADA ----
                 st.markdown("""
-                <div class='section-title'>
+                <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:10px;">
                 💡 Ação Recomendada
                 </div>
                 """, unsafe_allow_html=True)
 
-                acoes_pedido = acoes[
-                    acoes["Pedido"].astype(str) == pedido_numero
-                ]
+                acoes_pedido = acoes[acoes["Pedido"].astype(str) == pedido_numero]
 
                 if not acoes_pedido.empty:
-
-                    texto = limpar_texto(
-                        acoes_pedido.iloc[0]["Texto"]
-                    )
-
-                    st.markdown(
-                        f"""
-                        <div style="
-                            background:#fff5f5;
-                            border:1px solid #fefaca;
-                            border-left:5px solid #f5cf11;
-                            padding:10px;
-                            border-radius:08px;
-                            line-height:1.7;
-                            white-space:pre-line;
-                            font-size:15px;
-                            color:#111827;
-                        ">
-                            {texto}
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
+                    texto = limpar_texto(acoes_pedido.iloc[0]["Texto"])
+                    st.markdown(f"""
+                    <div style="
+                        background:#fffbeb;
+                        border:1px solid #fde68a;
+                        border-left:5px solid #f59e0b;
+                        padding:14px 18px;
+                        border-radius:10px;
+                        line-height:1.7;
+                        white-space:pre-line;
+                        font-size:14px;
+                        color:#111827;
+                    ">
+                        {texto}
+                    </div>
+                    """, unsafe_allow_html=True)
                 else:
-
-                    st.info(
-                        "Nenhuma ação cadastrada para este pedido."
-                    )
+                    st.info("Nenhuma ação cadastrada para este pedido.")
 
     else:
-
-        st.error(
-            "Nenhum pedido encontrado para este RC."
-        )
+        st.error("Nenhum pedido encontrado para este RC.")
