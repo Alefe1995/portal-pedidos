@@ -1270,7 +1270,7 @@ if rc_input:
                     )
 
                 st.markdown("<br>", unsafe_allow_html=True)
-
+                
                 # =========================
                 # AÇÃO RECOMENDADA
                 # =========================
@@ -1278,6 +1278,9 @@ if rc_input:
                     "<div style='margin-top:8px;'></div>",
                     unsafe_allow_html=True
                 )
+                
+                st.markdown("""
+                <div class='section-title'>
                 💡 Ação Recomendada
                 </div>
                 """, unsafe_allow_html=True)
