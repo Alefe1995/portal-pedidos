@@ -90,6 +90,10 @@ div[data-baseweb="select"] > div {
     color:white !important;
 }
 
+.stTabs [data-baseweb="tab-border"] {
+    display:none;
+}
+
 /* CARDS */
 .card-geral {
     background:white;
