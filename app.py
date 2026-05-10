@@ -1104,23 +1104,16 @@ if rc_input:
                     altura_itens = (quantidade_itens * 35) + 38
 
                     st.dataframe(
-                        itens_pedido.style.applymap(
-                    
-                            lambda v:
-                            "background-color:#fee2e2; color:#991b1b; font-weight:700;"
-                            if str(v).lower() == "sem estoque"
-                    
-                            else "background-color:#dcfce7; color:#166534; font-weight:700;"
-                            if str(v).lower() == "reservado"
-                    
-                            else "",
-                    
-                            subset=["Status Reserva"]
-                    
-                        ),
+                        itens_pedido,
                         use_container_width=True,
                         hide_index=True,
-                        height=altura_itens
+                        height=altura_itens,
+                        column_config={
+                    
+                            "Status Reserva": st.column_config.TextColumn(
+                                "Status Reserva"
+                            )
+                        }
                     )
 
                 else:
