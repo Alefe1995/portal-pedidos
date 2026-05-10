@@ -225,7 +225,7 @@ st.markdown("""
         <div>📋 Portal de Pedidos</div>
         <div class='subtitle'>Portal Pedidos Pendentes</div>
     </div>
-    <div style="margin-left:auto;font-size:13px;opacity:0.8;">Admin</div>
+    <div style="margin-left:auto;font-size:18px;opacity:0.8;color:white;">Admin</div>
 </div>
 """, unsafe_allow_html=True)
 
