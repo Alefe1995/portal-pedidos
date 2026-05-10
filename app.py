@@ -683,8 +683,8 @@ if rc_input:
             <div style="
             background:#fffbeb;
             border:1px solid #dfe3eb;
-            border-left:5px solid #f59e0b;
-            border-radius:14px;
+            border-left:5px solid #c00000;
+            border-radius:08px;
             padding:20px;
             margin-top:15px;
             margin-bottom:25px;
