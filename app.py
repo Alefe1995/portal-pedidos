@@ -801,7 +801,7 @@ if rc_input:
                 """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
-
+            
             # =========================
             # TÍTULO
             # =========================
@@ -809,207 +809,93 @@ if rc_input:
                 "<div class='section-title'>🧾 Seus Pedidos</div>",
                 unsafe_allow_html=True
             )
-
+            
             # =========================
-            # HTML TABELA PEDIDOS
+            # FILTRO DE STATUS (ABAS TIPO BASE44)
             # =========================
-            html = """
-            <style>
-
-            table {
-                width:100%;
-                border-collapse:collapse;
-                font-family:Arial;
-                background:white;
-                border-radius:12px;
-                overflow:hidden;
-            }
-
-            thead tr {
-                background:#f3f4f6;
-            }
-
-            th {
-                padding:14px;
-                text-align:left;
-                font-size:14px;
-                color:#374151;
-            }
-
-            td {
-                padding:14px;
-                border-top:1px solid #f1f5f9;
-                font-size:14px;
-                color:#111827;
-            }
-
-            tr:hover {
-                background:#f9fafb;
-            }
-
-            .badge-liberado {
-                background:#dcfce7;
-                color:#166534;
-                padding:6px 10px;
-                border-radius:999px;
-                font-size:12px;
-                font-weight:700;
-            }
-
-            .badge-conferido {
-                background:#dbeafe;
-                color:#1d4ed8;
-                padding:6px 10px;
-                border-radius:999px;
-                font-size:12px;
-                font-weight:700;
-            }
-
-            .badge-pendente {
-                background:#fee2e2;
-                color:#991b1b;
-                padding:6px 10px;
-                border-radius:999px;
-                font-size:12px;
-                font-weight:700;
-            }
-
-            .pedido-highlight {
-                font-weight:700;
-                color:#c00000;
-            }
-
-            .valor-highlight {
-                font-weight:700;
-                color:#166534;
-            }
-
-            .motivo-estoque {
-                font-weight:700;
-                color:#dc2626;
-            }
-
-            .motivo-retorno {
-                font-weight:700;
-                color:#d97706;
-            }
-
-            .motivo-liberado {
-                font-weight:700;
-                color:#16a34a;
-            }
-
-            </style>
-
-            <table>
-            <thead>
-            <tr>
-            """
-
-            # CABEÇALHO
-            for col in pedidos_view.drop(columns=["Valor_num"]).columns:
-                html += f"<th>{col}</th>"
-
-            html += "</tr></thead><tbody>"
-
-            # LINHAS
-            for _, row in pedidos_view.drop(columns=["Valor_num"]).iterrows():
-
-                status = str(row["Status"]).strip().lower()
-
-                # STATUS
-                if status == "liberado":
-
-                    badge = f"""
-                    <span class='badge-liberado'>
-                        {row['Status']}
-                    </span>
-                    """
-
-                elif status == "conferido":
-
-                    badge = f"""
-                    <span class='badge-conferido'>
-                        {row['Status']}
-                    </span>
-                    """
-
-                else:
-
-                    badge = f"""
-                    <span class='badge-pendente'>
-                        {row['Status']}
-                    </span>
-                    """
-
-                motivo_html = f"""
-                <span style="
-                    font-weight:700;
-                    color:#d97706;
-                ">
-                    {row['Motivo']}
-                </span>
+            n_todos       = len(pedidos_view)
+            n_pendentes   = len(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
+            n_liberados   = len(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
+            n_conferidos  = len(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
+            
+            filtro_tab1, filtro_tab2, filtro_tab3, filtro_tab4 = st.tabs([
+                f"🟡 Todos ({n_todos})",
+                f"🔴 Pendentes ({n_pendentes})",
+                f"🟢 Liberados ({n_liberados})",
+                f"🔵 Conferidos ({n_conferidos})",
+            ])
+            
+            def renderizar_tabela(df_filtrado):
+                # =========================
+                # HTML TABELA PEDIDOS
+                # =========================
+                html = """
+                <style>
+                table { width:100%; border-collapse:collapse; font-family:Arial; background:white; border-radius:12px; overflow:hidden; }
+                thead tr { background:#f3f4f6; }
+                th { padding:14px; text-align:left; font-size:14px; color:#374151; }
+                td { padding:14px; border-top:1px solid #f1f5f9; font-size:14px; color:#111827; }
+                tr:hover { background:#f9fafb; }
+                .badge-liberado { background:#dcfce7; color:#166534; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+                .badge-conferido { background:#dbeafe; color:#1d4ed8; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+                .badge-pendente { background:#fee2e2; color:#991b1b; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+                .pedido-highlight { font-weight:700; color:#c00000; }
+                .valor-highlight { font-weight:700; color:#166534; }
+                </style>
+                <table><thead><tr>
                 """
-
-                html += f"""
-                <tr>
-
-                    <td class="pedido-highlight">
-                        {row['Pedido']}
-                    </td>
-
-                    <td>
-                        {row['Cliente']}
-                    </td>
-
-                    <td>
-                        {row['UF']}
-                    </td>
-
-                    <td>
-                        {badge}
-                    </td>
-
-                    <td>
-                        {motivo_html}
-                    </td>
-
-                    <td style="
-                        font-weight:700;
-                        color:#374151;
-                    ">
-                        {row['Previsão']}
-                    </td>
-
-                    <td class="valor-highlight">
-                        {row['Valor (R$)']}
-                    </td>
-
-                </tr>
-                """
-
-            html += "</tbody></table>"
-
-            # =========================
-            # ALTURA DINÂMICA
-            # =========================
-            quantidade_pedidos = len(pedidos_view)
-
-            if quantidade_pedidos <= 5:
-
-                altura_pedidos = (quantidade_pedidos * 52) + 50
-                scroll = False
-
-            else:
-
-                altura_pedidos = 330
-                scroll = True
-
-            components.html(
-                html,
-                height=altura_pedidos,
-                scrolling=scroll
-            )
+            
+                for col in df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore").columns:
+                    html += f"<th>{col}</th>"
+            
+                html += "</tr></thead><tbody>"
+            
+                for _, row in df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore").iterrows():
+            
+                    status_lower = str(row["Status"]).strip().lower()
+            
+                    if status_lower == "liberado":
+                        badge = f"<span class='badge-liberado'>{row['Status']}</span>"
+                    elif status_lower == "conferido":
+                        badge = f"<span class='badge-conferido'>{row['Status']}</span>"
+                    else:
+                        badge = f"<span class='badge-pendente'>{row['Status']}</span>"
+            
+                    motivo_html = f"<span style='font-weight:700;color:#d97706;'>{row['Motivo']}</span>"
+            
+                    html += f"""
+                    <tr>
+                        <td class="pedido-highlight">{row['Pedido']}</td>
+                        <td>{row['Cliente']}</td>
+                        <td>{row['UF']}</td>
+                        <td>{badge}</td>
+                        <td>{motivo_html}</td>
+                        <td style="font-weight:700;color:#374151;">{row['Previsão']}</td>
+                        <td class="valor-highlight">{row['Valor (R$)']}</td>
+                    </tr>
+                    """
+            
+                html += "</tbody></table>"
+            
+                qtd = len(df_filtrado)
+                altura = (qtd * 52) + 50 if qtd <= 5 else 330
+                scroll = qtd > 5
+            
+                components.html(html, height=altura, scrolling=scroll)
+            
+            with filtro_tab1:
+                renderizar_tabela(pedidos_view)
+            
+            with filtro_tab2:
+                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
+            
+            with filtro_tab3:
+                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
+            
+            with filtro_tab4:
+                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
+            
+            # Usa o df completo para o selectbox abaixo (independente da aba ativa)
 
             # =========================
             # SELECT PEDIDO
