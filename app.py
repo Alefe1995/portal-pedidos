@@ -1289,10 +1289,10 @@ if rc_input:
                         f"""
                         <div style="
                             background:#fff5f5;
-                            border:1px solid #fecaca;
-                            border-left:5px solid #c00000;
+                            border:1px solid #fefaca;
+                            border-left:5px solid #f5cf11;
                             padding:18px;
-                            border-radius:12px;
+                            border-radius:08px;
                             line-height:1.7;
                             white-space:pre-line;
                             font-size:15px;
