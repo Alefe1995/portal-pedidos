@@ -810,7 +810,7 @@ if rc_input:
 
             if pedido_escolha != "":
 
-                pedido_numero = pedido_escolha.split(" — ")[0]
+                pedido_numero = pedido_escolha.split(" - ")[0]
                 pedido_info   = pedidos_view[
                     pedidos_view["Pedido"].astype(str) == pedido_numero
                 ].iloc[0]
