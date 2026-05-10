@@ -26,40 +26,59 @@ header {
     margin-top:10px;
 }
 
-/* ESCONDE MENU SUPERIOR */
+/* MENU SUPERIOR */
 #MainMenu {
     visibility: hidden;
 }
 
-/* ESCONDE HEADER */
+/* HEADER */
 header {
     visibility: hidden;
 }
 
-/* ESCONDE FOOTER */
+/* FOOTER */
 footer {
     visibility: hidden;
 }
 
-/* ESCONDE BOTÕES FLUTUANTES STREAMLIT */
+/* TOOLBAR SUPERIOR */
 [data-testid="stToolbar"] {
-    display: none;
+    display: none !important;
 }
 
-[data-testid="stDecoration"] {
-    display: none;
-}
-
-[data-testid="stStatusWidget"] {
-    display: none;
-}
-
-[data-testid="stFloatingButton"] {
-    display: none;
-}
-
+/* BOTÃO DEPLOY */
 .stDeployButton {
-    display: none;
+    display: none !important;
+}
+
+/* DECORAÇÃO STREAMLIT */
+[data-testid="stDecoration"] {
+    display: none !important;
+}
+
+/* STATUS */
+[data-testid="stStatusWidget"] {
+    display: none !important;
+}
+
+/* BOTÕES FLUTUANTES */
+[data-testid="stFloatingButton"] {
+    display: none !important;
+}
+
+/* BOTÃO HOSTED WITH STREAMLIT */
+[data-testid="stAppViewContainer"] > .main > div:last-child {
+    display: none !important;
+}
+
+/* CANTO INFERIOR DIREITO */
+button[kind="secondary"] {
+    display:none !important;
+}
+
+/* ELEMENTOS FIXOS */
+div[style*="position: fixed"] {
+    display:none !important;
 }
 
 /* FUNDO */
