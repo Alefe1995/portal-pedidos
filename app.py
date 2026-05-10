@@ -575,7 +575,7 @@ if rc_input:
                     {row['Motivo']}
                 </td>
 
-                <td>
+                <td style="font-weight:700;">
                     {row['Previsão']}
                 </td>
 
