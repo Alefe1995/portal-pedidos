@@ -322,7 +322,7 @@ if rc_input:
                 color:#6b7280;
                 margin-top:3px;
             ">
-            Pedidos
+            Pedido(s)
             </div>
 
             </div>
