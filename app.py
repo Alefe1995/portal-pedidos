@@ -221,7 +221,6 @@ def badge_status(status_val):
 # =========================
 
 st.markdown("""
-
 <div class='top-header'>
 
     <div>
@@ -232,7 +231,7 @@ st.markdown("""
             color:white;
             line-height:1.1;
         ">
-        📋 Portal de Pedidos
+            📋 Portal de Pedidos
         </div>
 
         <div style="
@@ -241,13 +240,12 @@ st.markdown("""
             color:white;
             margin-top:4px;
         ">
-        Portal Pedidos Pendentes
+            Portal Pedidos Pendentes
         </div>
 
     </div>
 
 </div>
-
 """, unsafe_allow_html=True)
 
 # =========================
