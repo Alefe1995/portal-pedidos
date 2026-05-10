@@ -1291,7 +1291,7 @@ if rc_input:
                             background:#fff5f5;
                             border:1px solid #fefaca;
                             border-left:5px solid #f5cf11;
-                            padding:18px;
+                            padding:10px;
                             border-radius:08px;
                             line-height:1.7;
                             white-space:pre-line;
