@@ -1,6 +1,8 @@
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
+import plotly.express as px
+import plotly.graph_objects as go
 
 # =========================
 # CONFIGURAÇÃO
@@ -67,6 +69,41 @@ div[data-baseweb="select"] > div {
 /* ALERTAS */
 .stAlert {
     border-radius:12px;
+}
+
+/* ABAS */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 12px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background:white;
+    border-radius:10px;
+    padding:10px 18px;
+    border:1px solid #e5e7eb;
+    font-weight:600;
+}
+
+.stTabs [aria-selected="true"] {
+    background:#c00000 !important;
+    color:white !important;
+}
+
+/* CARDS */
+.card-geral {
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* TITULO GRAFICO */
+.chart-title {
+    font-size:15px;
+    font-weight:700;
+    color:#6b7280;
+    margin-bottom:15px;
 }
 
 </style>
@@ -154,8 +191,8 @@ def limpar_texto(texto):
     texto = str(texto)
 
     texto = texto.replace("_x000D_", "\n")
-    texto = texto.replace("\r\n", "\n")
-    texto = texto.replace("\r", "\n")
+    texto = texto.replace("\\r\\n", "\n")
+    texto = texto.replace("\\r", "\n")
 
     linhas = [
         l.strip()
@@ -286,493 +323,492 @@ if rc_input:
         ]["Valor_num"].sum()
 
         # =========================
-        # CARDS RESUMO
+        # ABAS
         # =========================
-        col1, col2, col3, col4, col5 = st.columns(5)
+        tab1, tab2 = st.tabs([
+            "📊 Visão Geral",
+            f"📦 Pedidos ({total_pedidos})"
+        ])
 
-        # CARD PEDIDOS
-        with col1:
+        # =====================================================
+        # ABA 1 — VISÃO GERAL
+        # =====================================================
+        with tab1:
 
-            st.markdown(f"""
+            # =========================
+            # INSIGHTS
+            # =========================
+            st.markdown("""
             <div style="
-                background:white;
-                border:1px solid #e5e7eb;
-                border-radius:14px;
-                padding:14px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-
-            <div style="
-                font-size:24px;
-            ">
-            📦
-            </div>
-
-            <div style="
-                font-size:24px;
+                font-size:16px;
                 font-weight:700;
-                color:#111827;
-                margin-top:5px;
-            ">
-            {total_pedidos}
-            </div>
-
-            <div style="
-                font-size:13px;
                 color:#6b7280;
-                margin-top:3px;
+                margin-top:5px;
+                margin-bottom:10px;
             ">
-            Pedido(s)
-            </div>
-
+            ⚡ INSIGHTS AUTOMÁTICOS
             </div>
             """, unsafe_allow_html=True)
 
-        # CARD VALOR TOTAL
-        with col2:
+            insight1, insight2 = st.columns(2)
 
-            st.markdown(f"""
-            <div style="
-                background:white;
-                border:1px solid #e5e7eb;
-                border-radius:14px;
-                padding:14px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
+            motivo_top = (
+                pedidos_view.groupby("Motivo")["Valor_num"]
+                .sum()
+                .sort_values(ascending=False)
+            )
 
-            <div style="
-                font-size:24px;
-            ">
-            💰
-            </div>
+            if len(motivo_top) > 0:
 
-            <div style="
-                font-size:22px;
-                font-weight:700;
-                color:#111827;
-                margin-top:5px;
-            ">
-            {formatar_moeda(valor_total)}
-            </div>
+                motivo_nome = motivo_top.index[0]
+                motivo_valor = motivo_top.iloc[0]
 
-            <div style="
-                font-size:13px;
-                color:#6b7280;
-                margin-top:3px;
-            ">
-            Valor Total
-            </div>
+                percentual_motivo = (
+                    motivo_valor / valor_total * 100
+                ) if valor_total > 0 else 0
 
-            </div>
-            """, unsafe_allow_html=True)
-
-        # CARD LIBERADOS
-        with col3:
-
-            st.markdown(f"""
-            <div style="
-                background:white;
-                border:1px solid #dcfce7;
-                border-radius:14px;
-                padding:14px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-
-            <div style="
-                font-size:24px;
-            ">
-            🟢
-            </div>
-
-            <div style="
-                font-size:22px;
-                font-weight:700;
-                color:#166534;
-                margin-top:5px;
-            ">
-            {formatar_moeda(valor_liberado)}
-            </div>
-
-            <div style="
-                font-size:13px;
-                color:#6b7280;
-                margin-top:3px;
-            ">
-            Valor Liberado
-            </div>
-
-            </div>
-            """, unsafe_allow_html=True)
-
-        # CARD CRÍTICOS
-        with col4:
-
-            st.markdown(f"""
-            <div style="
-                background:white;
-                border:1px solid #fee2e2;
-                border-radius:14px;
-                padding:14px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-
-            <div style="
-                font-size:24px;
-            ">
-            🔴
-            </div>
-
-            <div style="
-                font-size:22px;
-                font-weight:700;
-                color:#991b1b;
-                margin-top:5px;
-            ">
-            {formatar_moeda(valor_critico)}
-            </div>
-
-            <div style="
-                font-size:13px;
-                color:#6b7280;
-                margin-top:3px;
-            ">
-            Estoque / Ag Retorno Comercial
-            </div>
-
-            </div>
-            """, unsafe_allow_html=True)
-
-        # CARD PENDENTES
-        with col5:
-        
-            st.markdown(f"""
-            <div style="
-                background:white;
-                border:1px solid #fef3c7;
-                border-radius:14px;
-                padding:14px;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);
-            ">
-        
-            <div style="
-                font-size:24px;
-            ">
-            🟡
-            </div>
-        
-            <div style="
-                font-size:22px;
-                font-weight:700;
-                color:#b45309;
-                margin-top:5px;
-            ">
-            {formatar_moeda(valor_pendente)}
-            </div>
-        
-            <div style="
-                font-size:13px;
-                color:#6b7280;
-                margin-top:3px;
-            ">
-            Aguardando Atendimento
-            </div>
-        
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # =========================
-        # TÍTULO
-        # =========================
-        st.markdown(
-            "<div class='section-title'>🧾 Seus Pedidos</div>",
-            unsafe_allow_html=True
-        )
-
-        # =========================
-        # HTML TABELA PEDIDOS
-        # =========================
-        html = """
-        <style>
-
-        table {
-            width:100%;
-            border-collapse:collapse;
-            font-family:Arial;
-            background:white;
-            border-radius:12px;
-            overflow:hidden;
-        }
-
-        thead tr {
-            background:#f3f4f6;
-        }
-
-        th {
-            padding:14px;
-            text-align:left;
-            font-size:14px;
-            color:#374151;
-        }
-
-        td {
-            padding:14px;
-            border-top:1px solid #f1f5f9;
-            font-size:14px;
-            color:#111827;
-        }
-
-        tr:hover {
-            background:#f9fafb;
-        }
-
-        .pedido-highlight {
-            font-weight:700;
-            color:#c00000;
-        }
-
-        .motivo-highlight {
-            font-weight:600;
-            color:#b45309;
-        }
-
-        .valor-highlight {
-            font-weight:700;
-            color:#166534;
-        }
-
-        .badge-liberado {
-            background:#dcfce7;
-            color:#166534;
-            padding:6px 10px;
-            border-radius:999px;
-            font-size:12px;
-            font-weight:700;
-        }
-
-        .badge-pendente {
-            background:#fee2e2;
-            color:#991b1b;
-            padding:6px 10px;
-            border-radius:999px;
-            font-size:12px;
-            font-weight:700;
-        }
-
-        .badge-conferido {
-            background:#dbeafe;
-            color:#1d4ed8;
-            padding:6px 10px;
-            border-radius:999px;
-            font-size:12px;
-            font-weight:700;
-        }    
-
-        </style>
-
-        <table>
-        <thead>
-        <tr>
-        """
-
-        # CABEÇALHO
-        for col in pedidos_view.drop(columns=["Valor_num"]).columns:
-            html += f"<th>{col}</th>"
-
-        html += "</tr></thead><tbody>"
-
-        # LINHAS
-        for _, row in pedidos_view.drop(columns=["Valor_num"]).iterrows():
-
-            status = str(row["Status"]).strip().lower()
-
-            if status == "liberado":
-            
-                badge = f"""
-                <span class='badge-liberado'>
-                    {row['Status']}
-                </span>
-                """
-            
-            elif status == "conferido":
-            
-                badge = f"""
-                <span class='badge-conferido'>
-                    {row['Status']}
-                </span>
-                """
-            
             else:
-            
-                badge = f"""
-                <span class='badge-pendente'>
-                    {row['Status']}
-                </span>
-                """
 
-            html += f"""
-            <tr>
+                motivo_nome = "-"
+                percentual_motivo = 0
 
-                <td class="pedido-highlight">
-                    {row['Pedido']}
-                </td>
+            percentual_liberado = (
+                valor_liberado / valor_total * 100
+            ) if valor_total > 0 else 0
 
-                <td>
-                    {row['Cliente']}
-                </td>
+            with insight1:
 
-                <td>
-                    {row['UF']}
-                </td>
+                st.markdown(f"""
+                <div style="
+                    background:#eff6ff;
+                    border:1px solid #bfdbfe;
+                    border-radius:14px;
+                    padding:16px;
+                    margin-bottom:15px;
+                ">
 
-                <td>
-                    {badge}
-                </td>
+                <div style="
+                    font-size:18px;
+                    font-weight:700;
+                    color:#1d4ed8;
+                ">
+                📉 Concentração: "{motivo_nome}"
+                </div>
 
-                <td class="motivo-highlight">
-                    {row['Motivo']}
-                </td>
+                <div style="
+                    margin-top:8px;
+                    color:#2563eb;
+                    font-size:15px;
+                ">
+                Representa {percentual_motivo:.0f}% do valor total
+                ({formatar_moeda(motivo_valor)})
+                </div>
 
-                <td style="font-weight:700;">
-                    {row['Previsão']}
-                </td>
+                </div>
+                """, unsafe_allow_html=True)
 
-                <td class="valor-highlight">
-                    {row['Valor (R$)']}
-                </td>
+            with insight2:
 
-            </tr>
-            """
+                st.markdown(f"""
+                <div style="
+                    background:#f0fdf4;
+                    border:1px solid #86efac;
+                    border-radius:14px;
+                    padding:16px;
+                    margin-bottom:15px;
+                ">
 
-        html += "</tbody></table>"
+                <div style="
+                    font-size:18px;
+                    font-weight:700;
+                    color:#15803d;
+                ">
+                ✅ {percentual_liberado:.0f}% dos pedidos estão liberados
+                </div>
 
-        # =========================
-        # ALTURA DINÂMICA
-        # =========================
-        quantidade_pedidos = len(pedidos_view)
+                <div style="
+                    margin-top:8px;
+                    color:#16a34a;
+                    font-size:15px;
+                ">
+                {formatar_moeda(valor_liberado)} já disponíveis
+                </div>
 
-        if quantidade_pedidos <= 5:
-
-            altura_pedidos = (quantidade_pedidos * 52) + 50
-            scroll = False
-
-        else:
-
-            altura_pedidos = 330
-            scroll = True
-
-        components.html(
-            html,
-            height=altura_pedidos,
-            scrolling=scroll
-        )
-
-        # =========================
-        # SELECT PEDIDO
-        # =========================
-        pedidos_view["Pedido_Cliente"] = (
-            pedidos_view["Pedido"].astype(str)
-            + " - "
-            + pedidos_view["Cliente"].astype(str)
-        )
-
-        pedido_escolha = st.selectbox(
-            "📌 Selecione um Pedido:",
-            [""] + pedidos_view["Pedido_Cliente"].tolist()
-        )
-
-        # =========================
-        # MOSTRAR APENAS SE ESCOLHER
-        # =========================
-        if pedido_escolha != "":
-
-            pedido_selecionado = pedido_escolha.split(" - ")[0]
-
-            pedido_info = pedidos_view[
-                pedidos_view["Pedido"].astype(str) == pedido_selecionado
-            ].iloc[0]
+                </div>
+                """, unsafe_allow_html=True)
 
             # =========================
-            # CARD PEDIDO
+            # GRÁFICOS
             # =========================
-            st.markdown(f"""
-            <div style="
-            background:#fef2f2;
-            border:1px solid #dfe3eb;
-            border-left:5px solid #c00000;
-            border-radius:08px;
-            padding:20px;
-            margin-top:15px;
-            margin-bottom:25px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.05);
-            ">
+            col_graf1, col_graf2, col_graf3 = st.columns(3)
 
-            <div style="
-            font-size:14px;
-            color:#6b7280;
-            font-weight:600;
-            ">
-            Pedido Selecionado
-            </div>
+            # =========================
+            # STATUS
+            # =========================
+            with col_graf1:
 
-            <div style="
-            font-size:28px;
-            font-weight:700;
-            color:#111827;
-            margin-top:5px;
-            ">
-            #{pedido_selecionado}
-            </div>
+                st.markdown("""
+                <div class='card-geral'>
+                <div class='chart-title'>
+                DISTRIBUIÇÃO POR STATUS
+                </div>
+                """, unsafe_allow_html=True)
 
-            <div style="
-            font-size:15px;
-            color:#6b7280;
-            margin-top:6px;
-            ">
-            <b>Cliente:</b> {pedido_info['Cliente']}
-            &nbsp;&nbsp; | &nbsp;&nbsp;
-            <b>Valor:</b> {pedido_info['Valor (R$)']}
-            </div>
+                status_chart = (
+                    pedidos_view.groupby("Status")
+                    .size()
+                    .reset_index(name="Quantidade")
+                )
 
+                fig_status = px.pie(
+                    status_chart,
+                    values="Quantidade",
+                    names="Status",
+                    hole=0.65
+                )
+
+                fig_status.update_layout(
+                    height=320,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    showlegend=True
+                )
+
+                st.plotly_chart(
+                    fig_status,
+                    use_container_width=True
+                )
+
+                st.markdown("</div>", unsafe_allow_html=True)
+
+            # =========================
+            # MOTIVO
+            # =========================
+            with col_graf2:
+
+                st.markdown("""
+                <div class='card-geral'>
+                <div class='chart-title'>
+                VALOR POR MOTIVO
+                </div>
+                """, unsafe_allow_html=True)
+
+                motivo_chart = (
+                    pedidos_view.groupby("Motivo")["Valor_num"]
+                    .sum()
+                    .reset_index()
+                )
+
+                fig_motivo = px.bar(
+                    motivo_chart,
+                    x="Motivo",
+                    y="Valor_num"
+                )
+
+                fig_motivo.update_layout(
+                    height=320,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    xaxis_title="",
+                    yaxis_title=""
+                )
+
+                st.plotly_chart(
+                    fig_motivo,
+                    use_container_width=True
+                )
+
+                st.markdown("</div>", unsafe_allow_html=True)
+
+            # =========================
+            # UF
+            # =========================
+            with col_graf3:
+
+                st.markdown("""
+                <div class='card-geral'>
+                <div class='chart-title'>
+                VALOR POR ESTADO (UF)
+                </div>
+                """, unsafe_allow_html=True)
+
+                uf_chart = (
+                    pedidos_view.groupby("UF")["Valor_num"]
+                    .sum()
+                    .reset_index()
+                )
+
+                fig_uf = px.bar(
+                    uf_chart,
+                    x="Valor_num",
+                    y="UF",
+                    orientation="h"
+                )
+
+                fig_uf.update_layout(
+                    height=320,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    xaxis_title="",
+                    yaxis_title=""
+                )
+
+                st.plotly_chart(
+                    fig_uf,
+                    use_container_width=True
+                )
+
+                st.markdown("</div>", unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            # =========================
+            # TOP CLIENTES
+            # =========================
+            st.markdown("""
+            <div class='section-title'>
+            🏆 Top Clientes por Valor
             </div>
             """, unsafe_allow_html=True)
 
+            top_clientes = (
+                pedidos_view.groupby("Cliente")["Valor_num"]
+                .sum()
+                .sort_values(ascending=False)
+                .head(10)
+                .reset_index()
+            )
+
+            fig_clientes = px.bar(
+                top_clientes,
+                x="Valor_num",
+                y="Cliente",
+                orientation="h"
+            )
+
+            fig_clientes.update_layout(
+                height=420,
+                margin=dict(l=0, r=0, t=0, b=0),
+                xaxis_title="",
+                yaxis_title=""
+            )
+
+            st.plotly_chart(
+                fig_clientes,
+                use_container_width=True
+            )
+
+        # =====================================================
+        # ABA 2 — PEDIDOS
+        # =====================================================
+        with tab2:
+
             # =========================
-            # ITENS
+            # CARDS RESUMO
             # =========================
-            itens_pedido = itens[
-                itens["Pedido"].astype(str) == pedido_selecionado
-            ].copy()
+            col1, col2, col3, col4, col5 = st.columns(5)
 
-            if "RC" in itens_pedido.columns:
-                itens_pedido = itens_pedido.drop(columns=["RC"])
+            # CARD PEDIDOS
+            with col1:
 
-            if "Pedido" in itens_pedido.columns:
-                itens_pedido = itens_pedido.drop(columns=["Pedido"])
+                st.markdown(f"""
+                <div style="
+                    background:white;
+                    border:1px solid #e5e7eb;
+                    border-radius:14px;
+                    padding:14px;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+                ">
 
-            itens_pedido = itens_pedido.rename(columns={
-                "Pedido2": "Qtde",
-                "Soma de Valor": "Valor (R$)"
-            })
+                <div style="
+                    font-size:24px;
+                ">
+                📦
+                </div>
 
-            for col in ["Valor (R$)", "Soma de Valores"]:
+                <div style="
+                    font-size:24px;
+                    font-weight:700;
+                    color:#111827;
+                    margin-top:5px;
+                ">
+                {total_pedidos}
+                </div>
 
-                if col in itens_pedido.columns:
-                    itens_pedido[col] = itens_pedido[col].apply(formatar_moeda)
+                <div style="
+                    font-size:13px;
+                    color:#6b7280;
+                    margin-top:3px;
+                ">
+                Pedido(s)
+                </div>
 
-            if "Previsão Final" in itens_pedido.columns:
-                itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data)
+                </div>
+                """, unsafe_allow_html=True)
 
+            # CARD VALOR TOTAL
+            with col2:
+
+                st.markdown(f"""
+                <div style="
+                    background:white;
+                    border:1px solid #e5e7eb;
+                    border-radius:14px;
+                    padding:14px;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+                ">
+
+                <div style="
+                    font-size:24px;
+                ">
+                💰
+                </div>
+
+                <div style="
+                    font-size:22px;
+                    font-weight:700;
+                    color:#111827;
+                    margin-top:5px;
+                ">
+                {formatar_moeda(valor_total)}
+                </div>
+
+                <div style="
+                    font-size:13px;
+                    color:#6b7280;
+                    margin-top:3px;
+                ">
+                Valor Total
+                </div>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+            # CARD LIBERADOS
+            with col3:
+
+                st.markdown(f"""
+                <div style="
+                    background:white;
+                    border:1px solid #dcfce7;
+                    border-radius:14px;
+                    padding:14px;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+                ">
+
+                <div style="
+                    font-size:24px;
+                ">
+                🟢
+                </div>
+
+                <div style="
+                    font-size:22px;
+                    font-weight:700;
+                    color:#166534;
+                    margin-top:5px;
+                ">
+                {formatar_moeda(valor_liberado)}
+                </div>
+
+                <div style="
+                    font-size:13px;
+                    color:#6b7280;
+                    margin-top:3px;
+                ">
+                Valor Liberado
+                </div>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+            # CARD CRÍTICOS
+            with col4:
+
+                st.markdown(f"""
+                <div style="
+                    background:white;
+                    border:1px solid #fee2e2;
+                    border-radius:14px;
+                    padding:14px;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+                ">
+
+                <div style="
+                    font-size:24px;
+                ">
+                🔴
+                </div>
+
+                <div style="
+                    font-size:22px;
+                    font-weight:700;
+                    color:#991b1b;
+                    margin-top:5px;
+                ">
+                {formatar_moeda(valor_critico)}
+                </div>
+
+                <div style="
+                    font-size:13px;
+                    color:#6b7280;
+                    margin-top:3px;
+                ">
+                Estoque / Ag RC
+                </div>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+            # CARD PENDENTES
+            with col5:
+
+                st.markdown(f"""
+                <div style="
+                    background:white;
+                    border:1px solid #fef3c7;
+                    border-radius:14px;
+                    padding:14px;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+                ">
+
+                <div style="
+                    font-size:24px;
+                ">
+                🟡
+                </div>
+
+                <div style="
+                    font-size:22px;
+                    font-weight:700;
+                    color:#b45309;
+                    margin-top:5px;
+                ">
+                {formatar_moeda(valor_pendente)}
+                </div>
+
+                <div style="
+                    font-size:13px;
+                    color:#6b7280;
+                    margin-top:3px;
+                ">
+                Valor Pendente
+                </div>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            # =========================
+            # TÍTULO
+            # =========================
             st.markdown(
-                "<div class='section-title'>📦 Itens do Pedido</div>",
+                "<div class='section-title'>🧾 Seus Pedidos</div>",
                 unsafe_allow_html=True
             )
 
             # =========================
-            # HTML TABELA ITENS
+            # HTML TABELA PEDIDOS
             # =========================
-            html_itens = """
+            html = """
             <style>
 
             table {
@@ -806,7 +842,7 @@ if rc_input:
                 background:#f9fafb;
             }
 
-            .status-ok {
+            .badge-liberado {
                 background:#dcfce7;
                 color:#166534;
                 padding:6px 10px;
@@ -815,7 +851,16 @@ if rc_input:
                 font-weight:700;
             }
 
-            .status-alerta {
+            .badge-conferido {
+                background:#dbeafe;
+                color:#1d4ed8;
+                padding:6px 10px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:700;
+            }
+
+            .badge-pendente {
                 background:#fee2e2;
                 color:#991b1b;
                 padding:6px 10px;
@@ -824,9 +869,29 @@ if rc_input:
                 font-weight:700;
             }
 
+            .pedido-highlight {
+                font-weight:700;
+                color:#2563eb;
+            }
+
             .valor-highlight {
                 font-weight:700;
                 color:#166534;
+            }
+
+            .motivo-estoque {
+                font-weight:700;
+                color:#dc2626;
+            }
+
+            .motivo-retorno {
+                font-weight:700;
+                color:#d97706;
+            }
+
+            .motivo-liberado {
+                font-weight:700;
+                color:#16a34a;
             }
 
             </style>
@@ -837,121 +902,291 @@ if rc_input:
             """
 
             # CABEÇALHO
-            for col in itens_pedido.columns:
-                html_itens += f"<th>{col}</th>"
+            for col in pedidos_view.drop(columns=["Valor_num"]).columns:
+                html += f"<th>{col}</th>"
 
-            html_itens += "</tr></thead><tbody>"
+            html += "</tr></thead><tbody>"
 
             # LINHAS
-            for _, row in itens_pedido.iterrows():
+            for _, row in pedidos_view.drop(columns=["Valor_num"]).iterrows():
 
-                status_reserva = str(
-                    row.get("Status Reserva", "")
-                ).strip().lower()
+                status = str(row["Status"]).strip().lower()
 
-                if (
-                    "reservado" in status_reserva
-                    or
-                    "ok" in status_reserva
-                    or
-                    "liberado" in status_reserva
-                ):
+                # STATUS
+                if status == "liberado":
 
-                    badge_reserva = f"""
-                    <span class='status-ok'>
-                        {row.get('Status Reserva', '')}
+                    badge = f"""
+                    <span class='badge-liberado'>
+                        {row['Status']}
+                    </span>
+                    """
+
+                elif status == "conferido":
+
+                    badge = f"""
+                    <span class='badge-conferido'>
+                        {row['Status']}
                     </span>
                     """
 
                 else:
 
-                    badge_reserva = f"""
-                    <span class='status-alerta'>
-                        {row.get('Status Reserva', '')}
+                    badge = f"""
+                    <span class='badge-pendente'>
+                        {row['Status']}
                     </span>
                     """
 
-                html_itens += "<tr>"
+                # MOTIVO
+                motivo = str(row["Motivo"]).strip().lower()
 
-                for col in itens_pedido.columns:
+                if motivo == "estoque":
 
-                    valor = row[col]
+                    motivo_html = f"""
+                    <span class='motivo-estoque'>
+                        {row['Motivo']}
+                    </span>
+                    """
 
-                    if col == "Status Reserva":
+                elif motivo == "ag retorno comercial":
 
-                        html_itens += f"<td>{badge_reserva}</td>"
+                    motivo_html = f"""
+                    <span class='motivo-retorno'>
+                        {row['Motivo']}
+                    </span>
+                    """
 
-                    elif col == "Valor (R$)":
+                elif motivo == "liberado":
 
-                        html_itens += f"""
-                        <td class='valor-highlight'>
-                            {valor}
-                        </td>
-                        """
+                    motivo_html = f"""
+                    <span class='motivo-liberado'>
+                        {row['Motivo']}
+                    </span>
+                    """
 
-                    else:
+                else:
 
-                        html_itens += f"<td>{valor}</td>"
+                    motivo_html = row["Motivo"]
 
-                html_itens += "</tr>"
+                html += f"""
+                <tr>
 
-            html_itens += "</tbody></table>"
+                    <td class="pedido-highlight">
+                        {row['Pedido']}
+                    </td>
 
-            # ALTURA DINÂMICA
-            quantidade_itens = len(itens_pedido)
+                    <td>
+                        {row['Cliente']}
+                    </td>
 
-            altura_itens = (quantidade_itens * 52) + 60
+                    <td>
+                        {row['UF']}
+                    </td>
 
-            components.html(
-                html_itens,
-                height=altura_itens,
-                scrolling=False
-            )
+                    <td>
+                        {badge}
+                    </td>
 
-            # =========================
-            # AÇÃO RECOMENDADA
-            # =========================
-            acoes_pedido = acoes[
-                (acoes["Pedido"].astype(str) == pedido_selecionado)
-                &
-                (acoes["RC"].astype(str) == rc_input)
-            ]
+                    <td>
+                        {motivo_html}
+                    </td>
 
-            if not acoes_pedido.empty:
-
-                texto = limpar_texto(
-                    acoes_pedido.iloc[0]["Texto"]
-                )
-
-                st.markdown(
-                    "<div class='section-title'>🚨 Ação Recomendada</div>",
-                    unsafe_allow_html=True
-                )
-
-                st.markdown(
-                    f"""
-                    <div style="
-                        background:#fffbeb;
-                        border:1px solid #d1d5db;
-                        border-left:5px solid #f59e0b;
-                        padding:18px;
-                        border-radius:12px;
-                        line-height:1.7;
-                        white-space:pre-line;
-                        font-size:15px;
-                        color:#111827;
+                    <td style="
+                        font-weight:700;
+                        color:#374151;
                     ">
-                        {texto}
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                        {row['Previsão']}
+                    </td>
+
+                    <td class="valor-highlight">
+                        {row['Valor (R$)']}
+                    </td>
+
+                </tr>
+                """
+
+            html += "</tbody></table>"
+
+            # =========================
+            # ALTURA DINÂMICA
+            # =========================
+            quantidade_pedidos = len(pedidos_view)
+
+            if quantidade_pedidos <= 5:
+
+                altura_pedidos = (quantidade_pedidos * 52) + 50
+                scroll = False
 
             else:
 
-                st.info(
-                    "Nenhuma ação cadastrada para este pedido."
-                )
+                altura_pedidos = 330
+                scroll = True
+
+            components.html(
+                html,
+                height=altura_pedidos,
+                scrolling=scroll
+            )
+
+            # =========================
+            # SELECT PEDIDO
+            # =========================
+            pedidos_view["Pedido_Cliente"] = (
+                pedidos_view["Pedido"].astype(str)
+                + " - "
+                + pedidos_view["Cliente"].astype(str)
+            )
+
+            pedido_escolha = st.selectbox(
+                "📌 Selecione um Pedido:",
+                [""] + pedidos_view["Pedido_Cliente"].tolist()
+            )
+
+            # =========================
+            # SOMENTE SE ESCOLHER PEDIDO
+            # =========================
+            if pedido_escolha != "":
+
+                pedido_numero = pedido_escolha.split(" - ")[0]
+
+                pedido_info = pedidos_view[
+                    pedidos_view["Pedido"].astype(str) == pedido_numero
+                ].iloc[0]
+
+                st.markdown("<br>", unsafe_allow_html=True)
+
+                # =========================
+                # PEDIDO SELECIONADO
+                # =========================
+                st.markdown("""
+                <div class='section-title'>
+                📌 Pedido Selecionado
+                </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f"""
+                <div style="
+                    background:#fffbeb;
+                    border:1px solid #fcd34d;
+                    border-left:5px solid #f59e0b;
+                    border-radius:14px;
+                    padding:20px;
+                    margin-bottom:20px;
+                ">
+
+                <div style="
+                    font-size:26px;
+                    font-weight:700;
+                    color:#111827;
+                ">
+                Pedido {pedido_info['Pedido']}
+                </div>
+
+                <div style="
+                    font-size:15px;
+                    color:#6b7280;
+                    margin-top:6px;
+                ">
+                Cliente: {pedido_info['Cliente']}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                Valor: {pedido_info['Valor (R$)']}
+                </div>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+                # =========================
+                # ITENS
+                # =========================
+                st.markdown("""
+                <div class='section-title'>
+                📦 Itens do Pedido
+                </div>
+                """, unsafe_allow_html=True)
+
+                itens_pedido = itens[
+                    itens["Pedido"].astype(str) == pedido_numero
+                ].copy()
+
+                if not itens_pedido.empty:
+
+                    if "Previsão Final" in itens_pedido.columns:
+
+                        itens_pedido["Previsão Final"] = (
+                            itens_pedido["Previsão Final"]
+                            .apply(formatar_data)
+                            .replace("NaT", "")
+                        )
+
+                    # ALTURA AUTOMÁTICA
+                    quantidade_itens = len(itens_pedido)
+
+                    altura_itens = (quantidade_itens * 35) + 38
+
+                    st.dataframe(
+                        itens_pedido,
+                        use_container_width=True,
+                        hide_index=True,
+                        height=altura_itens,
+                        column_config={
+
+                            "Status Reserva": st.column_config.TextColumn(
+                                "Status Reserva"
+                            )
+                        }
+                    )
+
+                else:
+
+                    st.info(
+                        "Nenhum item encontrado para este pedido."
+                    )
+
+                st.markdown("<br>", unsafe_allow_html=True)
+
+                # =========================
+                # AÇÃO RECOMENDADA
+                # =========================
+                st.markdown("""
+                <div class='section-title'>
+                💡 Ação Recomendada
+                </div>
+                """, unsafe_allow_html=True)
+
+                acoes_pedido = acoes[
+                    acoes["Pedido"].astype(str) == pedido_numero
+                ]
+
+                if not acoes_pedido.empty:
+
+                    texto = limpar_texto(
+                        acoes_pedido.iloc[0]["Texto"]
+                    )
+
+                    st.markdown(
+                        f"""
+                        <div style="
+                            background:#fff5f5;
+                            border:1px solid #fecaca;
+                            border-left:5px solid #c00000;
+                            padding:18px;
+                            border-radius:12px;
+                            line-height:1.7;
+                            white-space:pre-line;
+                            font-size:15px;
+                            color:#111827;
+                        ">
+                            {texto}
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                else:
+
+                    st.info(
+                        "Nenhuma ação cadastrada para este pedido."
+                    )
 
     else:
 
