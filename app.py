@@ -1036,11 +1036,6 @@ if rc_input:
                 # =========================
                 # PEDIDO SELECIONADO
                 # =========================
-                st.markdown("""
-                <div class='section-title'>
-                📌 Pedido Selecionado
-                </div>
-                """, unsafe_allow_html=True)
 
                 st.markdown(f"""
                 <div style="
