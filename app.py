@@ -937,36 +937,14 @@ if rc_input:
                     </span>
                     """
 
-                # MOTIVO
-                motivo = str(row["Motivo"]).strip().lower()
-
-                if motivo == "estoque":
-
-                    motivo_html = f"""
-                    <span class='motivo-estoque'>
-                        {row['Motivo']}
-                    </span>
-                    """
-
-                elif motivo == "ag retorno comercial":
-
-                    motivo_html = f"""
-                    <span class='motivo-retorno'>
-                        {row['Motivo']}
-                    </span>
-                    """
-
-                elif motivo == "liberado":
-
-                    motivo_html = f"""
-                    <span class='motivo-liberado'>
-                        {row['Motivo']}
-                    </span>
-                    """
-
-                else:
-
-                    motivo_html = row["Motivo"]
+                motivo_html = f"""
+                <span style="
+                    font-weight:700;
+                    color:#d97706;
+                ">
+                    {row['Motivo']}
+                </span>
+                """
 
                 html += f"""
                 <tr>
@@ -1066,32 +1044,34 @@ if rc_input:
 
                 st.markdown(f"""
                 <div style="
-                    background:#fffbeb;
-                    border:1px solid #fcd34d;
-                    border-left:5px solid #f59e0b;
-                    border-radius:14px;
-                    padding:20px;
-                    margin-bottom:20px;
+                background:white;
+                border:1px solid #dfe3eb;
+                border-left:5px solid #f59e0b;
+                border-radius:14px;
+                padding:20px;
+                margin-top:15px;
+                margin-bottom:25px;
+                box-shadow:0 2px 8px rgba(0,0,0,0.05);
                 ">
-
+                
                 <div style="
-                    font-size:26px;
-                    font-weight:700;
-                    color:#111827;
+                font-size:28px;
+                font-weight:700;
+                color:#111827;
                 ">
                 Pedido {pedido_info['Pedido']}
                 </div>
-
+                
                 <div style="
-                    font-size:15px;
-                    color:#6b7280;
-                    margin-top:6px;
+                font-size:15px;
+                color:#6b7280;
+                margin-top:6px;
                 ">
                 Cliente: {pedido_info['Cliente']}
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 Valor: {pedido_info['Valor (R$)']}
                 </div>
-
+                
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -1124,16 +1104,23 @@ if rc_input:
                     altura_itens = (quantidade_itens * 35) + 38
 
                     st.dataframe(
-                        itens_pedido,
+                        itens_pedido.style.applymap(
+                    
+                            lambda v:
+                            "background-color:#fee2e2; color:#991b1b; font-weight:700;"
+                            if str(v).lower() == "sem estoque"
+                    
+                            else "background-color:#dcfce7; color:#166534; font-weight:700;"
+                            if str(v).lower() == "reservado"
+                    
+                            else "",
+                    
+                            subset=["Status Reserva"]
+                    
+                        ),
                         use_container_width=True,
                         hide_index=True,
-                        height=altura_itens,
-                        column_config={
-
-                            "Status Reserva": st.column_config.TextColumn(
-                                "Status Reserva"
-                            )
-                        }
+                        height=altura_itens
                     )
 
                 else:
