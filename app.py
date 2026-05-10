@@ -223,7 +223,7 @@ st.markdown("""
 <div class='top-header'>
     <div>
         <div>📋 Portal de Pedidos</div>
-        <div class='subtitle'>ADERE · Colou, tá colado.</div>
+        <div class='subtitle'>Portal Pedidos Pendentes</div>
     </div>
     <div style="margin-left:auto;font-size:13px;opacity:0.8;">Admin</div>
 </div>
