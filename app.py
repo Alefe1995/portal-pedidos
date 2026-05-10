@@ -871,7 +871,7 @@ if rc_input:
 
             .pedido-highlight {
                 font-weight:700;
-                color:#2563eb;
+                color:#c00000;
             }
 
             .valor-highlight {
