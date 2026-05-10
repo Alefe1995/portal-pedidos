@@ -26,6 +26,21 @@ header {
     margin-top:10px;
 }
 
+/* ESCONDE HEADER STREAMLIT */
+header {
+    visibility:hidden;
+}
+
+/* ESCONDE FOOTER STREAMLIT */
+footer {
+    visibility:hidden;
+}
+
+/* ESCONDE MENU SUPERIOR */
+#MainMenu {
+    visibility:hidden;
+}
+
 /* FUNDO */
 .stApp {
     background-color: #f4f5f7;
