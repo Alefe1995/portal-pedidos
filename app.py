@@ -1274,8 +1274,10 @@ if rc_input:
                 # =========================
                 # AÇÃO RECOMENDADA
                 # =========================
-                st.markdown("""
-                <div class='section-title'>
+                st.markdown(
+                    "<div style='margin-top:8px;'></div>",
+                    unsafe_allow_html=True
+                )
                 💡 Ação Recomendada
                 </div>
                 """, unsafe_allow_html=True)
