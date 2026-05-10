@@ -501,131 +501,141 @@ if rc_input:
                 </div>
                 """, unsafe_allow_html=True)
 
+            # CSS para estilizar containers nativos como cards
+            st.markdown("""
+            <style>
+            /* card de gráfico via container nativo */
+            [data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(> [data-testid="stPlotlyChart"]) {
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                padding: 16px;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+                margin-bottom: 16px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
             # ---- LINHA 1: STATUS | VALOR POR MOTIVO ----
             g1, g2 = st.columns(2)
 
             with g1:
-                status_chart = (
-                    pedidos_view.groupby("Status")
-                    .size()
-                    .reset_index(name="Quantidade")
-                )
-                color_map = {"Pendente": "#f59e0b", "Conferido": "#3b82f6", "Liberado": "#22c55e"}
-                cores = [color_map.get(s, "#9ca3af") for s in status_chart["Status"]]
-
-                fig_status = go.Figure(go.Pie(
-                    labels=status_chart["Status"],
-                    values=status_chart["Quantidade"],
-                    hole=0.6,
-                    marker_colors=cores,
-                    textinfo="percent",
-                    textfont_size=12,
-                ))
-                fig_status.update_layout(
-                    height=300,
-                    margin=dict(l=0, r=0, t=10, b=0),
-                    showlegend=True,
-                    legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    plot_bgcolor="rgba(0,0,0,0)",
-                )
-                st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-                st.markdown("<div class='chart-card-title'>Distribuição por Status</div>", unsafe_allow_html=True)
-                st.plotly_chart(fig_status, use_container_width=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+                with st.container():
+                    st.markdown("<p class='chart-card-title'>Distribuição por Status</p>", unsafe_allow_html=True)
+                    status_chart = (
+                        pedidos_view.groupby("Status")
+                        .size()
+                        .reset_index(name="Quantidade")
+                    )
+                    color_map = {"Pendente": "#f59e0b", "Conferido": "#3b82f6", "Liberado": "#22c55e"}
+                    cores = [color_map.get(s, "#9ca3af") for s in status_chart["Status"]]
+                    fig_status = go.Figure(go.Pie(
+                        labels=status_chart["Status"],
+                        values=status_chart["Quantidade"],
+                        hole=0.6,
+                        marker_colors=cores,
+                        textinfo="percent",
+                        textfont_size=12,
+                    ))
+                    fig_status.update_layout(
+                        height=300,
+                        margin=dict(l=10, r=10, t=10, b=10),
+                        showlegend=True,
+                        legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
+                        paper_bgcolor="white",
+                        plot_bgcolor="white",
+                    )
+                    st.plotly_chart(fig_status, use_container_width=True)
 
             with g2:
-                motivo_chart = (
-                    pedidos_view.groupby("Motivo")["Valor_num"]
-                    .sum().reset_index().sort_values("Valor_num", ascending=False)
-                )
-                fig_motivo = px.bar(
-                    motivo_chart, x="Motivo", y="Valor_num",
-                    color="Motivo", color_discrete_sequence=px.colors.qualitative.Bold,
-                )
-                fig_motivo.update_layout(
-                    height=300,
-                    margin=dict(l=0, r=0, t=10, b=80),
-                    xaxis_title="", yaxis_title="", showlegend=False,
-                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                    xaxis=dict(tickfont=dict(size=10), tickangle=-30),
-                    yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
-                )
-                fig_motivo.update_traces(marker_line_width=0)
-                st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-                st.markdown("<div class='chart-card-title'>Valor por Motivo</div>", unsafe_allow_html=True)
-                st.plotly_chart(fig_motivo, use_container_width=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+                with st.container():
+                    st.markdown("<p class='chart-card-title'>Valor por Motivo</p>", unsafe_allow_html=True)
+                    motivo_chart = (
+                        pedidos_view.groupby("Motivo")["Valor_num"]
+                        .sum().reset_index().sort_values("Valor_num", ascending=False)
+                    )
+                    fig_motivo = px.bar(
+                        motivo_chart, x="Motivo", y="Valor_num",
+                        color="Motivo", color_discrete_sequence=px.colors.qualitative.Bold,
+                    )
+                    fig_motivo.update_layout(
+                        height=300,
+                        margin=dict(l=10, r=10, t=10, b=80),
+                        xaxis_title="", yaxis_title="", showlegend=False,
+                        paper_bgcolor="white", plot_bgcolor="white",
+                        xaxis=dict(tickfont=dict(size=10), tickangle=-30),
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                    )
+                    fig_motivo.update_traces(marker_line_width=0)
+                    st.plotly_chart(fig_motivo, use_container_width=True)
 
             # ---- LINHA 2: VALOR POR UF | PREVISÃO POR MÊS ----
             g3, g4 = st.columns(2)
 
             with g3:
-                uf_chart = (
-                    pedidos_view.groupby("UF")["Valor_num"]
-                    .sum().reset_index().sort_values("Valor_num", ascending=True)
-                )
-                fig_uf = px.bar(
-                    uf_chart, x="Valor_num", y="UF", orientation="h",
-                    color="Valor_num", color_continuous_scale=["#fca5a5", "#dc2626", "#7f1d1d"],
-                )
-                fig_uf.update_layout(
-                    height=300,
-                    margin=dict(l=0, r=0, t=10, b=0),
-                    xaxis_title="", yaxis_title="", coloraxis_showscale=False,
-                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                    xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
-                    yaxis=dict(tickfont=dict(size=11)),
-                )
-                fig_uf.update_traces(marker_line_width=0)
-                st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-                st.markdown("<div class='chart-card-title'>Valor por Estado (UF)</div>", unsafe_allow_html=True)
-                st.plotly_chart(fig_uf, use_container_width=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+                with st.container():
+                    st.markdown("<p class='chart-card-title'>Valor por Estado (UF)</p>", unsafe_allow_html=True)
+                    uf_chart = (
+                        pedidos_view.groupby("UF")["Valor_num"]
+                        .sum().reset_index().sort_values("Valor_num", ascending=True)
+                    )
+                    fig_uf = px.bar(
+                        uf_chart, x="Valor_num", y="UF", orientation="h",
+                        color="Valor_num", color_continuous_scale=["#fca5a5", "#dc2626", "#7f1d1d"],
+                    )
+                    fig_uf.update_layout(
+                        height=300,
+                        margin=dict(l=10, r=10, t=10, b=10),
+                        xaxis_title="", yaxis_title="", coloraxis_showscale=False,
+                        paper_bgcolor="white", plot_bgcolor="white",
+                        xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                        yaxis=dict(tickfont=dict(size=11)),
+                    )
+                    fig_uf.update_traces(marker_line_width=0)
+                    st.plotly_chart(fig_uf, use_container_width=True)
 
             with g4:
-                if "Previsão" in pedidos_view.columns:
-                    prev_df = pedidos_view.copy()
-                    prev_df["Prev_dt"] = pd.to_datetime(prev_df["Previsão"], dayfirst=True, errors="coerce")
-                    prev_df = prev_df.dropna(subset=["Prev_dt"])
-                    prev_df["Mes"] = prev_df["Prev_dt"].dt.to_period("M").astype(str)
-                    hoje = pd.Timestamp.today()
-                    mes_atual = hoje.to_period("M").strftime("%Y-%m")
+                with st.container():
+                    st.markdown("<p class='chart-card-title'>Previsão de Produção por Mês</p>", unsafe_allow_html=True)
+                    if "Previsão" in pedidos_view.columns:
+                        prev_df = pedidos_view.copy()
+                        prev_df["Prev_dt"] = pd.to_datetime(prev_df["Previsão"], dayfirst=True, errors="coerce")
+                        prev_df = prev_df.dropna(subset=["Prev_dt"])
+                        prev_df["Mes"] = prev_df["Prev_dt"].dt.to_period("M").astype(str)
+                        hoje = pd.Timestamp.today()
+                        mes_atual = hoje.to_period("M").strftime("%Y-%m")
 
-                    def classifica_mes(row):
-                        if row["Mes"] < mes_atual:
-                            return "Vencidos"
-                        elif row["Mes"] == mes_atual:
-                            return "Mês atual"
-                        else:
-                            return "Futuro"
+                        def classifica_mes(row):
+                            if row["Mes"] < mes_atual:
+                                return "Vencidos"
+                            elif row["Mes"] == mes_atual:
+                                return "Mês atual"
+                            else:
+                                return "Futuro"
 
-                    prev_df["Tipo"] = prev_df.apply(classifica_mes, axis=1)
-                    prev_group = (
-                        prev_df.groupby(["Mes", "Tipo"]).size()
-                        .reset_index(name="Qtde").sort_values("Mes")
-                    )
-                    color_tipo = {"Mês atual": "#f9a8d4", "Futuro": "#dc2626", "Vencidos": "#fca5a5"}
-                    fig_prev = px.bar(
-                        prev_group, x="Mes", y="Qtde", color="Tipo",
-                        color_discrete_map=color_tipo, barmode="group", text="Qtde",
-                    )
-                    fig_prev.update_layout(
-                        height=300,
-                        margin=dict(l=0, r=0, t=10, b=0),
-                        xaxis_title="", yaxis_title="",
-                        legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5, font=dict(size=10)),
-                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                        xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
-                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
-                    )
-                    fig_prev.update_traces(marker_line_width=0, textposition="outside", textfont_size=10)
-                    st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-                    st.markdown("<div class='chart-card-title'>Previsão de Produção por Mês</div>", unsafe_allow_html=True)
-                    st.plotly_chart(fig_prev, use_container_width=True)
-                    st.markdown("</div>", unsafe_allow_html=True)
+                        prev_df["Tipo"] = prev_df.apply(classifica_mes, axis=1)
+                        prev_group = (
+                            prev_df.groupby(["Mes", "Tipo"]).size()
+                            .reset_index(name="Qtde").sort_values("Mes")
+                        )
+                        color_tipo = {"Mês atual": "#f9a8d4", "Futuro": "#dc2626", "Vencidos": "#fca5a5"}
+                        fig_prev = px.bar(
+                            prev_group, x="Mes", y="Qtde", color="Tipo",
+                            color_discrete_map=color_tipo, barmode="group", text="Qtde",
+                        )
+                        fig_prev.update_layout(
+                            height=300,
+                            margin=dict(l=10, r=10, t=10, b=10),
+                            xaxis_title="", yaxis_title="",
+                            legend=dict(orientation="h", yanchor="top", y=-0.18, xanchor="center", x=0.5, font=dict(size=10)),
+                            paper_bgcolor="white", plot_bgcolor="white",
+                            xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                            yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                        )
+                        fig_prev.update_traces(marker_line_width=0, textposition="outside", textfont_size=10)
+                        st.plotly_chart(fig_prev, use_container_width=True)
 
-            # ---- LINHA 3: TOP CLIENTES (largura total) ----
+            # ---- LINHA 3: TOP CLIENTES (largura total, HTML puro) ----
             top_clientes = (
                 pedidos_view.groupby("Cliente")
                 .agg(Valor=("Valor_num", "sum"), Pedidos=("Pedido", "count"))
@@ -634,33 +644,37 @@ if rc_input:
                 .reset_index()
             )
 
-            st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-            st.markdown("<div class='chart-card-title'>👤 Top Clientes por Valor</div>", unsafe_allow_html=True)
-
             if not top_clientes.empty:
                 max_val = top_clientes["Valor"].max()
+                rows_top = ""
                 for idx, row in top_clientes.reset_index(drop=True).iterrows():
                     pct        = int((row["Valor"] / max_val) * 100) if max_val > 0 else 0
-                    nome_curto = str(row["Cliente"])[:42] + "..." if len(str(row["Cliente"])) > 42 else str(row["Cliente"])
+                    nome_curto = str(row["Cliente"])[:45] + "..." if len(str(row["Cliente"])) > 45 else str(row["Cliente"])
                     valor_fmt  = formatar_moeda_curto(row["Valor"])
                     pedidos_qt = int(row["Pedidos"])
-                    st.markdown(
-                        f'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;">'
+                    rows_top += (
+                        f'<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f3f4f6;">'
                         f'<div style="font-size:12px;font-weight:700;color:#9ca3af;width:20px;text-align:right;">{idx+1}</div>'
                         f'<div style="flex:1;min-width:0;">'
                         f'<div style="font-size:13px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nome_curto}</div>'
-                        f'<div style="margin-top:3px;background:#fee2e2;border-radius:999px;height:5px;width:100%;">'
+                        f'<div style="margin-top:4px;background:#fee2e2;border-radius:999px;height:5px;">'
                         f'<div style="background:#dc2626;border-radius:999px;height:5px;width:{pct}%;"></div></div></div>'
                         f'<div style="text-align:right;min-width:90px;">'
                         f'<div style="font-size:12px;color:#6b7280;">{pedidos_qt} ped.</div>'
                         f'<div style="font-size:13px;font-weight:700;color:#111827;">{valor_fmt}</div>'
-                        f'</div></div>',
-                        unsafe_allow_html=True
+                        f'</div></div>'
                     )
+
+                st.markdown(
+                    f'<div style="background:white;border:1px solid #e5e7eb;border-radius:12px;'
+                    f'padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);margin-bottom:16px;">'
+                    f'<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.08em;'
+                    f'text-transform:uppercase;margin-bottom:8px;">👤 Top Clientes por Valor</div>'
+                    f'{rows_top}</div>',
+                    unsafe_allow_html=True
+                )
             else:
                 st.info("Sem dados de clientes.")
-
-            st.markdown("</div>", unsafe_allow_html=True)
 
         # =====================================================
         # ABA 2 — PEDIDOS (LAYOUT BASE44)
