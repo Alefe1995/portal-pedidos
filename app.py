@@ -282,16 +282,6 @@ if rc_input:
         ]["Valor_num"].sum()
 
         # =========================
-        # RESUMO SIDEBAR
-        # =========================
-        st.sidebar.markdown("---")
-        st.sidebar.markdown("### 💰 Valor Total")
-
-        st.sidebar.success(
-            formatar_moeda(valor_total)
-        )
-
-        # =========================
         # CARDS RESUMO
         # =========================
         col1, col2, col3, col4 = st.columns(4)
@@ -304,29 +294,29 @@ if rc_input:
                 background:white;
                 border:1px solid #e5e7eb;
                 border-radius:14px;
-                padding:18px;
+                padding:14px;
                 box-shadow:0 2px 8px rgba(0,0,0,0.04);
             ">
 
             <div style="
-                font-size:28px;
+                font-size:24px;
             ">
             📦
             </div>
 
             <div style="
-                font-size:28px;
+                font-size:24px;
                 font-weight:700;
                 color:#111827;
-                margin-top:8px;
+                margin-top:5px;
             ">
             {total_pedidos}
             </div>
 
             <div style="
-                font-size:14px;
+                font-size:13px;
                 color:#6b7280;
-                margin-top:5px;
+                margin-top:3px;
             ">
             Pedidos
             </div>
@@ -342,29 +332,29 @@ if rc_input:
                 background:white;
                 border:1px solid #e5e7eb;
                 border-radius:14px;
-                padding:18px;
+                padding:14px;
                 box-shadow:0 2px 8px rgba(0,0,0,0.04);
             ">
 
             <div style="
-                font-size:28px;
+                font-size:24px;
             ">
             💰
             </div>
 
             <div style="
-                font-size:24px;
+                font-size:22px;
                 font-weight:700;
                 color:#111827;
-                margin-top:8px;
+                margin-top:5px;
             ">
             {formatar_moeda(valor_total)}
             </div>
 
             <div style="
-                font-size:14px;
+                font-size:13px;
                 color:#6b7280;
-                margin-top:5px;
+                margin-top:3px;
             ">
             Valor Total
             </div>
@@ -380,29 +370,29 @@ if rc_input:
                 background:white;
                 border:1px solid #dcfce7;
                 border-radius:14px;
-                padding:18px;
+                padding:14px;
                 box-shadow:0 2px 8px rgba(0,0,0,0.04);
             ">
 
             <div style="
-                font-size:28px;
+                font-size:24px;
             ">
             🟢
             </div>
 
             <div style="
-                font-size:24px;
+                font-size:22px;
                 font-weight:700;
                 color:#166534;
-                margin-top:8px;
+                margin-top:5px;
             ">
             {formatar_moeda(valor_liberado)}
             </div>
 
             <div style="
-                font-size:14px;
+                font-size:13px;
                 color:#6b7280;
-                margin-top:5px;
+                margin-top:3px;
             ">
             Valor Liberado
             </div>
@@ -418,29 +408,29 @@ if rc_input:
                 background:white;
                 border:1px solid #fee2e2;
                 border-radius:14px;
-                padding:18px;
+                padding:14px;
                 box-shadow:0 2px 8px rgba(0,0,0,0.04);
             ">
 
             <div style="
-                font-size:28px;
+                font-size:24px;
             ">
             🔴
             </div>
 
             <div style="
-                font-size:24px;
+                font-size:22px;
                 font-weight:700;
                 color:#991b1b;
-                margin-top:8px;
+                margin-top:5px;
             ">
             {formatar_moeda(valor_critico)}
             </div>
 
             <div style="
-                font-size:14px;
+                font-size:13px;
                 color:#6b7280;
-                margin-top:5px;
+                margin-top:3px;
             ">
             Estoque / Ag RC
             </div>
@@ -720,15 +710,143 @@ if rc_input:
                 unsafe_allow_html=True
             )
 
+            # =========================
+            # HTML TABELA ITENS
+            # =========================
+            html_itens = """
+            <style>
+
+            table {
+                width:100%;
+                border-collapse:collapse;
+                font-family:Arial;
+                background:white;
+                border-radius:12px;
+                overflow:hidden;
+            }
+
+            thead tr {
+                background:#f3f4f6;
+            }
+
+            th {
+                padding:14px;
+                text-align:left;
+                font-size:14px;
+                color:#374151;
+            }
+
+            td {
+                padding:14px;
+                border-top:1px solid #f1f5f9;
+                font-size:14px;
+                color:#111827;
+            }
+
+            tr:hover {
+                background:#f9fafb;
+            }
+
+            .status-ok {
+                background:#dcfce7;
+                color:#166534;
+                padding:6px 10px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:700;
+            }
+
+            .status-alerta {
+                background:#fee2e2;
+                color:#991b1b;
+                padding:6px 10px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:700;
+            }
+
+            .valor-highlight {
+                font-weight:700;
+                color:#166534;
+            }
+
+            </style>
+
+            <table>
+            <thead>
+            <tr>
+            """
+
+            # CABEÇALHO
+            for col in itens_pedido.columns:
+                html_itens += f"<th>{col}</th>"
+
+            html_itens += "</tr></thead><tbody>"
+
+            # LINHAS
+            for _, row in itens_pedido.iterrows():
+
+                status_reserva = str(
+                    row.get("Status Reserva", "")
+                ).strip().lower()
+
+                if (
+                    "reservado" in status_reserva
+                    or
+                    "ok" in status_reserva
+                    or
+                    "liberado" in status_reserva
+                ):
+
+                    badge_reserva = f"""
+                    <span class='status-ok'>
+                        {row.get('Status Reserva', '')}
+                    </span>
+                    """
+
+                else:
+
+                    badge_reserva = f"""
+                    <span class='status-alerta'>
+                        {row.get('Status Reserva', '')}
+                    </span>
+                    """
+
+                html_itens += "<tr>"
+
+                for col in itens_pedido.columns:
+
+                    valor = row[col]
+
+                    if col == "Status Reserva":
+
+                        html_itens += f"<td>{badge_reserva}</td>"
+
+                    elif col == "Valor (R$)":
+
+                        html_itens += f"""
+                        <td class='valor-highlight'>
+                            {valor}
+                        </td>
+                        """
+
+                    else:
+
+                        html_itens += f"<td>{valor}</td>"
+
+                html_itens += "</tr>"
+
+            html_itens += "</tbody></table>"
+
+            # ALTURA DINÂMICA
             quantidade_itens = len(itens_pedido)
 
-            altura_itens = (quantidade_itens * 35) + 38
+            altura_itens = (quantidade_itens * 52) + 60
 
-            st.dataframe(
-                itens_pedido,
-                use_container_width=True,
-                hide_index=True,
-                height=altura_itens
+            components.html(
+                html_itens,
+                height=altura_itens,
+                scrolling=False
             )
 
             # =========================
