@@ -588,15 +588,23 @@ if rc_input:
             status = str(row["Status"]).strip().lower()
 
             if status == "liberado":
-
+            
                 badge = f"""
                 <span class='badge-liberado'>
                     {row['Status']}
                 </span>
                 """
-
+            
+            elif status == "conferido":
+            
+                badge = f"""
+                <span class='badge-conferido'>
+                    {row['Status']}
+                </span>
+                """
+            
             else:
-
+            
                 badge = f"""
                 <span class='badge-pendente'>
                     {row['Status']}
