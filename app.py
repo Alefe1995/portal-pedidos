@@ -219,22 +219,13 @@ def badge_status(status_val):
 # =========================
 # HEADER ESTILO BASE44
 # =========================
-
 st.markdown("""
 <div class='top-header'>
-
     <div>
-
         <div>📋 Portal de Pedidos</div>
-
-        <div class='subtitle'>Portal Pedidos Pendentes</div>
-
+        <div class='subtitle'>ADERE · Colou, tá colado.</div>
     </div>
-
-    <div style="margin-left:auto;font-size:08px;opacity:0.8;color:white;">
-        Admin
-    </div>
-
+    <div style="margin-left:auto;font-size:13px;opacity:0.8;">Admin</div>
 </div>
 """, unsafe_allow_html=True)
 
