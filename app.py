@@ -521,7 +521,6 @@ if rc_input:
 
             with g1:
                 with st.container():
-                    st.markdown("<p class='chart-card-title'>Distribuição por Status</p>", unsafe_allow_html=True)
                     status_chart = (
                         pedidos_view.groupby("Status")
                         .size()
@@ -538,8 +537,9 @@ if rc_input:
                         textfont_size=12,
                     ))
                     fig_status.update_layout(
-                        height=300,
-                        margin=dict(l=10, r=10, t=10, b=10),
+                        title=dict(text="DISTRIBUIÇÃO POR STATUS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                        height=320,
+                        margin=dict(l=10, r=10, t=40, b=10),
                         showlegend=True,
                         legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
                         paper_bgcolor="white",
@@ -549,7 +549,6 @@ if rc_input:
 
             with g2:
                 with st.container():
-                    st.markdown("<p class='chart-card-title'>Valor por Motivo</p>", unsafe_allow_html=True)
                     motivo_chart = (
                         pedidos_view.groupby("Motivo")["Valor_num"]
                         .sum().reset_index().sort_values("Valor_num", ascending=False)
@@ -559,8 +558,9 @@ if rc_input:
                         color="Motivo", color_discrete_sequence=px.colors.qualitative.Bold,
                     )
                     fig_motivo.update_layout(
-                        height=300,
-                        margin=dict(l=10, r=10, t=10, b=80),
+                        title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                        height=320,
+                        margin=dict(l=10, r=10, t=40, b=80),
                         xaxis_title="", yaxis_title="", showlegend=False,
                         paper_bgcolor="white", plot_bgcolor="white",
                         xaxis=dict(tickfont=dict(size=10), tickangle=-30),
@@ -574,7 +574,6 @@ if rc_input:
 
             with g3:
                 with st.container():
-                    st.markdown("<p class='chart-card-title'>Valor por Estado (UF)</p>", unsafe_allow_html=True)
                     uf_chart = (
                         pedidos_view.groupby("UF")["Valor_num"]
                         .sum().reset_index().sort_values("Valor_num", ascending=True)
@@ -584,8 +583,9 @@ if rc_input:
                         color="Valor_num", color_continuous_scale=["#fca5a5", "#dc2626", "#7f1d1d"],
                     )
                     fig_uf.update_layout(
-                        height=300,
-                        margin=dict(l=10, r=10, t=10, b=10),
+                        title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                        height=320,
+                        margin=dict(l=10, r=10, t=40, b=10),
                         xaxis_title="", yaxis_title="", coloraxis_showscale=False,
                         paper_bgcolor="white", plot_bgcolor="white",
                         xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
@@ -596,7 +596,6 @@ if rc_input:
 
             with g4:
                 with st.container():
-                    st.markdown("<p class='chart-card-title'>Previsão de Produção por Mês</p>", unsafe_allow_html=True)
                     if "Previsão" in pedidos_view.columns:
                         prev_df = pedidos_view.copy()
                         prev_df["Prev_dt"] = pd.to_datetime(prev_df["Previsão"], dayfirst=True, errors="coerce")
@@ -624,8 +623,9 @@ if rc_input:
                             color_discrete_map=color_tipo, barmode="group", text="Qtde",
                         )
                         fig_prev.update_layout(
-                            height=300,
-                            margin=dict(l=10, r=10, t=10, b=10),
+                            title=dict(text="PREVISÃO DE PRODUÇÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                            height=320,
+                            margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
                             legend=dict(orientation="h", yanchor="top", y=-0.18, xanchor="center", x=0.5, font=dict(size=10)),
                             paper_bgcolor="white", plot_bgcolor="white",
