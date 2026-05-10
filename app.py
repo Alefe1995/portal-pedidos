@@ -225,24 +225,14 @@ st.markdown("""
 
     <div>
 
-        <div style="
-            font-size:32px;
-            font-weight:800;
-            color:white;
-            line-height:1.1;
-        ">
-            📋 Portal de Pedidos
-        </div>
+        <div>📋 Portal de Pedidos</div>
 
-        <div style="
-            font-size:16px;
-            font-weight:700;
-            color:white;
-            margin-top:4px;
-        ">
-            Portal Pedidos Pendentes
-        </div>
+        <div class='subtitle'>Portal Pedidos Pendentes</div>
 
+    </div>
+
+    <div style="margin-left:auto;font-size:08px;opacity:0.8;color:white;">
+        Admin
     </div>
 
 </div>
