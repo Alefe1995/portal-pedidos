@@ -62,24 +62,18 @@ if st.button("Validar E-mail RC"):
             rc_encontrado = linha["RC"]
 
             break
-    
+
     if rc_encontrado:
-    
+
         st.session_state.logado = True
-    
+
         st.session_state.tipo_usuario = "RC"
-    
+
         st.session_state.usuario_atual = email_rc
-    
+
         st.session_state.rc_usuario = rc_encontrado
-    
+
         st.rerun()
-    
-    else:
-    
-        st.error(
-            "E-mail não encontrado."
-        )
 
     else:
 
