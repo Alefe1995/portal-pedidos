@@ -716,7 +716,7 @@ if rc_input:
                             ))
                         
                         fig_est.update_layout(
-                            title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                            title=dict(text="ESTOQUE - PREVISÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                             height=320,
                             margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
@@ -873,7 +873,7 @@ if rc_input:
             # ---- SELECT PEDIDO ----
             pedidos_view["Pedido_Cliente"] = (
                 pedidos_view["Pedido"].astype(str)
-                + " — "
+                + " - "
                 + pedidos_view["Cliente"].astype(str)
             )
 
@@ -884,7 +884,7 @@ if rc_input:
 
             if pedido_escolha != "":
 
-                pedido_numero = pedido_escolha.split(" — ")[0]
+                pedido_numero = pedido_escolha.split(" - ")[0]
                 pedido_info   = pedidos_view[
                     pedidos_view["Pedido"].astype(str) == pedido_numero
                 ].iloc[0]
