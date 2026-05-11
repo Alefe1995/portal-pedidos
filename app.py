@@ -884,7 +884,7 @@ if rc_input:
             # ---- SELECT PEDIDO ----
             pedidos_view["Pedido_Cliente"] = (
                 pedidos_view["Pedido"].astype(str)
-                + " — "
+                + " - "
                 + pedidos_view["Cliente"].astype(str)
             )
 
@@ -895,7 +895,7 @@ if rc_input:
 
             if pedido_escolha != "":
 
-                pedido_numero = pedido_escolha.split(" — ")[0]
+                pedido_numero = pedido_escolha.split(" - ")[0]
                 pedido_info   = pedidos_view[
                     pedidos_view["Pedido"].astype(str) == pedido_numero
                 ].iloc[0]
