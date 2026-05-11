@@ -80,3 +80,46 @@ def mostrar_login():
             st.error(
                 "E-mail não encontrado."
             )
+    # ====================================
+    # LOGIN COORDENADOR
+    # ====================================
+
+    st.markdown("---")
+
+    st.subheader("Login Coordenador")
+
+    email_coord = st.text_input(
+        "Digite o e-mail do coordenador"
+    )
+
+    if st.button("Validar E-mail Coordenador"):
+
+        df_coord = pd.read_excel(
+            "E-mailsCoordenador.xlsx"
+        )
+
+        coord_encontrado = None
+
+        for _, linha in df_coord.iterrows():
+
+            email_planilha = str(
+                linha.get("E-mail", "")
+            ).strip().lower()
+
+            if email_coord.strip().lower() == email_planilha:
+
+                coord_encontrado = linha["Coordenador"]
+
+                break
+
+        if coord_encontrado:
+
+            st.success(
+                f"Coordenador encontrado: {coord_encontrado}"
+            )
+
+        else:
+
+            st.error(
+                "E-mail do coordenador não encontrado."
+            )
