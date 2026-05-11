@@ -634,18 +634,18 @@ if rc_input:
                             ),
                             showlegend=False,
                         ))
-
+                    
                     fig_uf.update_layout(
                         title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=10),
                         xaxis_title="", yaxis_title="",
                         paper_bgcolor="white",
-                        plot_bgcolor="#f9fafb",
+                        plot_bgcolor="white", # ALTERADO: De #f9fafb para white [cite: 261]
                         bargap=0.4,
                         xaxis=dict(
                             tickfont=dict(size=10),
-                            gridcolor="white",
+                            gridcolor="#f3f4f6", # Cor sutil para a grade
                             showline=False,
                             zeroline=False,
                         ),
@@ -655,12 +655,8 @@ if rc_input:
                             showline=False,
                             zeroline=False,
                         ),
-                        shapes=[dict(
-                            type="rect", xref="paper", yref="paper",
-                            x0=0, y0=0, x1=1, y1=1,
-                            line=dict(color="#d1d5db", width=1.5),
-                            fillcolor="rgba(0,0,0,0)",
-                        )],
+                        # O bloco 'shapes' abaixo foi limpo para remover a borda cinza [cite: 265, 266]
+                        shapes=[],
                     )
                     st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
 
@@ -718,14 +714,14 @@ if rc_input:
                                 ),
                                 showlegend=False,
                             ))
-
+                        
                         fig_est.update_layout(
                             title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                             height=320,
                             margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
                             paper_bgcolor="white",
-                            plot_bgcolor="#f9fafb",
+                            plot_bgcolor="white", # ALTERADO: De #f9fafb para white [cite: 282]
                             bargap=0.5,
                             xaxis=dict(
                                 tickfont=dict(size=12),
@@ -735,17 +731,14 @@ if rc_input:
                             ),
                             yaxis=dict(
                                 tickfont=dict(size=10),
-                                gridcolor="white",
+                                gridcolor="#f3f4f6", # Cor sutil para a grade
                                 showline=False,
                                 zeroline=False,
                             ),
-                            shapes=[dict(
-                                type="rect", xref="paper", yref="paper",
-                                x0=0, y0=0, x1=1, y1=1,
-                                line=dict(color="#d1d5db", width=1.5),
-                                fillcolor="rgba(0,0,0,0)",
-                            )],
+                            # O bloco 'shapes' abaixo foi limpo para remover a borda cinza [cite: 287, 288]
+                            shapes=[],
                         )
+                        
                         st.plotly_chart(fig_est, use_container_width=True, config={"displayModeBar": False})
 
                     else:
