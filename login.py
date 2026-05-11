@@ -9,26 +9,49 @@ st.set_page_config(
 )
 
 # =========================
-# TÍTULO
+# CONTROLE DE LOGIN
 # =========================
-st.title("🔐 Portal de Pedidos")
-
-st.markdown("---")
+if "logado" not in st.session_state:
+    st.session_state["logado"] = False
 
 # =========================
-# LOGIN MASTER
+# LOGIN
 # =========================
-st.subheader("Login Administrador")
+if st.session_state["logado"] == False:
 
-usuario = st.text_input("Usuário")
-senha = st.text_input("Senha", type="password")
+    st.title("🔐 Portal de Pedidos")
 
-if st.button("Entrar"):
+    st.markdown("---")
 
-    if usuario == "admin" and senha == "123456":
+    st.subheader("Login Administrador")
 
-        st.success("Login realizado com sucesso!")
+    usuario = st.text_input("Usuário")
 
-    else:
+    senha = st.text_input("Senha", type="password")
 
-        st.error("Usuário ou senha inválidos.")
+    if st.button("Entrar"):
+
+        if usuario == "admin" and senha == "123456":
+
+            st.session_state["logado"] = True
+
+            st.rerun()
+
+        else:
+
+            st.error("Usuário ou senha inválidos.")
+
+# =========================
+# ÁREA LOGADA
+# =========================
+else:
+
+    st.success("Login realizado com sucesso!")
+
+    st.write("✅ Área administrativa liberada.")
+
+    if st.button("Sair"):
+
+        st.session_state["logado"] = False
+
+        st.rerun()
