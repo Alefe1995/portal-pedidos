@@ -296,7 +296,7 @@ st.markdown("""
         <div>📋 Portal de Pedidos</div>
         <div class='subtitle'>ADERE Produto Auto Adesivos</div>
     </div>
-    <div style="margin-left:auto;font-size:13px;opacity:0.8;">Olá</div>
+    <div style="margin-left:auto;font-size:13px;opacity:0.8;">Olá - Última atualização: 11/05/2026 07:38:00</div>
 </div>
 """, unsafe_allow_html=True)
 
