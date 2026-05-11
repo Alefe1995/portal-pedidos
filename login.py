@@ -1,58 +1,62 @@
 import streamlit as st
 
-# =========================
+# ====================================
 # CONFIGURAÇÃO DA PÁGINA
-# =========================
+# ====================================
 st.set_page_config(
-    page_title="Login Portal",
+    page_title="Portal de Pedidos",
     layout="centered"
 )
 
-
-# =========================
+# ====================================
 # CONTROLE DE LOGIN
-# =========================
+# ====================================
 if "logado" not in st.session_state:
-    st.session_state["logado"] = False
+    st.session_state.logado = False
 
-# =========================
-# LOGIN
-# =========================
-if st.session_state["logado"] == False:
+# ====================================
+# TELA LOGIN
+# ====================================
+if not st.session_state.logado:
 
     st.title("🔐 Portal de Pedidos")
 
     st.markdown("---")
 
-    st.subheader("Login Administrador")
+    with st.form("form_login"):
 
-    usuario = st.text_input("Usuário")
+        usuario = st.text_input("Usuário")
 
-    senha = st.text_input("Senha", type="password")
+        senha = st.text_input(
+            "Senha",
+            type="password"
+        )
 
-    if st.button("Entrar"):
+        botao_login = st.form_submit_button("Entrar")
 
-        if usuario == "admin" and senha == "123456":
+        if botao_login:
 
-            st.session_state["logado"] = True
+            if usuario == "admin" and senha == "123456":
 
-            st.rerun()
+                st.session_state.logado = True
 
-        else:
+                st.success("Login realizado com sucesso!")
 
-            st.error("Usuário ou senha inválidos.")
+            else:
 
-# =========================
+                st.error("Usuário ou senha inválidos.")
+
+# ====================================
 # ÁREA LOGADA
-# =========================
+# ====================================
 else:
 
-    st.success("Login realizado com sucesso!")
+    st.title("✅ Área Administrativa")
 
-    st.write("✅ Área administrativa liberada.")
+    st.write("Você está logado no portal.")
 
     if st.button("Sair"):
 
-        st.session_state["logado"] = False
+        st.session_state.logado = False
 
         st.rerun()
