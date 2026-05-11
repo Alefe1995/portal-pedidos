@@ -501,17 +501,16 @@ if rc_input:
                 </div>
                 """, unsafe_allow_html=True)
 
-            # CSS para estilizar containers nativos como cards
+            # CSS: igualar st.container(border=True) ao card do Top Clientes
             st.markdown("""
             <style>
-            /* card de gráfico via container nativo */
-            [data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(> [data-testid="stPlotlyChart"]) {
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 12px;
-                padding: 16px;
-                box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-                margin-bottom: 16px;
+            /* Estiliza todos os containers com border=True na aba Visão Geral */
+            [data-testid="stVerticalBlockBorderWrapper"] {
+                background: white !important;
+                border: 1.5px solid #e5e7eb !important;
+                border-radius: 14px !important;
+                box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important;
+                padding: 12px 16px !important;
             }
             </style>
             """, unsafe_allow_html=True)
@@ -520,7 +519,7 @@ if rc_input:
             g1, g2 = st.columns(2)
 
             with g1:
-                with st.container():
+                with st.container(border=True):
                     status_chart = (
                         pedidos_view.groupby("Status")
                         .size()
@@ -543,62 +542,38 @@ if rc_input:
                         margin=dict(l=10, r=10, t=40, b=10),
                         showlegend=True,
                         legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
-                        paper_bgcolor="white",
-                        plot_bgcolor="white",
+                        paper_bgcolor="rgba(0,0,0,0)",
+                        plot_bgcolor="rgba(0,0,0,0)",
                     )
                     st.plotly_chart(fig_status, use_container_width=True, config={"displayModeBar": False})
 
             with g2:
-                with st.container():
+                with st.container(border=True):
                     motivo_chart = (
                         pedidos_view.groupby("Motivo")["Valor_num"]
                         .sum().reset_index().sort_values("Valor_num", ascending=False)
                     )
-
-                    # Paleta de cores manual (evita repetição de cor)
                     paleta = ["#ef4444", "#f97316", "#eab308", "#22c55e",
                               "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6"]
-
                     fig_motivo = go.Figure()
-                    for i, row in motivo_chart.iterrows():
+                    for i, row in motivo_chart.reset_index(drop=True).iterrows():
                         cor = paleta[i % len(paleta)]
                         fig_motivo.add_trace(go.Bar(
                             x=[row["Motivo"]],
                             y=[row["Valor_num"]],
                             name=row["Motivo"],
-                            marker=dict(
-                                color=cor,
-                                cornerradius=8,
-                                line=dict(width=0),
-                            ),
+                            marker=dict(color=cor, cornerradius=8, line=dict(width=0)),
                             showlegend=False,
                         ))
-
                     fig_motivo.update_layout(
                         title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=80),
                         xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white",
-                        plot_bgcolor="#f9fafb",
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                         bargap=0.4,
-                        xaxis=dict(
-                            tickfont=dict(size=10), tickangle=-30,
-                            showgrid=False, zeroline=False,
-                            showline=False,
-                        ),
-                        yaxis=dict(
-                            tickfont=dict(size=10),
-                            gridcolor="white",
-                            showline=False,
-                            zeroline=False,
-                        ),
-                        shapes=[dict(
-                            type="rect", xref="paper", yref="paper",
-                            x0=0, y0=0, x1=1, y1=1,
-                            line=dict(color="#d1d5db", width=1.5),
-                            fillcolor="rgba(0,0,0,0)",
-                        )],
+                        xaxis=dict(tickfont=dict(size=10), tickangle=-30, showgrid=False, zeroline=False, showline=False),
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
                     )
                     st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
 
@@ -606,70 +581,39 @@ if rc_input:
             g3, g4 = st.columns(2)
 
             with g3:
-                with st.container():
+                with st.container(border=True):
                     uf_chart = (
                         pedidos_view.groupby("UF")["Valor_num"]
                         .sum().reset_index().sort_values("Valor_num", ascending=True)
                     )
-
-                    # Escala de vermelho manual proporcional
                     max_uf = uf_chart["Valor_num"].max() if len(uf_chart) > 0 else 1
                     cores_uf = []
                     for v in uf_chart["Valor_num"]:
                         pct = v / max_uf
-                        if pct > 0.66:
-                            cores_uf.append("#dc2626")
-                        elif pct > 0.33:
-                            cores_uf.append("#f87171")
-                        else:
-                            cores_uf.append("#fca5a5")
+                        cores_uf.append("#dc2626" if pct > 0.66 else "#f87171" if pct > 0.33 else "#fca5a5")
 
                     fig_uf = go.Figure()
-                    for i, row in uf_chart.iterrows():
+                    for i, (_, row) in enumerate(uf_chart.iterrows()):
                         fig_uf.add_trace(go.Bar(
-                            y=[row["UF"]],
-                            x=[row["Valor_num"]],
-                            orientation="h",
+                            y=[row["UF"]], x=[row["Valor_num"]], orientation="h",
                             name=row["UF"],
-                            marker=dict(
-                                color=cores_uf[list(uf_chart.index).index(i)],
-                                cornerradius=8,
-                                line=dict(width=0),
-                            ),
+                            marker=dict(color=cores_uf[i], cornerradius=8, line=dict(width=0)),
                             showlegend=False,
                         ))
-
                     fig_uf.update_layout(
                         title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=10),
                         xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white",
-                        plot_bgcolor="#f9fafb",
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                         bargap=0.4,
-                        xaxis=dict(
-                            tickfont=dict(size=10),
-                            gridcolor="white",
-                            showline=False,
-                            zeroline=False,
-                        ),
-                        yaxis=dict(
-                            tickfont=dict(size=11),
-                            showgrid=False,
-                            showline=False,
-                            zeroline=False,
-                        ),
-                        shapes=[dict(
-                            type="rect", xref="paper", yref="paper",
-                            x0=0, y0=0, x1=1, y1=1,
-                            line=dict(color="#d1d5db", width=1.5),
-                            fillcolor="rgba(0,0,0,0)",
-                        )],
+                        xaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
+                        yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False),
                     )
                     st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
 
             with g4:
-                with st.container():
+                with st.container(border=True):
                     estoque_df = pedidos_view[
                         pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
                     ].copy()
@@ -689,66 +633,35 @@ if rc_input:
                             return "Outros"
 
                         estoque_df["Tipo"] = estoque_df["Previsão"].apply(classifica_estoque)
-
                         est_group = (
-                            estoque_df.groupby("Tipo")
-                            .size()
+                            estoque_df.groupby("Tipo").size()
                             .reset_index(name="Qtde")
                         )
-
                         ordem = ["Mês Atual", "Futuro", "Outros"]
                         est_group["Tipo"] = pd.Categorical(est_group["Tipo"], categories=ordem, ordered=True)
                         est_group = est_group.sort_values("Tipo")
-
-                        color_est = {
-                            "Mês Atual": "#f9a8d4",
-                            "Futuro":    "#dc2626",
-                            "Outros":    "#d1d5db",
-                        }
+                        color_est = {"Mês Atual": "#f9a8d4", "Futuro": "#dc2626", "Outros": "#d1d5db"}
 
                         fig_est = go.Figure()
                         for _, row in est_group.iterrows():
                             fig_est.add_trace(go.Bar(
-                                x=[str(row["Tipo"])],
-                                y=[row["Qtde"]],
+                                x=[str(row["Tipo"])], y=[row["Qtde"]],
                                 name=str(row["Tipo"]),
                                 text=[str(int(row["Qtde"]))],
                                 textposition="outside",
                                 textfont=dict(size=13, color="#374151"),
-                                marker=dict(
-                                    color=color_est.get(str(row["Tipo"]), "#d1d5db"),
-                                    cornerradius=8,
-                                    line=dict(width=0),
-                                ),
+                                marker=dict(color=color_est.get(str(row["Tipo"]), "#d1d5db"), cornerradius=8, line=dict(width=0)),
                                 showlegend=False,
                             ))
-
                         fig_est.update_layout(
                             title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                             height=320,
                             margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
-                            paper_bgcolor="white",
-                            plot_bgcolor="#f9fafb",
+                            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                             bargap=0.5,
-                            xaxis=dict(
-                                tickfont=dict(size=12),
-                                showgrid=False,
-                                showline=False,
-                                zeroline=False,
-                            ),
-                            yaxis=dict(
-                                tickfont=dict(size=10),
-                                gridcolor="white",
-                                showline=False,
-                                zeroline=False,
-                            ),
-                            shapes=[dict(
-                                type="rect", xref="paper", yref="paper",
-                                x0=0, y0=0, x1=1, y1=1,
-                                line=dict(color="#d1d5db", width=1.5),
-                                fillcolor="rgba(0,0,0,0)",
-                            )],
+                            xaxis=dict(tickfont=dict(size=12), showgrid=False, showline=False, zeroline=False),
+                            yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
                         )
                         st.plotly_chart(fig_est, use_container_width=True, config={"displayModeBar": False})
 
@@ -884,7 +797,7 @@ if rc_input:
             # ---- SELECT PEDIDO ----
             pedidos_view["Pedido_Cliente"] = (
                 pedidos_view["Pedido"].astype(str)
-                + " - "
+                + " — "
                 + pedidos_view["Cliente"].astype(str)
             )
 
@@ -895,7 +808,7 @@ if rc_input:
 
             if pedido_escolha != "":
 
-                pedido_numero = pedido_escolha.split(" - ")[0]
+                pedido_numero = pedido_escolha.split(" — ")[0]
                 pedido_info   = pedidos_view[
                     pedidos_view["Pedido"].astype(str) == pedido_numero
                 ].iloc[0]
@@ -908,7 +821,7 @@ if rc_input:
 
                 st.markdown(f"""
                 <div style="
-                    background:#fff7f7;
+                    background:white;
                     border:1px solid #e5e7eb;
                     border-left:5px solid #c00000;
                     border-radius:12px;
