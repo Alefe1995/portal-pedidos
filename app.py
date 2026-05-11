@@ -508,7 +508,7 @@ if rc_input:
             [data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(> [data-testid="stPlotlyChart"]) {
                 background: white;
                 border: 1px solid #e5e7eb;
-                border-radius: 12px;
+                border-radius: 30px; /* Ajuste aqui para 30px */
                 padding: 16px;
                 box-shadow: 0 1px 4px rgba(0,0,0,0.05);
                 margin-bottom: 16px;
