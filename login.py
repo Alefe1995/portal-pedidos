@@ -30,11 +30,47 @@ def mostrar_login():
         st.error(st.session_state.erro_login)
 
 # ====================================
-# TESTE LEITURA RCs
+# LOGIN RC
 # ====================================
 
-df_rc = pd.read_excel(
-    "E-mailsRCs.xlsx"
+st.markdown("---")
+
+st.subheader("Login RC")
+
+email_rc = st.text_input(
+    "Digite seu e-mail"
 )
 
-st.write(df_rc.head())
+if st.button("Validar E-mail RC"):
+
+    df_rc = pd.read_excel(
+        "E-mailsRCs.xlsx"
+    )
+
+    rc_encontrado = None
+
+    for _, linha in df_rc.iterrows():
+
+        emails = [
+            str(linha.get("Email1", "")).strip().lower(),
+            str(linha.get("Email2", "")).strip().lower(),
+            str(linha.get("Email3", "")).strip().lower()
+        ]
+
+        if email_rc.strip().lower() in emails:
+
+            rc_encontrado = linha["RC"]
+
+            break
+
+    if rc_encontrado:
+
+        st.success(
+            f"RC encontrado: {rc_encontrado}"
+        )
+
+    else:
+
+        st.error(
+            "E-mail não encontrado."
+        )
