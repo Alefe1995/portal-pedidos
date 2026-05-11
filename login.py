@@ -19,6 +19,7 @@ def mostrar_login():
         if usuario in USUARIOS and USUARIOS[usuario] == senha:
             st.session_state.logado = True
             st.session_state.usuario_atual = usuario
+            st.session_state.tipo_usuario = "MASTER"
             st.session_state.erro_login = ""
             st.rerun()
         else:
