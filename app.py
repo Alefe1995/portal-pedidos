@@ -501,6 +501,17 @@ if rc_input:
                 </div>
                 """, unsafe_allow_html=True)
 
+            # CSS: reduz espaço entre as linhas de gráficos
+            st.markdown("""
+            <style>
+            [data-testid="stHorizontalBlock"] { margin-bottom: -24px !important; }
+            </style>
+            """, unsafe_allow_html=True)
+
+            # Estilo do card compartilhado
+            CARD = ('background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
+                    'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;')
+
             # ---- LINHA 1: STATUS | VALOR POR MOTIVO ----
             g1, g2 = st.columns(2)
 
@@ -517,18 +528,14 @@ if rc_input:
                     textinfo="percent", textfont_size=12,
                 ))
                 fig_status.update_layout(
-                    title=dict(text="DISTRIBUIÇÃO POR STATUS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                    height=300, margin=dict(l=10, r=10, t=40, b=10),
+                    title=dict(text="<b>DISTRIBUIÇÃO POR STATUS</b>", font=dict(size=11, color="#6b7280"), x=0.01, xanchor="left"),
+                    height=260, margin=dict(l=10, r=10, t=38, b=10),
                     showlegend=True,
                     legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
                     paper_bgcolor="white", plot_bgcolor="white",
                 )
                 html_s = fig_status.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
-                components.html(
-                    f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
-                    f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_s}</div>',
-                    height=340
-                )
+                components.html(f'<div style="{CARD}">{html_s}</div>', height=300)
 
             with g2:
                 motivo_chart = (
@@ -544,19 +551,15 @@ if rc_input:
                         showlegend=False,
                     ))
                 fig_motivo.update_layout(
-                    title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                    height=300, margin=dict(l=10, r=10, t=40, b=80),
+                    title=dict(text="<b>VALOR POR MOTIVO</b>", font=dict(size=11, color="#6b7280"), x=0.01, xanchor="left"),
+                    height=260, margin=dict(l=10, r=10, t=38, b=90),
                     xaxis_title="", yaxis_title="",
                     paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
-                    xaxis=dict(tickfont=dict(size=10), tickangle=-30, showgrid=False, zeroline=False, showline=False),
-                    yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
+                    xaxis=dict(tickfont=dict(size=10), tickangle=-35, showgrid=False, zeroline=False, showline=False),
+                    yaxis=dict(tickfont=dict(size=10), showgrid=False, showline=False, zeroline=False),
                 )
                 html_m = fig_motivo.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
-                components.html(
-                    f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
-                    f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_m}</div>',
-                    height=400
-                )
+                components.html(f'<div style="{CARD}">{html_m}</div>', height=370)
 
             # ---- LINHA 2: VALOR POR UF | ESTOQUE POR SITUAÇÃO ----
             g3, g4 = st.columns(2)
@@ -578,20 +581,18 @@ if rc_input:
                         marker=dict(color=cores_uf[i], cornerradius=8, line=dict(width=0)),
                         showlegend=False,
                     ))
+                n_ufs = len(uf_chart)
+                altura_uf = max(260, n_ufs * 48 + 80)
                 fig_uf.update_layout(
-                    title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                    height=300, margin=dict(l=10, r=10, t=40, b=10),
+                    title=dict(text="<b>VALOR POR ESTADO (UF)</b>", font=dict(size=11, color="#6b7280"), x=0.01, xanchor="left"),
+                    height=altura_uf, margin=dict(l=10, r=10, t=38, b=10),
                     xaxis_title="", yaxis_title="",
-                    paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
-                    xaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
+                    paper_bgcolor="white", plot_bgcolor="white", bargap=0.35,
+                    xaxis=dict(tickfont=dict(size=10), showgrid=False, showline=False, zeroline=False),
                     yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False),
                 )
                 html_uf = fig_uf.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
-                components.html(
-                    f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
-                    f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_uf}</div>',
-                    height=340
-                )
+                components.html(f'<div style="{CARD}">{html_uf}</div>', height=altura_uf + 40)
 
             with g4:
                 estoque_df = pedidos_view[
@@ -629,19 +630,15 @@ if rc_input:
                             showlegend=False,
                         ))
                     fig_est.update_layout(
-                        title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                        height=300, margin=dict(l=10, r=10, t=40, b=10),
+                        title=dict(text="<b>ESTOQUE — PEDIDOS POR SITUAÇÃO</b>", font=dict(size=11, color="#6b7280"), x=0.01, xanchor="left"),
+                        height=260, margin=dict(l=10, r=10, t=38, b=10),
                         xaxis_title="", yaxis_title="",
                         paper_bgcolor="white", plot_bgcolor="white", bargap=0.5,
                         xaxis=dict(tickfont=dict(size=12), showgrid=False, showline=False, zeroline=False),
-                        yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
+                        yaxis=dict(tickfont=dict(size=10), showgrid=False, showline=False, zeroline=False),
                     )
                     html_est = fig_est.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
-                    components.html(
-                        f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
-                        f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_est}</div>',
-                        height=340
-                    )
+                    components.html(f'<div style="{CARD}">{html_est}</div>', height=300)
                 else:
                     st.info("Nenhum pedido com Motivo 'Estoque' encontrado.")
 
