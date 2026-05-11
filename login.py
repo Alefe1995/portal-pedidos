@@ -114,8 +114,20 @@ def mostrar_login():
 
         if coord_encontrado:
 
-            st.success(
-                f"Coordenador encontrado: {coord_encontrado}"
+            st.session_state.logado = True
+
+            st.session_state.tipo_usuario = "COORDENADOR"
+
+            st.session_state.usuario_atual = email_coord
+
+            st.session_state.coordenador_usuario = coord_encontrado
+
+            st.rerun()
+
+        else:
+
+            st.error(
+                "E-mail do coordenador não encontrado."
             )
 
         else:
