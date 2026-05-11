@@ -501,20 +501,19 @@ if rc_input:
                 </div>
                 """, unsafe_allow_html=True)
 
-            # CSS: igualar st.container(border=True) ao card do Top Clientes
+            # CSS: forçar background branco em TODOS os elementos dentro do container
             st.markdown("""
             <style>
-            [data-testid="stVerticalBlockBorderWrapper"],
-            [data-testid="stVerticalBlockBorderWrapper"] > div,
-            [data-testid="stVerticalBlockBorderWrapper"] > div > div,
-            [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
-                background: white !important;
-                border-radius: 14px !important;
-            }
+            /* Container externo */
             [data-testid="stVerticalBlockBorderWrapper"] {
+                background: white !important;
                 border: 1.5px solid #e5e7eb !important;
+                border-radius: 14px !important;
                 box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important;
-                padding: 12px 16px !important;
+            }
+            /* Todos os descendentes sem exceção */
+            [data-testid="stVerticalBlockBorderWrapper"] *:not(canvas):not(svg):not(path):not(g):not(rect):not(text) {
+                background-color: white !important;
             }
             </style>
             """, unsafe_allow_html=True)
