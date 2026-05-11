@@ -13,7 +13,7 @@ st.set_page_config(
 # CREDENCIAIS (idealmente via secrets)
 # ====================================
 USUARIOS = {
-    "admin": "92485717",
+    "admin": "924857171",
     "usuario": "senha123"
 }
 
