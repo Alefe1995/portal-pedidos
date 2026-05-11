@@ -318,7 +318,25 @@ def mostrar_portal():
     # =========================
     # SELEÇÃO DO TIPO DE BUSCA
     # =========================
-    st.markdown("<div style='margin-bottom:8px;font-size:13px;font-weight:600;color:#374151;'>🔍 Buscar por:</div>", unsafe_allow_html=True)
+
+    st.markdown(
+        "<div style='margin-bottom:8px;font-size:13px;font-weight:600;color:#374151;'>🔍 Buscar por:</div>",
+        unsafe_allow_html=True
+    )
+
+    # ====================================
+    # CONTROLE DE USUÁRIO
+    # ====================================
+
+    tipo_usuario = st.session_state.get(
+        "tipo_usuario",
+        "MASTER"
+    )
+
+    rc_usuario = st.session_state.get(
+        "rc_usuario",
+        ""
+    )
 
     tipo_busca = st.radio(
         label="Tipo de Busca",
@@ -330,49 +348,126 @@ def mostrar_portal():
     # =========================
     # CAMPOS DE BUSCA
     # =========================
+
     base = pd.DataFrame()
+
     identificador = ""
 
-    if tipo_busca == "Código RC":
+    # ====================================
+    # USUÁRIO RC
+    # ====================================
+
+    if tipo_usuario == "RC":
+
+        rc_input = str(rc_usuario)
+
+        base = pedidos[
+            pedidos["RC"].astype(str) == rc_input
+        ].copy()
+
+        identificador = f"RC {rc_input}"
+
+    # ====================================
+    # BUSCA POR RC
+    # ====================================
+
+    elif tipo_busca == "Código RC":
+
         col_rc, col_btn, col_espaco = st.columns([2, 1, 5])
+
         with col_rc:
-            rc_input = st.text_input("CÓDIGO RC", placeholder="Ex: 614", label_visibility="visible", max_chars=5)
+
+            rc_input = st.text_input(
+                "CÓDIGO RC",
+                placeholder="Ex: 614",
+                label_visibility="visible",
+                max_chars=5
+            )
+
         with col_btn:
-            st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
-            buscar = st.button("Buscar", use_container_width=True)
+
+            st.markdown(
+                "<div style='margin-top:28px;'></div>",
+                unsafe_allow_html=True
+            )
+
+            buscar = st.button(
+                "Buscar",
+                use_container_width=True
+            )
 
         if rc_input:
-            base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
+
+            base = pedidos[
+                pedidos["RC"].astype(str) == rc_input
+            ].copy()
+
             identificador = f"RC {rc_input}"
 
-    else:  # Coordenador de Vendas
+    # ====================================
+    # BUSCA POR COORDENADOR
+    # ====================================
+
+    elif tipo_busca == "Coordenador de Vendas":
+
         if "Coordenador" in pedidos.columns:
-            coordenadores_lista = sorted(pedidos["Coordenador"].dropna().astype(str).unique().tolist())
+
+            coordenadores_lista = sorted(
+                pedidos["Coordenador"]
+                .dropna()
+                .astype(str)
+                .unique()
+                .tolist()
+            )
+
         else:
+
             coordenadores_lista = []
 
         col_coord, col_btn, col_espaco = st.columns([3, 1, 4])
+
         with col_coord:
+
             if coordenadores_lista:
+
                 coord_input = st.selectbox(
                     "COORDENADOR DE VENDAS",
                     options=[""] + coordenadores_lista,
                     label_visibility="visible"
                 )
+
             else:
+
                 coord_input = st.text_input(
                     "COORDENADOR DE VENDAS",
                     placeholder="Digite o nome do coordenador",
                     label_visibility="visible"
                 )
-                st.caption("⚠️ Coluna 'Coordenador' não encontrada na planilha.")
+
+                st.caption(
+                    "⚠️ Coluna 'Coordenador' não encontrada na planilha."
+                )
+
         with col_btn:
-            st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
-            buscar = st.button("Buscar", use_container_width=True)
+
+            st.markdown(
+                "<div style='margin-top:28px;'></div>",
+                unsafe_allow_html=True
+            )
+
+            buscar = st.button(
+                "Buscar",
+                use_container_width=True
+            )
 
         if coord_input and coord_input != "":
+
             if "Coordenador" in pedidos.columns:
-                base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
+
+                base = pedidos[
+                    pedidos["Coordenador"].astype(str) == coord_input
+                ].copy()
+
             identificador = f"Coordenador: {coord_input}"
 
     # =========================
