@@ -1,11 +1,12 @@
 # app.py
 import streamlit as st
-from login import mostrar_login  # ← importa a função, não o módulo solto
+from login import mostrar_login
+from portal_backup import mostrar_portal   # ← importa a função
 
 st.set_page_config(
     page_title="Portal de Pedidos",
     page_icon="🛒",
-    layout="centered"
+    layout="wide"                          # ← muda para wide, que é o que o portal usa
 )
 
 if "logado" not in st.session_state:
@@ -16,12 +17,11 @@ if "erro_login" not in st.session_state:
     st.session_state.erro_login = ""
 
 if st.session_state.logado:
-    import portal_backup
+    mostrar_portal()                       # ← chama o portal
     st.sidebar.markdown("---")
     if st.sidebar.button("🚪 Sair"):
         st.session_state.logado = False
         st.session_state.usuario_atual = ""
         st.rerun()
-        
 else:
-    mostrar_login()  # ← chama a função
+    mostrar_login()
