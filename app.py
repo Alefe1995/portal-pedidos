@@ -542,8 +542,8 @@ if rc_input:
                         margin=dict(l=10, r=10, t=40, b=10),
                         showlegend=True,
                         legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        plot_bgcolor="rgba(0,0,0,0)",
+                        paper_bgcolor="white",
+                        plot_bgcolor="white",
                     )
                     st.plotly_chart(fig_status, use_container_width=True, config={"displayModeBar": False})
 
@@ -570,7 +570,7 @@ if rc_input:
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=80),
                         xaxis_title="", yaxis_title="",
-                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                        paper_bgcolor="white", plot_bgcolor="white",
                         bargap=0.4,
                         xaxis=dict(tickfont=dict(size=10), tickangle=-30, showgrid=False, zeroline=False, showline=False),
                         yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
@@ -605,7 +605,7 @@ if rc_input:
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=10),
                         xaxis_title="", yaxis_title="",
-                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                        paper_bgcolor="white", plot_bgcolor="white",
                         bargap=0.4,
                         xaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
                         yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False),
@@ -658,7 +658,7 @@ if rc_input:
                             height=320,
                             margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
-                            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                            paper_bgcolor="white", plot_bgcolor="white",
                             bargap=0.5,
                             xaxis=dict(tickfont=dict(size=12), showgrid=False, showline=False, zeroline=False),
                             yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
