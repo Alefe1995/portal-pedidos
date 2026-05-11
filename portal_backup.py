@@ -5,14 +5,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # =========================
-# CONFIGURAÇÃO
-# =========================
-st.set_page_config(
-    page_title="Portal de Pedidos",
-    layout="wide"
-)
-
-# =========================
 # CSS GLOBAL — ESTILO BASE44
 # =========================
 st.markdown("""
