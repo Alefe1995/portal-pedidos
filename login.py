@@ -29,54 +29,54 @@ def mostrar_login():
     if st.session_state.erro_login:
         st.error(st.session_state.erro_login)
 
-# ====================================
-# LOGIN RC
-# ====================================
-
-st.markdown("---")
-
-st.subheader("Login RC")
-
-email_rc = st.text_input(
-    "Digite seu e-mail"
-)
-
-if st.button("Validar E-mail RC"):
-
-    df_rc = pd.read_excel(
-        "E-mailsRCs.xlsx"
+    # ====================================
+    # LOGIN RC
+    # ====================================
+    
+    st.markdown("---")
+    
+    st.subheader("Login RC")
+    
+    email_rc = st.text_input(
+        "Digite seu e-mail"
     )
-
-    rc_encontrado = None
-
-    for _, linha in df_rc.iterrows():
-
-        emails = [
-            str(linha.get("Email1", "")).strip().lower(),
-            str(linha.get("Email2", "")).strip().lower(),
-            str(linha.get("Email3", "")).strip().lower()
-        ]
-
-        if email_rc.strip().lower() in emails:
-
-            rc_encontrado = linha["RC"]
-
-            break
-
-    if rc_encontrado:
-
-        st.session_state.logado = True
-
-        st.session_state.tipo_usuario = "RC"
-
-        st.session_state.usuario_atual = email_rc
-
-        st.session_state.rc_usuario = rc_encontrado
-
-        st.rerun()
-
-    else:
-
-        st.error(
-            "E-mail não encontrado."
+    
+    if st.button("Validar E-mail RC"):
+    
+        df_rc = pd.read_excel(
+            "E-mailsRCs.xlsx"
         )
+    
+        rc_encontrado = None
+    
+        for _, linha in df_rc.iterrows():
+    
+            emails = [
+                str(linha.get("Email1", "")).strip().lower(),
+                str(linha.get("Email2", "")).strip().lower(),
+                str(linha.get("Email3", "")).strip().lower()
+            ]
+    
+            if email_rc.strip().lower() in emails:
+    
+                rc_encontrado = linha["RC"]
+    
+                break
+    
+        if rc_encontrado:
+    
+            st.session_state.logado = True
+    
+            st.session_state.tipo_usuario = "RC"
+    
+            st.session_state.usuario_atual = email_rc
+    
+            st.session_state.rc_usuario = rc_encontrado
+    
+            st.rerun()
+    
+        else:
+    
+            st.error(
+                "E-mail não encontrado."
+            )
