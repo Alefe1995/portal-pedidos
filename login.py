@@ -1,5 +1,6 @@
 # login.py
 import streamlit as st
+import pandas as pd
 
 USUARIOS = {
     "admin": "123456",
