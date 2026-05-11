@@ -573,14 +573,14 @@ if rc_input:
                             ),
                             showlegend=False,
                         ))
-
+                    
                     fig_motivo.update_layout(
                         title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=80),
                         xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white",
-                        plot_bgcolor="#f9fafb",
+                        paper_bgcolor="white", # Cor do fundo do papel
+                        plot_bgcolor="white",  # ALTERADO: De #f9fafb para white para tirar o cinza
                         bargap=0.4,
                         xaxis=dict(
                             tickfont=dict(size=10), tickangle=-30,
@@ -589,16 +589,12 @@ if rc_input:
                         ),
                         yaxis=dict(
                             tickfont=dict(size=10),
-                            gridcolor="white",
+                            gridcolor="#f3f4f6", # Opcional: uma cor de grade bem sutil
                             showline=False,
                             zeroline=False,
                         ),
-                        shapes=[dict(
-                            type="rect", xref="paper", yref="paper",
-                            x0=0, y0=0, x1=1, y1=1,
-                            line=dict(color="#d1d5db", width=1.5),
-                            fillcolor="rgba(0,0,0,0)",
-                        )],
+                        # O bloco 'shapes' abaixo foi removido para eliminar a borda cinza grossa
+                        shapes=[] 
                     )
                     st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
 
