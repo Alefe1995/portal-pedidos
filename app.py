@@ -177,7 +177,7 @@ div[data-baseweb="select"] > div {
 .chart-card {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 08px;
+    border-radius: 30px;
     padding: 16px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     margin-bottom: 16px;
