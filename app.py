@@ -501,175 +501,149 @@ if rc_input:
                 </div>
                 """, unsafe_allow_html=True)
 
-            # CSS: forçar background branco em TODOS os elementos dentro do container
-            st.markdown("""
-            <style>
-            /* Container externo */
-            [data-testid="stVerticalBlockBorderWrapper"] {
-                background: white !important;
-                border: 1.5px solid #e5e7eb !important;
-                border-radius: 14px !important;
-                box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important;
-            }
-            /* Todos os descendentes sem exceção */
-            [data-testid="stVerticalBlockBorderWrapper"] *:not(canvas):not(svg):not(path):not(g):not(rect):not(text) {
-                background-color: white !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-
             # ---- LINHA 1: STATUS | VALOR POR MOTIVO ----
             g1, g2 = st.columns(2)
 
             with g1:
-                with st.container(border=True):
-                    status_chart = (
-                        pedidos_view.groupby("Status")
-                        .size()
-                        .reset_index(name="Quantidade")
-                    )
-                    color_map = {"Pendente": "#f59e0b", "Conferido": "#3b82f6", "Liberado": "#22c55e"}
-                    cores = [color_map.get(s, "#9ca3af") for s in status_chart["Status"]]
-                    fig_status = go.Figure(go.Pie(
-                        labels=status_chart["Status"],
-                        values=status_chart["Quantidade"],
-                        hole=0.6,
-                        marker_colors=cores,
-                        marker=dict(line=dict(color="white", width=2)),
-                        textinfo="percent",
-                        textfont_size=12,
-                    ))
-                    fig_status.update_layout(
-                        title=dict(text="DISTRIBUIÇÃO POR STATUS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                        height=320,
-                        margin=dict(l=10, r=10, t=40, b=10),
-                        showlegend=True,
-                        legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
-                        paper_bgcolor="white",
-                        plot_bgcolor="white",
-                    )
-                    st.plotly_chart(fig_status, use_container_width=True, config={"displayModeBar": False})
+                status_chart = (
+                    pedidos_view.groupby("Status").size().reset_index(name="Quantidade")
+                )
+                color_map = {"Pendente": "#f59e0b", "Conferido": "#3b82f6", "Liberado": "#22c55e"}
+                cores = [color_map.get(s, "#9ca3af") for s in status_chart["Status"]]
+                fig_status = go.Figure(go.Pie(
+                    labels=status_chart["Status"], values=status_chart["Quantidade"],
+                    hole=0.6, marker_colors=cores,
+                    marker=dict(line=dict(color="white", width=2)),
+                    textinfo="percent", textfont_size=12,
+                ))
+                fig_status.update_layout(
+                    title=dict(text="DISTRIBUIÇÃO POR STATUS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                    height=300, margin=dict(l=10, r=10, t=40, b=10),
+                    showlegend=True,
+                    legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
+                    paper_bgcolor="white", plot_bgcolor="white",
+                )
+                html_s = fig_status.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+                components.html(
+                    f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
+                    f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_s}</div>',
+                    height=340
+                )
 
             with g2:
-                with st.container(border=True):
-                    motivo_chart = (
-                        pedidos_view.groupby("Motivo")["Valor_num"]
-                        .sum().reset_index().sort_values("Valor_num", ascending=False)
-                    )
-                    paleta = ["#ef4444", "#f97316", "#eab308", "#22c55e",
-                              "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6"]
-                    fig_motivo = go.Figure()
-                    for i, row in motivo_chart.reset_index(drop=True).iterrows():
-                        cor = paleta[i % len(paleta)]
-                        fig_motivo.add_trace(go.Bar(
-                            x=[row["Motivo"]],
-                            y=[row["Valor_num"]],
-                            name=row["Motivo"],
-                            marker=dict(color=cor, cornerradius=8, line=dict(width=0)),
-                            showlegend=False,
-                        ))
-                    fig_motivo.update_layout(
-                        title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                        height=320,
-                        margin=dict(l=10, r=10, t=40, b=80),
-                        xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white", plot_bgcolor="white",
-                        bargap=0.4,
-                        xaxis=dict(tickfont=dict(size=10), tickangle=-30, showgrid=False, zeroline=False, showline=False),
-                        yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
-                    )
-                    st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
+                motivo_chart = (
+                    pedidos_view.groupby("Motivo")["Valor_num"]
+                    .sum().reset_index().sort_values("Valor_num", ascending=False)
+                )
+                paleta = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6"]
+                fig_motivo = go.Figure()
+                for i, row in motivo_chart.reset_index(drop=True).iterrows():
+                    fig_motivo.add_trace(go.Bar(
+                        x=[row["Motivo"]], y=[row["Valor_num"]], name=row["Motivo"],
+                        marker=dict(color=paleta[i % len(paleta)], cornerradius=8, line=dict(width=0)),
+                        showlegend=False,
+                    ))
+                fig_motivo.update_layout(
+                    title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                    height=300, margin=dict(l=10, r=10, t=40, b=80),
+                    xaxis_title="", yaxis_title="",
+                    paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
+                    xaxis=dict(tickfont=dict(size=10), tickangle=-30, showgrid=False, zeroline=False, showline=False),
+                    yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
+                )
+                html_m = fig_motivo.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+                components.html(
+                    f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
+                    f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_m}</div>',
+                    height=400
+                )
 
-            # ---- LINHA 2: VALOR POR UF | ESTOQUE POR MÊS ----
+            # ---- LINHA 2: VALOR POR UF | ESTOQUE POR SITUAÇÃO ----
             g3, g4 = st.columns(2)
 
             with g3:
-                with st.container(border=True):
-                    uf_chart = (
-                        pedidos_view.groupby("UF")["Valor_num"]
-                        .sum().reset_index().sort_values("Valor_num", ascending=True)
-                    )
-                    max_uf = uf_chart["Valor_num"].max() if len(uf_chart) > 0 else 1
-                    cores_uf = []
-                    for v in uf_chart["Valor_num"]:
-                        pct = v / max_uf
-                        cores_uf.append("#dc2626" if pct > 0.66 else "#f87171" if pct > 0.33 else "#fca5a5")
-
-                    fig_uf = go.Figure()
-                    for i, (_, row) in enumerate(uf_chart.iterrows()):
-                        fig_uf.add_trace(go.Bar(
-                            y=[row["UF"]], x=[row["Valor_num"]], orientation="h",
-                            name=row["UF"],
-                            marker=dict(color=cores_uf[i], cornerradius=8, line=dict(width=0)),
-                            showlegend=False,
-                        ))
-                    fig_uf.update_layout(
-                        title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                        height=320,
-                        margin=dict(l=10, r=10, t=40, b=10),
-                        xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white", plot_bgcolor="white",
-                        bargap=0.4,
-                        xaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
-                        yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False),
-                    )
-                    st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
+                uf_chart = (
+                    pedidos_view.groupby("UF")["Valor_num"]
+                    .sum().reset_index().sort_values("Valor_num", ascending=True)
+                )
+                max_uf = uf_chart["Valor_num"].max() if len(uf_chart) > 0 else 1
+                cores_uf = []
+                for v in uf_chart["Valor_num"]:
+                    pct = v / max_uf
+                    cores_uf.append("#dc2626" if pct > 0.66 else "#f87171" if pct > 0.33 else "#fca5a5")
+                fig_uf = go.Figure()
+                for i, (_, row) in enumerate(uf_chart.iterrows()):
+                    fig_uf.add_trace(go.Bar(
+                        y=[row["UF"]], x=[row["Valor_num"]], orientation="h", name=row["UF"],
+                        marker=dict(color=cores_uf[i], cornerradius=8, line=dict(width=0)),
+                        showlegend=False,
+                    ))
+                fig_uf.update_layout(
+                    title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                    height=300, margin=dict(l=10, r=10, t=40, b=10),
+                    xaxis_title="", yaxis_title="",
+                    paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
+                    xaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
+                    yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False),
+                )
+                html_uf = fig_uf.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+                components.html(
+                    f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
+                    f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_uf}</div>',
+                    height=340
+                )
 
             with g4:
-                with st.container(border=True):
-                    estoque_df = pedidos_view[
-                        pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
-                    ].copy()
+                estoque_df = pedidos_view[
+                    pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
+                ].copy()
 
-                    if not estoque_df.empty and "Previsão" in estoque_df.columns:
+                if not estoque_df.empty and "Previsão" in estoque_df.columns:
 
-                        def classifica_estoque(prev):
-                            val = str(prev).strip()
-                            if val.lower() == "futuro":
-                                return "Futuro"
-                            try:
-                                dt = pd.to_datetime(val, dayfirst=True, errors="raise")
-                                if pd.notna(dt):
-                                    return "Mês Atual"
-                            except:
-                                pass
-                            return "Outros"
+                    def classifica_estoque(prev):
+                        val = str(prev).strip()
+                        if val.lower() == "futuro":
+                            return "Futuro"
+                        try:
+                            dt = pd.to_datetime(val, dayfirst=True, errors="raise")
+                            if pd.notna(dt):
+                                return "Mês Atual"
+                        except:
+                            pass
+                        return "Outros"
 
-                        estoque_df["Tipo"] = estoque_df["Previsão"].apply(classifica_estoque)
-                        est_group = (
-                            estoque_df.groupby("Tipo").size()
-                            .reset_index(name="Qtde")
-                        )
-                        ordem = ["Mês Atual", "Futuro", "Outros"]
-                        est_group["Tipo"] = pd.Categorical(est_group["Tipo"], categories=ordem, ordered=True)
-                        est_group = est_group.sort_values("Tipo")
-                        color_est = {"Mês Atual": "#f9a8d4", "Futuro": "#dc2626", "Outros": "#d1d5db"}
+                    estoque_df["Tipo"] = estoque_df["Previsão"].apply(classifica_estoque)
+                    est_group = estoque_df.groupby("Tipo").size().reset_index(name="Qtde")
+                    ordem = ["Mês Atual", "Futuro", "Outros"]
+                    est_group["Tipo"] = pd.Categorical(est_group["Tipo"], categories=ordem, ordered=True)
+                    est_group = est_group.sort_values("Tipo")
+                    color_est = {"Mês Atual": "#f9a8d4", "Futuro": "#dc2626", "Outros": "#d1d5db"}
 
-                        fig_est = go.Figure()
-                        for _, row in est_group.iterrows():
-                            fig_est.add_trace(go.Bar(
-                                x=[str(row["Tipo"])], y=[row["Qtde"]],
-                                name=str(row["Tipo"]),
-                                text=[str(int(row["Qtde"]))],
-                                textposition="outside",
-                                textfont=dict(size=13, color="#374151"),
-                                marker=dict(color=color_est.get(str(row["Tipo"]), "#d1d5db"), cornerradius=8, line=dict(width=0)),
-                                showlegend=False,
-                            ))
-                        fig_est.update_layout(
-                            title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                            height=320,
-                            margin=dict(l=10, r=10, t=40, b=10),
-                            xaxis_title="", yaxis_title="",
-                            paper_bgcolor="white", plot_bgcolor="white",
-                            bargap=0.5,
-                            xaxis=dict(tickfont=dict(size=12), showgrid=False, showline=False, zeroline=False),
-                            yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
-                        )
-                        st.plotly_chart(fig_est, use_container_width=True, config={"displayModeBar": False})
-
-                    else:
-                        st.info("Nenhum pedido com Motivo 'Estoque' encontrado.")
+                    fig_est = go.Figure()
+                    for _, row in est_group.iterrows():
+                        fig_est.add_trace(go.Bar(
+                            x=[str(row["Tipo"])], y=[row["Qtde"]], name=str(row["Tipo"]),
+                            text=[str(int(row["Qtde"]))], textposition="outside",
+                            textfont=dict(size=13, color="#374151"),
+                            marker=dict(color=color_est.get(str(row["Tipo"]), "#d1d5db"), cornerradius=8, line=dict(width=0)),
+                            showlegend=False,
+                        ))
+                    fig_est.update_layout(
+                        title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                        height=300, margin=dict(l=10, r=10, t=40, b=10),
+                        xaxis_title="", yaxis_title="",
+                        paper_bgcolor="white", plot_bgcolor="white", bargap=0.5,
+                        xaxis=dict(tickfont=dict(size=12), showgrid=False, showline=False, zeroline=False),
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb", showline=False, zeroline=False),
+                    )
+                    html_est = fig_est.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+                    components.html(
+                        f'<div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;'
+                        f'box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:4px 8px;">{html_est}</div>',
+                        height=340
+                    )
+                else:
+                    st.info("Nenhum pedido com Motivo 'Estoque' encontrado.")
 
             # ---- LINHA 3: TOP CLIENTES (largura total, HTML puro) ----
             top_clientes = (
