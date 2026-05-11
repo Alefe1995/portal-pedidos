@@ -10,21 +10,22 @@ st.set_page_config(
 )
 
 # ====================================
-# CREDENCIAIS (idealmente via secrets)
+# CREDENCIAIS
 # ====================================
 USUARIOS = {
-    "admin": "92485717",
+    "admin": "123456",
     "usuario": "senha123"
 }
 
 # ====================================
-# CONTROLE DE LOGIN
+# INICIALIZA SESSION STATE
 # ====================================
 if "logado" not in st.session_state:
     st.session_state.logado = False
-
 if "usuario_atual" not in st.session_state:
     st.session_state.usuario_atual = ""
+if "erro_login" not in st.session_state:
+    st.session_state.erro_login = ""
 
 # ====================================
 # TELA DE LOGIN
@@ -38,13 +39,18 @@ def tela_login():
         senha = st.text_input("Senha", type="password")
         botao_login = st.form_submit_button("Entrar", use_container_width=True)
 
-        if botao_login:
-            if usuario in USUARIOS and USUARIOS[usuario] == senha:
-                st.session_state.logado = True
-                st.session_state.usuario_atual = usuario
-                st.rerun()  # ← CORREÇÃO PRINCIPAL
-            else:
-                st.error("❌ Usuário ou senha inválidos.")
+    # ← FORA do with st.form, mas ainda captura os valores
+    if botao_login:
+        if usuario in USUARIOS and USUARIOS[usuario] == senha:
+            st.session_state.logado = True
+            st.session_state.usuario_atual = usuario
+            st.session_state.erro_login = ""
+            st.rerun()  # ← Agora funciona corretamente fora do form
+        else:
+            st.session_state.erro_login = "❌ Usuário ou senha inválidos."
+
+    if st.session_state.erro_login:
+        st.error(st.session_state.erro_login)
 
 # ====================================
 # ÁREA LOGADA
@@ -54,7 +60,6 @@ def area_logada():
     st.write(f"Bem-vindo, **{st.session_state.usuario_atual}**!")
     st.markdown("---")
 
-    # Seu conteúdo aqui
     st.info("Portal carregado com sucesso.")
 
     if st.button("🚪 Sair", use_container_width=True):
