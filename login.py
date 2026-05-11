@@ -28,3 +28,13 @@ def mostrar_login():
 
     if st.session_state.erro_login:
         st.error(st.session_state.erro_login)
+
+# ====================================
+# TESTE LEITURA RCs
+# ====================================
+
+df_rc = pd.read_excel(
+    "E-mailsRCs.xlsx"
+)
+
+st.write(df_rc.head())
