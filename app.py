@@ -908,7 +908,7 @@ if rc_input:
 
                 st.markdown(f"""
                 <div style="
-                    background:white;
+                    background:#fff7f7;
                     border:1px solid #e5e7eb;
                     border-left:5px solid #c00000;
                     border-radius:12px;
