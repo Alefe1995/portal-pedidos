@@ -16,12 +16,12 @@ if "erro_login" not in st.session_state:
     st.session_state.erro_login = ""
 
 if st.session_state.logado:
-    st.title("✅ Área Administrativa")
-    st.write(f"Bem-vindo, **{st.session_state.usuario_atual}**!")
-    st.info("Portal carregado com sucesso.")
-    if st.button("🚪 Sair"):
+    import portal_backup
+    st.sidebar.markdown("---")
+    if st.sidebar.button("🚪 Sair"):
         st.session_state.logado = False
         st.session_state.usuario_atual = ""
         st.rerun()
+        
 else:
     mostrar_login()  # ← chama a função
