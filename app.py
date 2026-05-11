@@ -566,13 +566,16 @@ if rc_input:
                         paper_bgcolor="white", plot_bgcolor="white",
                         xaxis=dict(tickfont=dict(size=10), tickangle=-30,
                                    showgrid=False, zeroline=False,
-                                   showline=True, linecolor="#e5e7eb", linewidth=1),
-                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6",
-                                   showline=False, zeroline=False),
+                                   showline=True, linecolor="#9ca3af", linewidth=1.5),
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb",
+                                   showline=True, linecolor="#9ca3af", linewidth=1.5,
+                                   zeroline=True, zerolinecolor="#9ca3af", zerolinewidth=1.5),
+                        bargap=0.35,
                     )
                     fig_motivo.update_traces(
                         marker_line_width=0,
-                        marker_cornerradius=6,
+                        marker_cornerradius="10%",
+                        base=0,
                     )
                     st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
 
@@ -595,15 +598,18 @@ if rc_input:
                         margin=dict(l=10, r=10, t=40, b=10),
                         xaxis_title="", yaxis_title="", coloraxis_showscale=False,
                         paper_bgcolor="white", plot_bgcolor="white",
-                        xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6",
-                                   showline=False, zeroline=False),
+                        xaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb",
+                                   showline=True, linecolor="#9ca3af", linewidth=1.5,
+                                   zeroline=True, zerolinecolor="#9ca3af", zerolinewidth=1.5),
                         yaxis=dict(tickfont=dict(size=11),
                                    showgrid=False, zeroline=False,
-                                   showline=True, linecolor="#e5e7eb", linewidth=1),
+                                   showline=True, linecolor="#9ca3af", linewidth=1.5),
+                        bargap=0.35,
                     )
                     fig_uf.update_traces(
                         marker_line_width=0,
-                        marker_cornerradius=6,
+                        marker_cornerradius="10%",
+                        base=0,
                     )
                     st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
 
@@ -662,13 +668,16 @@ if rc_input:
                             paper_bgcolor="white", plot_bgcolor="white",
                             xaxis=dict(tickfont=dict(size=12),
                                        showgrid=False, zeroline=False,
-                                       showline=True, linecolor="#e5e7eb", linewidth=1),
-                            yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6",
-                                       showline=False, zeroline=False),
+                                       showline=True, linecolor="#9ca3af", linewidth=1.5),
+                            yaxis=dict(tickfont=dict(size=10), gridcolor="#e5e7eb",
+                                       showline=True, linecolor="#9ca3af", linewidth=1.5,
+                                       zeroline=True, zerolinecolor="#9ca3af", zerolinewidth=1.5),
+                            bargap=0.5,
                         )
                         fig_est.update_traces(
                             marker_line_width=0,
-                            marker_cornerradius=6,
+                            marker_cornerradius="10%",
+                            base=0,
                             textposition="outside",
                             textfont_size=13,
                             textfont_color="#374151",
