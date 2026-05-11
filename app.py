@@ -650,7 +650,7 @@ if rc_input:
                             text="Qtde",
                         )
                         fig_est.update_layout(
-                            title=dict(text="ESTOQUE — PREVISÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                            title=dict(text="ESTOQUE - PREVISÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                             height=320,
                             margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
