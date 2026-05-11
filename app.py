@@ -533,6 +533,7 @@ if rc_input:
                         values=status_chart["Quantidade"],
                         hole=0.6,
                         marker_colors=cores,
+                        marker=dict(line=dict(color="white", width=2)),
                         textinfo="percent",
                         textfont_size=12,
                     ))
@@ -563,10 +564,16 @@ if rc_input:
                         margin=dict(l=10, r=10, t=40, b=80),
                         xaxis_title="", yaxis_title="", showlegend=False,
                         paper_bgcolor="white", plot_bgcolor="white",
-                        xaxis=dict(tickfont=dict(size=10), tickangle=-30),
-                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                        xaxis=dict(tickfont=dict(size=10), tickangle=-30,
+                                   showgrid=False, zeroline=False,
+                                   showline=True, linecolor="#e5e7eb", linewidth=1),
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6",
+                                   showline=False, zeroline=False),
                     )
-                    fig_motivo.update_traces(marker_line_width=0)
+                    fig_motivo.update_traces(
+                        marker_line_width=0,
+                        marker_cornerradius=6,
+                    )
                     st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
 
             # ---- LINHA 2: VALOR POR UF | ESTOQUE POR MÊS ----
@@ -588,15 +595,20 @@ if rc_input:
                         margin=dict(l=10, r=10, t=40, b=10),
                         xaxis_title="", yaxis_title="", coloraxis_showscale=False,
                         paper_bgcolor="white", plot_bgcolor="white",
-                        xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
-                        yaxis=dict(tickfont=dict(size=11)),
+                        xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6",
+                                   showline=False, zeroline=False),
+                        yaxis=dict(tickfont=dict(size=11),
+                                   showgrid=False, zeroline=False,
+                                   showline=True, linecolor="#e5e7eb", linewidth=1),
                     )
-                    fig_uf.update_traces(marker_line_width=0)
+                    fig_uf.update_traces(
+                        marker_line_width=0,
+                        marker_cornerradius=6,
+                    )
                     st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
 
             with g4:
                 with st.container():
-                    # Filtra apenas pedidos com Motivo = Estoque
                     estoque_df = pedidos_view[
                         pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
                     ].copy()
@@ -604,15 +616,9 @@ if rc_input:
                     if not estoque_df.empty and "Previsão" in estoque_df.columns:
 
                         def classifica_estoque(prev):
-                            """
-                            - Se o valor é uma data válida → Mês Atual
-                            - Se o valor é o texto 'Futuro' → Futuro
-                            - Qualquer outro texto → Outros
-                            """
                             val = str(prev).strip()
                             if val.lower() == "futuro":
                                 return "Futuro"
-                            # Tenta converter para data
                             try:
                                 dt = pd.to_datetime(val, dayfirst=True, errors="raise")
                                 if pd.notna(dt):
@@ -623,14 +629,12 @@ if rc_input:
 
                         estoque_df["Tipo"] = estoque_df["Previsão"].apply(classifica_estoque)
 
-                        # Conta por tipo
                         est_group = (
                             estoque_df.groupby("Tipo")
                             .size()
                             .reset_index(name="Qtde")
                         )
 
-                        # Ordem e cores fixas
                         ordem = ["Mês Atual", "Futuro", "Outros"]
                         est_group["Tipo"] = pd.Categorical(est_group["Tipo"], categories=ordem, ordered=True)
                         est_group = est_group.sort_values("Tipo")
@@ -650,17 +654,21 @@ if rc_input:
                             text="Qtde",
                         )
                         fig_est.update_layout(
-                            title=dict(text="ESTOQUE - PREVISÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
+                            title=dict(text="ESTOQUE — PEDIDOS POR SITUAÇÃO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                             height=320,
                             margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
                             showlegend=False,
                             paper_bgcolor="white", plot_bgcolor="white",
-                            xaxis=dict(tickfont=dict(size=12)),
-                            yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6"),
+                            xaxis=dict(tickfont=dict(size=12),
+                                       showgrid=False, zeroline=False,
+                                       showline=True, linecolor="#e5e7eb", linewidth=1),
+                            yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6",
+                                       showline=False, zeroline=False),
                         )
                         fig_est.update_traces(
                             marker_line_width=0,
+                            marker_cornerradius=6,
                             textposition="outside",
                             textfont_size=13,
                             textfont_color="#374151",
@@ -799,7 +807,7 @@ if rc_input:
             # ---- SELECT PEDIDO ----
             pedidos_view["Pedido_Cliente"] = (
                 pedidos_view["Pedido"].astype(str)
-                + " - "
+                + " — "
                 + pedidos_view["Cliente"].astype(str)
             )
 
@@ -810,7 +818,7 @@ if rc_input:
 
             if pedido_escolha != "":
 
-                pedido_numero = pedido_escolha.split(" - ")[0]
+                pedido_numero = pedido_escolha.split(" — ")[0]
                 pedido_info   = pedidos_view[
                     pedidos_view["Pedido"].astype(str) == pedido_numero
                 ].iloc[0]
