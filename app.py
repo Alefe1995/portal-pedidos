@@ -504,11 +504,15 @@ if rc_input:
             # CSS: igualar st.container(border=True) ao card do Top Clientes
             st.markdown("""
             <style>
-            /* Estiliza todos os containers com border=True na aba Visão Geral */
-            [data-testid="stVerticalBlockBorderWrapper"] {
+            [data-testid="stVerticalBlockBorderWrapper"],
+            [data-testid="stVerticalBlockBorderWrapper"] > div,
+            [data-testid="stVerticalBlockBorderWrapper"] > div > div,
+            [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
                 background: white !important;
-                border: 1.5px solid #e5e7eb !important;
                 border-radius: 14px !important;
+            }
+            [data-testid="stVerticalBlockBorderWrapper"] {
+                border: 1.5px solid #e5e7eb !important;
                 box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important;
                 padding: 12px 16px !important;
             }
