@@ -1,6 +1,9 @@
 # login.py
 import streamlit as st
 import pandas as pd
+import smtplib
+
+from email.mime.text import MIMEText
 
 USUARIOS = {
     "admin": "123456",
@@ -89,3 +92,59 @@ def mostrar_login():
             st.rerun()
         else:
             st.error("E-mail do coordenador não encontrado.")  # ← else duplicado removido
+
+# ====================================
+# TESTE ENVIO E-MAIL
+# ====================================
+
+st.markdown("---")
+
+if st.button("Testar envio de e-mail"):
+
+    try:
+
+        remetente = st.secrets["EMAIL_REMETENTE"]
+
+        senha = st.secrets["SENHA_EMAIL"]
+
+        destinatario = "alefef4@gmail.com"
+
+        mensagem = MIMEText(
+            "Seu teste de envio de e-mail do portal funcionou."
+        )
+
+        mensagem["Subject"] = "Teste Portal"
+
+        mensagem["From"] = remetente
+
+        mensagem["To"] = destinatario
+
+        servidor = smtplib.SMTP(
+            "smtp.gmail.com",
+            587
+        )
+
+        servidor.starttls()
+
+        servidor.login(
+            remetente,
+            senha
+        )
+
+        servidor.sendmail(
+            remetente,
+            destinatario,
+            mensagem.as_string()
+        )
+
+        servidor.quit()
+
+        st.success(
+            "E-mail enviado com sucesso!"
+        )
+
+    except Exception as erro:
+
+        st.error(
+            f"Erro ao enviar e-mail: {erro}"
+        )
