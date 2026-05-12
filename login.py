@@ -170,9 +170,7 @@ def mostrar_login():
             <div style="font-size:20px; font-weight:800; color:#111827; margin-bottom:5px;">
                 Acesse o Portal
             </div>
-            <div style="font-size:12px; color:#6b7280; line-height:1.5;">
-                Informe seu e-mail cadastrado. Vamos enviar um código de acesso temporário.
-            </div>
+
         </div>
         """, unsafe_allow_html=True)
 
@@ -180,6 +178,11 @@ def mostrar_login():
 
         # ---- ABA RC ----
         with aba_rc:
+            st.markdown("""
+            <div style="font-size:12px; color:#6b7280; line-height:1.5; text-align:center; margin-bottom:12px;">
+                Informe seu e-mail cadastrado. Vamos enviar um código de acesso temporário.
+            </div>
+            """, unsafe_allow_html=True)
             if st.session_state.codigo_otp:
                 codigo_digitado = st.text_input(
                     "CÓDIGO RECEBIDO NO E-MAIL",
@@ -238,6 +241,11 @@ def mostrar_login():
 
         # ---- ABA COORDENADOR ----
         with aba_coord:
+            st.markdown("""
+            <div style="font-size:12px; color:#6b7280; line-height:1.5; text-align:center; margin-bottom:12px;">
+                Informe seu e-mail cadastrado. Vamos enviar um código de acesso temporário.
+            </div>
+            """, unsafe_allow_html=True)
             if st.session_state.codigo_otp_coord:
                 codigo_coord_digitado = st.text_input(
                     "CÓDIGO RECEBIDO NO E-MAIL",
