@@ -5,89 +5,38 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 
-def mostrar_portal():
+def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
+    """
+    filtro_tipo : "RC" | "COORDENADOR" | "MASTER"
+    filtro_valor: código RC (str) | nome do coordenador (str) | None
+    """
 
     # =========================
-    # CSS GLOBAL — ESTILO BASE44
+    # CSS GLOBAL
     # =========================
     st.markdown("""
     <style>
 
-    header {
-        visibility:hidden;
-    }
+    header { visibility:hidden; }
+    .top-header { margin-top:10px; }
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    [data-testid="stToolbar"] { display: none !important; }
+    .stDeployButton { display: none !important; }
+    [data-testid="stDecoration"] { display: none !important; }
+    [data-testid="stStatusWidget"] { display: none !important; }
+    [data-testid="stFloatingButton"] { display: none !important; }
+    [data-testid="stAppViewContainer"] > .main > div:last-child { display: none !important; }
+    button[kind="secondary"] { display:none !important; }
+    div[style*="position: fixed"] { display:none !important; }
 
-    .top-header {
-        margin-top:10px;
-    }
+    .stApp { background-color: #f4f5f7; }
 
-    /* MENU SUPERIOR */
-    #MainMenu {
-        visibility: hidden;
-    }
-
-    /* HEADER */
-    header {
-        visibility: hidden;
-    }
-
-    /* FOOTER */
-    footer {
-        visibility: hidden;
-    }
-
-    /* TOOLBAR SUPERIOR */
-    [data-testid="stToolbar"] {
-        display: none !important;
-    }
-
-    /* BOTÃO DEPLOY */
-    .stDeployButton {
-        display: none !important;
-    }
-
-    /* DECORAÇÃO STREAMLIT */
-    [data-testid="stDecoration"] {
-        display: none !important;
-    }
-
-    /* STATUS */
-    [data-testid="stStatusWidget"] {
-        display: none !important;
-    }
-
-    /* BOTÕES FLUTUANTES */
-    [data-testid="stFloatingButton"] {
-        display: none !important;
-    }
-
-    /* BOTÃO HOSTED WITH STREAMLIT */
-    [data-testid="stAppViewContainer"] > .main > div:last-child {
-        display: none !important;
-    }
-
-    /* CANTO INFERIOR DIREITO */
-    button[kind="secondary"] {
-        display:none !important;
-    }
-
-    /* ELEMENTOS FIXOS */
-    div[style*="position: fixed"] {
-        display:none !important;
-    }
-
-    /* FUNDO */
-    .stApp {
-        background-color: #f4f5f7;
-    }
-
-    /* REMOVE PADDING TOPO */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 2rem !important;
     }
 
-    /* HEADER */
     .top-header {
         background-color: #c00000;
         padding: 14px 24px;
@@ -108,13 +57,11 @@ def mostrar_portal():
         opacity: 0.85;
     }
 
-    /* SIDEBAR */
     section[data-testid="stSidebar"] {
         background: #ffffff;
         border-right: 1px solid #e5e7eb;
     }
 
-    /* INPUT BUSCA */
     .stTextInput input {
         border-radius: 8px !important;
         border: 1px solid #d1d5db !important;
@@ -123,7 +70,6 @@ def mostrar_portal():
         font-size: 14px !important;
     }
 
-    /* SELECT */
     div[data-baseweb="select"] > div {
         border-radius: 8px !important;
         border: 1px solid #d1d5db !important;
@@ -131,7 +77,6 @@ def mostrar_portal():
         min-height: 38px;
     }
 
-    /* ABAS PRINCIPAIS */
     .stTabs [data-baseweb="tab-list"] {
         gap: 4px;
         background: transparent;
@@ -155,11 +100,8 @@ def mostrar_portal():
         border-radius: 6px 6px 0 0;
     }
 
-    .stTabs [data-baseweb="tab-border"] {
-        display: none;
-    }
+    .stTabs [data-baseweb="tab-border"] { display: none; }
 
-    /* CARDS KPI */
     .kpi-card {
         background: white;
         border: 1px solid #e5e7eb;
@@ -168,36 +110,33 @@ def mostrar_portal():
         box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
-    /* CARDS GRÁFICO */
-    .chart-card {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 30px;
-        padding: 16px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        margin-bottom: 16px;
-    }
+    .stAlert { border-radius: 10px; }
 
-    .chart-card-title {
-        font-size: 11px;
-        font-weight: 700;
-        color: #9ca3af;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-    }
-
-    /* ALERTAS */
-    .stAlert {
-        border-radius: 10px;
-    }
-
-    /* RADIO BUTTONS DO TIPO DE BUSCA */
     div[data-testid="stRadio"] > label {
         font-weight: 600 !important;
         font-size: 13px !important;
     }
 
+    </style>
+    """, unsafe_allow_html=True)
+
+    # =========================
+    # CSS BOTÕES
+    # =========================
+    st.markdown("""
+    <style>
+    div[data-testid="stButton"] button {
+        background-color: #c00000 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        padding: 8px 20px !important;
+    }
+    div[data-testid="stButton"] button:hover {
+        background-color: #a00000 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -278,13 +217,16 @@ def mostrar_portal():
     # =========================
     # HEADER
     # =========================
-    st.markdown("""
+    usuario_logado = st.session_state.get("usuario_atual", "")
+    st.markdown(f"""
     <div class='top-header'>
         <div>
             <div>📋 Portal de Pedidos</div>
             <div class='subtitle'>ADERE Produto Auto Adesivos</div>
         </div>
-        <div style="margin-left:auto;font-size:13px;opacity:0.8;">Olá - Última atualização: 11/05/2026 09:37:00</div>
+        <div style="margin-left:auto;font-size:13px;opacity:0.8;">
+            Olá, {usuario_logado} &nbsp;|&nbsp; Última atualização: 11/05/2026 09:37:00
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -296,84 +238,83 @@ def mostrar_portal():
     acoes   = pd.read_excel("Ação.xlsx")
 
     # =========================
-    # BOTÃO BUSCAR (CSS)
+    # FILTRO POR TIPO DE USUÁRIO
+    # RC e COORDENADOR carregam direto, sem interface de busca.
+    # MASTER tem a busca manual completa.
     # =========================
-    st.markdown("""
-    <style>
-    div[data-testid="stButton"] button {
-        background-color: #c00000 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-        padding: 8px 20px !important;
-    }
-    div[data-testid="stButton"] button:hover {
-        background-color: #a00000 !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # =========================
-    # SELEÇÃO DO TIPO DE BUSCA
-    # =========================
-    st.markdown("<div style='margin-bottom:8px;font-size:13px;font-weight:600;color:#374151;'>🔍 Buscar por:</div>", unsafe_allow_html=True)
-
-    tipo_busca = st.radio(
-        label="Tipo de Busca",
-        options=["Código RC", "Coordenador de Vendas"],
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-
-    # =========================
-    # CAMPOS DE BUSCA
-    # =========================
-    base = pd.DataFrame()
+    base          = pd.DataFrame()
     identificador = ""
 
-    if tipo_busca == "Código RC":
-        col_rc, col_btn, col_espaco = st.columns([2, 1, 5])
-        with col_rc:
-            rc_input = st.text_input("CÓDIGO RC", placeholder="Ex: 614", label_visibility="visible", max_chars=5)
-        with col_btn:
-            st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
-            buscar = st.button("Buscar", use_container_width=True)
+    if filtro_tipo == "RC":
+        rc_input = str(filtro_valor)
+        base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
+        identificador = f"RC {rc_input}"
 
-        if rc_input:
-            base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
-            identificador = f"RC {rc_input}"
-
-    else:  # Coordenador de Vendas
+    elif filtro_tipo == "COORDENADOR":
+        coord_input = str(filtro_valor)
         if "Coordenador" in pedidos.columns:
-            coordenadores_lista = sorted(pedidos["Coordenador"].dropna().astype(str).unique().tolist())
-        else:
-            coordenadores_lista = []
+            base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
+        identificador = f"Coordenador: {coord_input}"
 
-        col_coord, col_btn, col_espaco = st.columns([3, 1, 4])
-        with col_coord:
-            if coordenadores_lista:
-                coord_input = st.selectbox(
-                    "COORDENADOR DE VENDAS",
-                    options=[""] + coordenadores_lista,
-                    label_visibility="visible"
+    else:
+        # MASTER — interface de busca completa
+        st.markdown(
+            "<div style='margin-bottom:8px;font-size:13px;font-weight:600;color:#374151;'>🔍 Buscar por:</div>",
+            unsafe_allow_html=True
+        )
+
+        tipo_busca = st.radio(
+            label="Tipo de Busca",
+            options=["Código RC", "Coordenador de Vendas"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+
+        if tipo_busca == "Código RC":
+            col_rc, col_btn, col_espaco = st.columns([2, 1, 5])
+            with col_rc:
+                rc_input = st.text_input(
+                    "CÓDIGO RC", placeholder="Ex: 614",
+                    label_visibility="visible", max_chars=5
+                )
+            with col_btn:
+                st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
+                st.button("Buscar", use_container_width=True)
+            if rc_input:
+                base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
+                identificador = f"RC {rc_input}"
+
+        else:  # Coordenador de Vendas
+            if "Coordenador" in pedidos.columns:
+                coordenadores_lista = sorted(
+                    pedidos["Coordenador"].dropna().astype(str).unique().tolist()
                 )
             else:
-                coord_input = st.text_input(
-                    "COORDENADOR DE VENDAS",
-                    placeholder="Digite o nome do coordenador",
-                    label_visibility="visible"
-                )
-                st.caption("⚠️ Coluna 'Coordenador' não encontrada na planilha.")
-        with col_btn:
-            st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
-            buscar = st.button("Buscar", use_container_width=True)
+                coordenadores_lista = []
 
-        if coord_input and coord_input != "":
-            if "Coordenador" in pedidos.columns:
-                base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
-            identificador = f"Coordenador: {coord_input}"
+            col_coord, col_btn, col_espaco = st.columns([3, 1, 4])
+            with col_coord:
+                if coordenadores_lista:
+                    coord_input = st.selectbox(
+                        "COORDENADOR DE VENDAS",
+                        options=[""] + coordenadores_lista,
+                        label_visibility="visible"
+                    )
+                else:
+                    coord_input = st.text_input(
+                        "COORDENADOR DE VENDAS",
+                        placeholder="Digite o nome do coordenador",
+                        label_visibility="visible"
+                    )
+                    st.caption("⚠️ Coluna 'Coordenador' não encontrada na planilha.")
+            with col_btn:
+                st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
+                st.button("Buscar", use_container_width=True, key="btn_buscar_coord")
+
+            if coord_input and coord_input != "":
+                if "Coordenador" in pedidos.columns:
+                    base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
+                identificador = f"Coordenador: {coord_input}"
 
     # =========================
     # PROCESSAMENTO
@@ -384,7 +325,7 @@ def mostrar_portal():
             base = base.drop(columns=["RC"])
 
         base = base.rename(columns={
-            "Pedido2": "Qtde",
+            "Pedido2":       "Qtde",
             "Soma de Valor": "Valor (R$)"
         })
 
@@ -396,7 +337,7 @@ def mostrar_portal():
             base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR
+        # SIDEBAR — FILTROS
         # =========================
         st.sidebar.image("download.png", width=100)
         st.sidebar.header("🔎 Filtros")
@@ -432,7 +373,7 @@ def mostrar_portal():
             pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")
         ]["Valor_num"].sum()
 
-        valor_critico  = pedidos_view[
+        valor_critico = pedidos_view[
             pedidos_view["Motivo"].astype(str).str.lower().isin(["estoque", "ag retorno comercial"])
         ]["Valor_num"].sum()
 
@@ -518,17 +459,15 @@ def mostrar_portal():
         # =====================================================
         with tab1:
 
-            motivo_top = (
-                pedidos_view.groupby("Motivo")["Valor_num"]
-                .sum()
-                .sort_values(ascending=False)
-            )
+            motivo_top   = pedidos_view.groupby("Motivo")["Valor_num"].sum().sort_values(ascending=False)
+            motivo_nome  = motivo_top.index[0] if len(motivo_top) > 0 else "-"
+            motivo_valor = motivo_top.iloc[0]  if len(motivo_top) > 0 else 0
 
-            motivo_nome = motivo_top.index[0] if len(motivo_top) > 0 else "-"
-            motivo_valor = motivo_top.iloc[0] if len(motivo_top) > 0 else 0
             percentual_motivo   = (motivo_valor / valor_total * 100) if valor_total > 0 else 0
             percentual_liberado = (valor_liberado / valor_total * 100) if valor_total > 0 else 0
-            n_liberados_ped     = len(pedidos_view[pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")])
+            n_liberados_ped     = len(pedidos_view[
+                pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")
+            ])
 
             ins1, ins2 = st.columns(2)
 
@@ -612,10 +551,8 @@ def mostrar_portal():
                         pedidos_view.groupby("Motivo")["Valor_num"]
                         .sum().reset_index().sort_values("Valor_num", ascending=False)
                     )
-
                     paleta = ["#ef4444", "#f97316", "#eab308", "#22c55e",
                               "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6"]
-
                     fig_motivo = go.Figure()
                     for i, row in motivo_chart.iterrows():
                         cor = paleta[i % len(paleta)]
@@ -623,33 +560,17 @@ def mostrar_portal():
                             x=[row["Motivo"]],
                             y=[row["Valor_num"]],
                             name=row["Motivo"],
-                            marker=dict(
-                                color=cor,
-                                cornerradius=8,
-                                line=dict(width=0),
-                            ),
+                            marker=dict(color=cor, cornerradius=8, line=dict(width=0)),
                             showlegend=False,
                         ))
-
                     fig_motivo.update_layout(
                         title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=80),
                         xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white",
-                        plot_bgcolor="white",
-                        bargap=0.4,
-                        xaxis=dict(
-                            tickfont=dict(size=10), tickangle=-30,
-                            showgrid=False, zeroline=False,
-                            showline=False,
-                        ),
-                        yaxis=dict(
-                            tickfont=dict(size=10),
-                            gridcolor="#f3f4f6",
-                            showline=False,
-                            zeroline=False,
-                        ),
+                        paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
+                        xaxis=dict(tickfont=dict(size=10), tickangle=-30, showgrid=False, zeroline=False, showline=False),
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False),
                         shapes=[]
                     )
                     st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
@@ -663,7 +584,6 @@ def mostrar_portal():
                         pedidos_view.groupby("UF")["Valor_num"]
                         .sum().reset_index().sort_values("Valor_num", ascending=True)
                     )
-
                     max_uf = uf_chart["Valor_num"].max() if len(uf_chart) > 0 else 1
                     cores_uf = []
                     for v in uf_chart["Valor_num"]:
@@ -674,42 +594,21 @@ def mostrar_portal():
                             cores_uf.append("#f87171")
                         else:
                             cores_uf.append("#fca5a5")
-
                     fig_uf = go.Figure()
                     for i, row in uf_chart.iterrows():
                         fig_uf.add_trace(go.Bar(
-                            y=[row["UF"]],
-                            x=[row["Valor_num"]],
-                            orientation="h",
-                            name=row["UF"],
-                            marker=dict(
-                                color=cores_uf[list(uf_chart.index).index(i)],
-                                cornerradius=8,
-                                line=dict(width=0),
-                            ),
+                            y=[row["UF"]], x=[row["Valor_num"]], orientation="h", name=row["UF"],
+                            marker=dict(color=cores_uf[list(uf_chart.index).index(i)], cornerradius=8, line=dict(width=0)),
                             showlegend=False,
                         ))
-
                     fig_uf.update_layout(
                         title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                         height=320,
                         margin=dict(l=10, r=10, t=40, b=10),
                         xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white",
-                        plot_bgcolor="white",
-                        bargap=0.4,
-                        xaxis=dict(
-                            tickfont=dict(size=10),
-                            gridcolor="#f3f4f6",
-                            showline=False,
-                            zeroline=False,
-                        ),
-                        yaxis=dict(
-                            tickfont=dict(size=11),
-                            showgrid=False,
-                            showline=False,
-                            zeroline=False,
-                        ),
+                        paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
+                        xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False),
+                        yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False),
                         shapes=[],
                     )
                     st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
@@ -735,63 +634,30 @@ def mostrar_portal():
                             return "Outros"
 
                         estoque_df["Tipo"] = estoque_df["Previsão"].apply(classifica_estoque)
-
-                        est_group = (
-                            estoque_df.groupby("Tipo")
-                            .size()
-                            .reset_index(name="Qtde")
-                        )
-
+                        est_group = estoque_df.groupby("Tipo").size().reset_index(name="Qtde")
                         ordem = ["Mês Atual", "Futuro", "Outros"]
                         est_group["Tipo"] = pd.Categorical(est_group["Tipo"], categories=ordem, ordered=True)
                         est_group = est_group.sort_values("Tipo")
-
-                        color_est = {
-                            "Mês Atual": "#f9a8d4",
-                            "Futuro":    "#dc2626",
-                            "Outros":    "#d1d5db",
-                        }
+                        color_est = {"Mês Atual": "#f9a8d4", "Futuro": "#dc2626", "Outros": "#d1d5db"}
 
                         fig_est = go.Figure()
                         for _, row in est_group.iterrows():
                             fig_est.add_trace(go.Bar(
-                                x=[str(row["Tipo"])],
-                                y=[row["Qtde"]],
-                                name=str(row["Tipo"]),
-                                text=[str(int(row["Qtde"]))],
-                                textposition="outside",
+                                x=[str(row["Tipo"])], y=[row["Qtde"]], name=str(row["Tipo"]),
+                                text=[str(int(row["Qtde"]))], textposition="outside",
                                 textfont=dict(size=13, color="#374151"),
-                                marker=dict(
-                                    color=color_est.get(str(row["Tipo"]), "#d1d5db"),
-                                    cornerradius=8,
-                                    line=dict(width=0),
-                                ),
+                                marker=dict(color=color_est.get(str(row["Tipo"]), "#d1d5db"), cornerradius=8, line=dict(width=0)),
                                 showlegend=False,
                             ))
-
                         fig_est.update_layout(
                             title=dict(text="ESTOQUE - PREVISÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                            height=320,
-                            margin=dict(l=10, r=10, t=40, b=10),
+                            height=320, margin=dict(l=10, r=10, t=40, b=10),
                             xaxis_title="", yaxis_title="",
-                            paper_bgcolor="white",
-                            plot_bgcolor="white",
-                            bargap=0.5,
-                            xaxis=dict(
-                                tickfont=dict(size=12),
-                                showgrid=False,
-                                showline=False,
-                                zeroline=False,
-                            ),
-                            yaxis=dict(
-                                tickfont=dict(size=10),
-                                gridcolor="#f3f4f6",
-                                showline=False,
-                                zeroline=False,
-                            ),
+                            paper_bgcolor="white", plot_bgcolor="white", bargap=0.5,
+                            xaxis=dict(tickfont=dict(size=12), showgrid=False, showline=False, zeroline=False),
+                            yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False),
                             shapes=[],
                         )
-
                         st.plotly_chart(fig_est, use_container_width=True, config={"displayModeBar": False})
 
                     else:
@@ -826,7 +692,6 @@ def mostrar_portal():
                         f'<div style="font-size:13px;font-weight:700;color:#111827;">{valor_fmt}</div>'
                         f'</div></div>'
                     )
-
                 st.markdown(
                     f'<div style="background:white;border:1px solid #e5e7eb;border-radius:12px;'
                     f'padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);margin-bottom:16px;">'
@@ -861,7 +726,6 @@ def mostrar_portal():
 
             def renderizar_tabela(df_filtrado):
                 df_show = df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore")
-
                 html = """
                 <style>
                 * { box-sizing: border-box; }
@@ -872,7 +736,7 @@ def mostrar_portal():
                 td { padding:10px 14px; border-bottom:1px solid #f3f4f6; font-size:13px; color:#111827; vertical-align:middle; }
                 tr:hover td { background:#f9fafb; }
                 .ped { font-weight:700; color:#c00000; }
-                .val { font-weight:600; color:#166534;; }
+                .val { font-weight:600; color:#166534; }
                 .mot { font-weight:600; color:#d97706; }
                 .prev { font-weight:700; color:#374151; }
                 .badge-lib  { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
@@ -885,7 +749,6 @@ def mostrar_portal():
                 <th>Pedido</th><th>Cliente</th><th>UF</th><th>Status</th><th>Motivo</th><th>Previsão</th><th>Valor (R$)</th>
                 </tr></thead><tbody>
                 """
-
                 for _, row in df_show.iterrows():
                     s = str(row.get("Status", "")).strip().lower()
                     if s == "liberado":
@@ -896,7 +759,6 @@ def mostrar_portal():
                         badge = f"<span class='badge-batch'>{row['Status']}</span>"
                     else:
                         badge = f"<span class='badge-pend'>{row['Status']}</span>"
-
                     html += f"""
                     <tr>
                         <td class='ped'>{row.get('Pedido','')}</td>
@@ -908,9 +770,7 @@ def mostrar_portal():
                         <td class='val'>{row.get('Valor (R$)','')}</td>
                     </tr>
                     """
-
                 html += "</tbody></table>"
-
                 qtd = len(df_filtrado)
                 altura = min((qtd * 46) + 52, 420)
                 scroll = qtd > 8
@@ -986,14 +846,12 @@ def mostrar_portal():
                 """, unsafe_allow_html=True)
 
                 itens_pedido = itens[itens["Pedido"].astype(str) == pedido_numero].copy()
-
                 colunas_remover = ["RC", "Pedido"]
                 itens_pedido = itens_pedido.drop(
                     columns=[c for c in colunas_remover if c in itens_pedido.columns]
                 )
 
                 if not itens_pedido.empty:
-
                     itens_pedido = itens_pedido.rename(columns={
                         "Codigo":        "Código",
                         "Descricao":     "Descrição",
@@ -1023,10 +881,8 @@ def mostrar_portal():
                     </style>
                     <table><thead><tr>
                     """
-
                     for col in itens_pedido.columns:
                         html_itens += f"<th>{col}</th>"
-
                     html_itens += "</tr></thead><tbody>"
 
                     for _, row in itens_pedido.iterrows():
@@ -1042,11 +898,9 @@ def mostrar_portal():
                         html_itens += "</tr>"
 
                     html_itens += "</tbody></table>"
-
-                    qtd_itens = len(itens_pedido)
+                    qtd_itens    = len(itens_pedido)
                     altura_itens = min((qtd_itens * 46) + 52, 420)
                     scroll_itens = qtd_itens > 8
-
                     components.html(html_itens, height=altura_itens, scrolling=scroll_itens)
 
                 else:
@@ -1084,6 +938,9 @@ def mostrar_portal():
                     st.info("Nenhuma ação cadastrada para este pedido.")
 
     else:
-        if (tipo_busca == "Código RC" and 'rc_input' in dir() and rc_input) or \
-           (tipo_busca == "Coordenador de Vendas" and 'coord_input' in dir() and coord_input and coord_input != ""):
-            st.error("Nenhum pedido encontrado para os critérios informados.")
+        # Só exibe aviso se o usuário fez uma busca e não encontrou nada
+        if filtro_tipo == "RC":
+            st.warning(f"Nenhum pedido encontrado para o RC {filtro_valor}.")
+        elif filtro_tipo == "COORDENADOR":
+            st.warning(f"Nenhum pedido encontrado para o Coordenador {filtro_valor}.")
+        # Para MASTER sem busca ainda, não exibe nada
