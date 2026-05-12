@@ -293,7 +293,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         # FIX 1: logo e info do usuário sem repetição
         # FIX 2: filtro CNPJ com máscara via components.html
         # ══════════════════════════════════════════
-        st.sidebar.image("download.png", width=100)
+        st.sidebar.image("download.png", width=170)
         st.sidebar.header("🔎 Filtros")
 
         # Status
