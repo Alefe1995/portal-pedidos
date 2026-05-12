@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 
 
 USUARIOS_MASTER = {
-    "admin": "123456",
+    "adere": "924857",
     "usuario": "senha123"
 }
 
