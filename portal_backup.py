@@ -763,6 +763,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     <tr>
                         <td class='ped'>{row.get('Pedido','')}</td>
                         <td>{row.get('Cliente','')}</td>
+                        <td>{row.get('CNPJ','')}</td>
                         <td>{row.get('UF','')}</td>
                         <td>{badge}</td>
                         <td class='mot'>{row.get('Motivo','')}</td>
