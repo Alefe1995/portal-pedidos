@@ -31,7 +31,6 @@ def mostrar_login():
     st.markdown("""
     <style>
 
-    /* Esconde elementos padrão Streamlit */
     #MainMenu, header, footer,
     [data-testid="stToolbar"],
     [data-testid="stDecoration"],
@@ -42,48 +41,47 @@ def mostrar_login():
         visibility: hidden !important;
     }
 
-    /* Fundo cinza claro */
     .stApp {
         background-color: #f1f3f6;
     }
 
-    /* Centraliza e limita largura da página */
+    /* Página centralizada e compacta */
     .block-container {
-        padding-top: 5rem !important;
-        padding-bottom: 2rem !important;
+        padding-top: 2.5rem !important;
+        padding-bottom: 1rem !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
-        max-width: 520px !important;
+        max-width: 460px !important;
         margin: 0 auto !important;
     }
 
-    /* CARD — detecta o container que contém as abas */
+    /* CARD */
     div[data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(
         div[data-testid="stTabs"]
     ) {
         background: white !important;
-        border-radius: 20px !important;
-        padding: 40px 44px 36px 44px !important;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.10) !important;
+        border-radius: 16px !important;
+        padding: 28px 32px 24px 32px !important;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.09) !important;
         border: 1px solid #e5e7eb !important;
     }
 
-    /* Inputs — label */
+    /* Input label */
     .stTextInput label {
-        font-size: 11px !important;
+        font-size: 10px !important;
         font-weight: 700 !important;
         color: #374151 !important;
         letter-spacing: 0.07em !important;
         text-transform: uppercase !important;
-        margin-bottom: 4px !important;
+        margin-bottom: 2px !important;
     }
 
-    /* Inputs — campo */
+    /* Input campo */
     .stTextInput input {
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         border: 1.5px solid #e5e7eb !important;
-        padding: 11px 14px !important;
-        font-size: 14px !important;
+        padding: 8px 12px !important;
+        font-size: 13px !important;
         background: #f9fafb !important;
         color: #111827 !important;
     }
@@ -98,60 +96,52 @@ def mostrar_login():
         background-color: #c00000 !important;
         color: white !important;
         border: none !important;
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         font-weight: 700 !important;
-        font-size: 15px !important;
-        padding: 12px 0 !important;
+        font-size: 13px !important;
+        padding: 9px 0 !important;
         width: 100% !important;
-        margin-top: 6px !important;
+        margin-top: 4px !important;
         letter-spacing: 0.02em !important;
     }
     div[data-testid="stButton"] > button:hover {
         background-color: #a00000 !important;
     }
 
-    /* Abas — fundo */
+    /* Abas */
     .stTabs [data-baseweb="tab-list"] {
         gap: 0 !important;
         background: #f3f4f6 !important;
-        border-radius: 10px !important;
-        padding: 4px !important;
-        margin-bottom: 20px !important;
+        border-radius: 8px !important;
+        padding: 3px !important;
+        margin-bottom: 14px !important;
         border-bottom: none !important;
     }
-
-    /* Abas — item */
     .stTabs [data-baseweb="tab"] {
-        border-radius: 8px !important;
+        border-radius: 6px !important;
         font-weight: 600 !important;
-        font-size: 13px !important;
+        font-size: 12px !important;
         color: #6b7280 !important;
-        padding: 7px 18px !important;
+        padding: 5px 14px !important;
         border: none !important;
         background: transparent !important;
     }
-
-    /* Aba selecionada */
     .stTabs [aria-selected="true"] {
         background: white !important;
         color: #c00000 !important;
         box-shadow: 0 1px 4px rgba(0,0,0,0.10) !important;
     }
-
     .stTabs [data-baseweb="tab-border"],
     .stTabs [data-baseweb="tab-highlight"] {
         display: none !important;
     }
 
-    /* Alertas */
-    .stAlert { border-radius: 10px !important; }
+    .stAlert { border-radius: 8px !important; }
 
     </style>
     """, unsafe_allow_html=True)
 
-    # =========================
     # Inicializa session_state
-    # =========================
     for k in ["erro_login", "email_temp", "rc_temp", "email_coord_temp", "coord_temp"]:
         if k not in st.session_state:
             st.session_state[k] = ""
@@ -160,44 +150,37 @@ def mostrar_login():
             st.session_state[k] = None
 
     # =========================
-    # CARD — tudo dentro aqui
+    # CARD
     # =========================
     with st.container():
 
-        # Ícone + título + subtítulo DENTRO do card
+        # Cabeçalho compacto
         st.markdown("""
-        <div style="text-align:center; margin-bottom: 28px;">
+        <div style="text-align:center; margin-bottom:20px;">
             <div style="
                 background:#fce8e8;
-                border-radius:20px;
-                width:68px; height:68px;
+                border-radius:14px;
+                width:52px; height:52px;
                 display:inline-flex;
                 align-items:center; justify-content:center;
-                font-size:30px;
-                margin-bottom:16px;
-                box-shadow: 0 2px 8px rgba(192,0,0,0.15);
+                font-size:22px;
+                margin-bottom:10px;
+                box-shadow: 0 2px 8px rgba(192,0,0,0.12);
             ">✉️</div>
-            <div style="font-size:26px; font-weight:800; color:#111827; margin-bottom:8px;">
+            <div style="font-size:20px; font-weight:800; color:#111827; margin-bottom:5px;">
                 Acesse o Portal
             </div>
-            <div style="font-size:14px; color:#6b7280; line-height:1.6;">
-                Informe seu e-mail cadastrado. Vamos enviar um<br>código de acesso temporário.
+            <div style="font-size:12px; color:#6b7280; line-height:1.5;">
+                Informe seu e-mail cadastrado. Vamos enviar um código de acesso temporário.
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        # ------------------------------------------------
-        # ABAS
-        # ------------------------------------------------
         aba_rc, aba_coord, aba_admin = st.tabs(["🧑‍💼 RC", "📋 Coordenador", "🔑 Admin"])
 
-        # ------------------------------------------------
-        # ABA RC
-        # ------------------------------------------------
+        # ---- ABA RC ----
         with aba_rc:
-
             if st.session_state.codigo_otp:
-                st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 codigo_digitado = st.text_input(
                     "CÓDIGO RECEBIDO NO E-MAIL",
                     max_chars=6, placeholder="000000",
@@ -205,7 +188,7 @@ def mostrar_login():
                 )
                 col1, col2 = st.columns(2)
                 with col1:
-                    if st.button("✅ Validar Código", key="btn_validar_rc", use_container_width=True):
+                    if st.button("✅ Validar", key="btn_validar_rc", use_container_width=True):
                         if codigo_digitado == str(st.session_state.codigo_otp):
                             st.session_state.logado        = True
                             st.session_state.tipo_usuario  = "RC"
@@ -214,14 +197,12 @@ def mostrar_login():
                             st.session_state.codigo_otp    = None
                             st.rerun()
                         else:
-                            st.error("❌ Código inválido. Tente novamente.")
+                            st.error("❌ Código inválido.")
                 with col2:
                     if st.button("↩ Voltar", key="btn_voltar_rc", use_container_width=True):
                         st.session_state.codigo_otp = None
                         st.rerun()
-
             else:
-                st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 email_rc = st.text_input(
                     "E-MAIL", placeholder="seu@email.com",
                     key="input_email_rc"
@@ -255,13 +236,9 @@ def mostrar_login():
                         else:
                             st.error("❌ E-mail não encontrado.")
 
-        # ------------------------------------------------
-        # ABA COORDENADOR
-        # ------------------------------------------------
+        # ---- ABA COORDENADOR ----
         with aba_coord:
-
             if st.session_state.codigo_otp_coord:
-                st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 codigo_coord_digitado = st.text_input(
                     "CÓDIGO RECEBIDO NO E-MAIL",
                     max_chars=6, placeholder="000000",
@@ -269,7 +246,7 @@ def mostrar_login():
                 )
                 col1, col2 = st.columns(2)
                 with col1:
-                    if st.button("✅ Validar Código", key="btn_validar_coord", use_container_width=True):
+                    if st.button("✅ Validar", key="btn_validar_coord", use_container_width=True):
                         if codigo_coord_digitado == str(st.session_state.codigo_otp_coord):
                             st.session_state.logado              = True
                             st.session_state.tipo_usuario        = "COORDENADOR"
@@ -278,21 +255,19 @@ def mostrar_login():
                             st.session_state.codigo_otp_coord    = None
                             st.rerun()
                         else:
-                            st.error("❌ Código inválido. Tente novamente.")
+                            st.error("❌ Código inválido.")
                 with col2:
                     if st.button("↩ Voltar", key="btn_voltar_coord", use_container_width=True):
                         st.session_state.codigo_otp_coord = None
                         st.rerun()
-
             else:
-                st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 email_coord = st.text_input(
                     "E-MAIL DO COORDENADOR", placeholder="coordenador@email.com",
                     key="input_email_coord"
                 )
                 if st.button("Enviar Código →", key="btn_enviar_coord", use_container_width=True):
                     if not email_coord.strip():
-                        st.warning("Informe o e-mail do coordenador.")
+                        st.warning("Informe o e-mail.")
                     else:
                         df_coord = pd.read_excel("E-mailsCoordenador.xlsx")
                         coord_encontrado = None
@@ -312,13 +287,10 @@ def mostrar_login():
                             except Exception as e:
                                 st.error(f"Erro ao enviar e-mail: {e}")
                         else:
-                            st.error("❌ E-mail do coordenador não encontrado.")
+                            st.error("❌ E-mail não encontrado.")
 
-        # ------------------------------------------------
-        # ABA ADMIN
-        # ------------------------------------------------
+        # ---- ABA ADMIN ----
         with aba_admin:
-            st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
             with st.form("form_login_admin"):
                 usuario     = st.text_input("USUÁRIO", placeholder="admin")
                 senha_admin = st.text_input("SENHA", type="password", placeholder="••••••")
@@ -337,11 +309,9 @@ def mostrar_login():
             if st.session_state.get("erro_login"):
                 st.error(st.session_state.erro_login)
 
-    # =========================
-    # RODAPÉ (fora do card)
-    # =========================
+    # Rodapé
     st.markdown("""
-    <div style="text-align:center; font-size:12px; color:#9ca3af; margin-top:20px;">
+    <div style="text-align:center; font-size:11px; color:#9ca3af; margin-top:16px;">
         Acesso exclusivo para representantes comerciais ADERE
     </div>
     """, unsafe_allow_html=True)
