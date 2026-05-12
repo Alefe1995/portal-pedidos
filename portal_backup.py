@@ -16,12 +16,11 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     # =========================
     st.markdown("""
     <style>
-    
+
     header { visibility:hidden; }
     .top-header { margin-top:10px; }
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
-    
     [data-testid="stToolbar"] { display: none !important; }
     .stDeployButton { display: none !important; }
     [data-testid="stDecoration"] { display: none !important; }
@@ -30,34 +29,14 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     [data-testid="stAppViewContainer"] > .main > div:last-child { display: none !important; }
     button[kind="secondary"] { display:none !important; }
     div[style*="position: fixed"] { display:none !important; }
-    
-    /* =========================
-       🔥 SIDEBAR COMPLETA OFF
-       ========================= */
-    
-    /* remove sidebar inteira */
-    section[data-testid="stSidebar"] {
-        display: none !important;
-    }
-    
-    /* remove botão << de recolher sidebar */
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
-    
-    /* =========================
-       ESTILO GERAL
-       ========================= */
-    
-    .stApp {
-        background-color: #f4f5f7;
-    }
-    
+
+    .stApp { background-color: #f4f5f7; }
+
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 2rem !important;
     }
-    
+
     .top-header {
         background-color: #c00000;
         padding: 14px 24px;
@@ -71,13 +50,18 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         margin-left: -1rem;
         margin-right: -1rem;
     }
-    
+
     .top-header .subtitle {
         font-size: 12px;
         font-weight: 400;
         opacity: 0.85;
     }
-    
+
+    section[data-testid="stSidebar"] {
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
+    }
+
     .stTextInput input {
         border-radius: 8px !important;
         border: 1px solid #d1d5db !important;
@@ -85,21 +69,21 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         background: white !important;
         font-size: 14px !important;
     }
-    
+
     div[data-baseweb="select"] > div {
         border-radius: 8px !important;
         border: 1px solid #d1d5db !important;
         background: white !important;
         min-height: 38px;
     }
-    
+
     .stTabs [data-baseweb="tab-list"] {
         gap: 4px;
         background: transparent;
         border-bottom: 1px solid #e5e7eb !important;
         padding-bottom: 0;
     }
-    
+
     .stTabs [data-baseweb="tab"] {
         background: transparent;
         border-radius: 6px 6px 0 0;
@@ -109,15 +93,15 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         font-size: 14px;
         color: #6b7280;
     }
-    
+
     .stTabs [aria-selected="true"] {
         background: #c00000 !important;
         color: white !important;
         border-radius: 6px 6px 0 0;
     }
-    
+
     .stTabs [data-baseweb="tab-border"] { display: none; }
-    
+
     .kpi-card {
         background: white;
         border: 1px solid #e5e7eb;
@@ -125,14 +109,14 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         padding: 16px 18px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    
+
     .stAlert { border-radius: 10px; }
-    
+
     div[data-testid="stRadio"] > label {
         font-weight: 600 !important;
         font-size: 13px !important;
     }
-    
+
     </style>
     """, unsafe_allow_html=True)
 
