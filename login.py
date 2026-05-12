@@ -200,3 +200,48 @@ def mostrar_login():
             st.error(
                 f"Erro ao enviar e-mail: {erro}"
             )
+
+    # ====================================
+    # VALIDAR CÓDIGO OTP RC
+    # ====================================
+
+    if "codigo_otp" in st.session_state:
+
+        st.markdown("---")
+
+        st.subheader("Código de Verificação")
+
+        codigo_digitado = st.text_input(
+            "Digite o código recebido no e-mail",
+            max_chars=6
+        )
+
+        if st.button("Validar Código"):
+
+            if codigo_digitado == st.session_state.codigo_otp:
+
+                st.session_state.logado = True
+
+                st.session_state.tipo_usuario = "RC"
+
+                st.session_state.usuario_atual = (
+                    st.session_state.email_temp
+                )
+
+                st.session_state.rc_usuario = (
+                    st.session_state.rc_temp
+                )
+
+                del st.session_state.codigo_otp
+
+                st.success(
+                    "Login realizado com sucesso!"
+                )
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    "Código inválido."
+                )
