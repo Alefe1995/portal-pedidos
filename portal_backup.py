@@ -225,7 +225,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             <div class='subtitle'>ADERE Produto Auto Adesivos</div>
         </div>
         <div style="margin-left:auto;font-size:13px;opacity:0.8;">
-            Olá, {usuario_logado} &nbsp;|&nbsp; Última atualização: 12/05/2026 07:39:00
+            Olá, {usuario_logado}
         </div>
     </div>
     """, unsafe_allow_html=True)
