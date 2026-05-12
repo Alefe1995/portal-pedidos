@@ -10,7 +10,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     filtro_tipo : "RC" | "COORDENADOR" | "MASTER"
     filtro_valor: código RC (str) | nome do coordenador (str) | None
     """
-    
+
     # =========================
     # CSS GLOBAL
     # =========================
@@ -18,7 +18,6 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     <style>
 
     header { visibility:hidden; }
-    .top-header { margin-top:10px; }
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     [data-testid="stToolbar"] { display: none !important; }
@@ -50,17 +49,71 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         margin-left: -1rem;
         margin-right: -1rem;
     }
+    .top-header .subtitle { font-size: 12px; font-weight: 400; opacity: 0.85; }
 
-    .top-header .subtitle {
-        font-size: 12px;
-        font-weight: 400;
-        opacity: 0.85;
-    }
-
+    /* =============================================
+       SIDEBAR — retraída por padrão, expande no hover
+       ============================================= */
     section[data-testid="stSidebar"] {
         background: #ffffff;
         border-right: 1px solid #e5e7eb;
+        transition: width 0.3s ease !important;
+        overflow: hidden !important;
+        min-width: 56px !important;
+        width: 56px !important;
     }
+
+    section[data-testid="stSidebar"]:hover {
+        width: 280px !important;
+        min-width: 280px !important;
+        box-shadow: 4px 0 16px rgba(0,0,0,0.10);
+    }
+
+    /* Esconde texto da sidebar quando retraída */
+    section[data-testid="stSidebar"] .stMarkdown p,
+    section[data-testid="stSidebar"] .stMarkdown h1,
+    section[data-testid="stSidebar"] .stMarkdown h2,
+    section[data-testid="stSidebar"] .stMarkdown h3,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] .stSelectbox,
+    section[data-testid="stSidebar"] .stTextInput,
+    section[data-testid="stSidebar"] .stButton,
+    section[data-testid="stSidebar"] img {
+        opacity: 0;
+        transition: opacity 0.2s ease 0s;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    section[data-testid="stSidebar"]:hover .stMarkdown p,
+    section[data-testid="stSidebar"]:hover .stMarkdown h1,
+    section[data-testid="stSidebar"]:hover .stMarkdown h2,
+    section[data-testid="stSidebar"]:hover .stMarkdown h3,
+    section[data-testid="stSidebar"]:hover label,
+    section[data-testid="stSidebar"]:hover .stSelectbox,
+    section[data-testid="stSidebar"]:hover .stTextInput,
+    section[data-testid="stSidebar"]:hover .stButton,
+    section[data-testid="stSidebar"]:hover img {
+        opacity: 1;
+        transition: opacity 0.2s ease 0.15s;
+    }
+
+    /* Ícone visível quando retraída */
+    section[data-testid="stSidebar"] [data-testid="stSidebarContent"]::before {
+        content: "🔎";
+        font-size: 22px;
+        display: block;
+        text-align: center;
+        padding: 14px 0 4px 0;
+    }
+
+    section[data-testid="stSidebar"]:hover [data-testid="stSidebarContent"]::before {
+        display: none;
+    }
+
+    /* Esconde botão de colapso nativo */
+    [data-testid="collapsedControl"] { display: none !important; }
+    button[data-testid="baseButton-headerNoPadding"] { display: none !important; }
 
     .stTextInput input {
         border-radius: 8px !important;
@@ -83,7 +136,6 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         border-bottom: 1px solid #e5e7eb !important;
         padding-bottom: 0;
     }
-
     .stTabs [data-baseweb="tab"] {
         background: transparent;
         border-radius: 6px 6px 0 0;
@@ -93,13 +145,11 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         font-size: 14px;
         color: #6b7280;
     }
-
     .stTabs [aria-selected="true"] {
         background: #c00000 !important;
         color: white !important;
         border-radius: 6px 6px 0 0;
     }
-
     .stTabs [data-baseweb="tab-border"] { display: none; }
 
     .kpi-card {
@@ -117,14 +167,6 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         font-size: 13px !important;
     }
 
-    </style>
-    """, unsafe_allow_html=True)
-
-    # =========================
-    # CSS BOTÕES
-    # =========================
-    st.markdown("""
-    <style>
     div[data-testid="stButton"] button {
         background-color: #c00000 !important;
         color: white !important;
@@ -137,6 +179,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     div[data-testid="stButton"] button:hover {
         background-color: #a00000 !important;
     }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -145,20 +188,16 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     # =========================
     def para_float(valor):
         try:
-            if pd.isna(valor):
-                return 0
-            if isinstance(valor, (int, float)):
-                return float(valor)
+            if pd.isna(valor): return 0
+            if isinstance(valor, (int, float)): return float(valor)
             valor = str(valor).replace("R$", "").strip()
             valor = valor.replace(".", "").replace(",", ".")
             return float(valor)
-        except:
-            return 0
+        except: return 0
 
     def formatar_moeda(valor):
         try:
-            if pd.isna(valor):
-                return ""
+            if pd.isna(valor): return ""
             if isinstance(valor, (int, float)):
                 valor_float = float(valor)
             else:
@@ -167,41 +206,35 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     valor_str = valor_str.replace(".", "").replace(",", ".")
                 valor_float = float(valor_str)
             return f"R$ {valor_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        except:
-            return valor
+        except: return valor
 
     def formatar_moeda_curto(valor):
         try:
             v = float(valor)
-            if v >= 1_000_000:
-                return f"R$ {v/1_000_000:.1f}M"
-            elif v >= 1_000:
-                return f"R$ {v/1_000:.1f}k"
-            else:
-                return f"R$ {v:.0f}"
-        except:
-            return "R$ 0"
+            if v >= 1_000_000: return f"R$ {v/1_000_000:.1f}M"
+            elif v >= 1_000:   return f"R$ {v/1_000:.1f}k"
+            else:              return f"R$ {v:.0f}"
+        except: return "R$ 0"
 
     def formatar_data(valor):
         try:
-            if pd.isna(valor):
-                return ""
+            if pd.isna(valor): return ""
             data = pd.to_datetime(valor, errors="coerce")
-            if pd.notna(data):
-                return data.strftime("%d/%m/%Y")
-            return str(valor)
-        except:
-            return str(valor)
+            return data.strftime("%d/%m/%Y") if pd.notna(data) else str(valor)
+        except: return str(valor)
+
+    def formatar_cnpj(valor):
+        """Formata número para XX.XXX.XXX/XXXX-XX"""
+        try:
+            if pd.isna(valor): return ""
+            digits = str(int(float(str(valor).replace(".", "").replace("/", "").replace("-", "")))).zfill(14)
+            return f"{digits[:2]}.{digits[2:5]}.{digits[5:8]}/{digits[8:12]}-{digits[12:14]}"
+        except: return str(valor)
 
     def limpar_texto(texto):
-        if pd.isna(texto):
-            return ""
-        texto = str(texto)
-        texto = texto.replace("_x000D_", "\n")
-        texto = texto.replace("\\r\\n", "\n")
-        texto = texto.replace("\\r", "\n")
-        linhas = [l.strip() for l in texto.split("\n") if l.strip() != ""]
-        return "\n".join(linhas)
+        if pd.isna(texto): return ""
+        texto = str(texto).replace("_x000D_", "\n").replace("\\r\\n", "\n").replace("\\r", "\n")
+        return "\n".join([l.strip() for l in texto.split("\n") if l.strip()])
 
     def badge_status(status_val):
         s = str(status_val).strip().lower()
@@ -224,9 +257,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             <div>📋 Portal de Pedidos</div>
             <div class='subtitle'>ADERE Produto Auto Adesivos</div>
         </div>
-        <div style="margin-left:auto;font-size:13px;opacity:0.8;">
-            Olá, {usuario_logado}
-        </div>
+        <div style="margin-left:auto;font-size:13px;opacity:0.8;">Olá, {usuario_logado}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -237,10 +268,12 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     itens   = pd.read_excel("Itens.xlsx")
     acoes   = pd.read_excel("Ação.xlsx")
 
+    # Formata CNPJ na planilha se existir
+    if "CNPJ" in pedidos.columns:
+        pedidos["CNPJ"] = pedidos["CNPJ"].apply(formatar_cnpj)
+
     # =========================
     # FILTRO POR TIPO DE USUÁRIO
-    # RC e COORDENADOR carregam direto, sem interface de busca.
-    # MASTER tem a busca manual completa.
     # =========================
     base          = pd.DataFrame()
     identificador = ""
@@ -257,63 +290,44 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         identificador = f"Coordenador: {coord_input}"
 
     else:
-        # MASTER — interface de busca completa
+        # MASTER — busca manual
         st.markdown(
             "<div style='margin-bottom:8px;font-size:13px;font-weight:600;color:#374151;'>🔍 Buscar por:</div>",
             unsafe_allow_html=True
         )
-
         tipo_busca = st.radio(
             label="Tipo de Busca",
             options=["Código RC", "Coordenador de Vendas"],
             horizontal=True,
             label_visibility="collapsed"
         )
-
         if tipo_busca == "Código RC":
             col_rc, col_btn, col_espaco = st.columns([2, 1, 5])
             with col_rc:
-                rc_input = st.text_input(
-                    "CÓDIGO RC", placeholder="Ex: 614",
-                    label_visibility="visible", max_chars=5
-                )
+                rc_input = st.text_input("CÓDIGO RC", placeholder="Ex: 614", max_chars=5)
             with col_btn:
                 st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
                 st.button("Buscar", use_container_width=True)
             if rc_input:
                 base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
                 identificador = f"RC {rc_input}"
-
-        else:  # Coordenador de Vendas
-            if "Coordenador" in pedidos.columns:
-                coordenadores_lista = sorted(
-                    pedidos["Coordenador"].dropna().astype(str).unique().tolist()
-                )
-            else:
-                coordenadores_lista = []
-
+        else:
+            coordenadores_lista = (
+                sorted(pedidos["Coordenador"].dropna().astype(str).unique().tolist())
+                if "Coordenador" in pedidos.columns else []
+            )
             col_coord, col_btn, col_espaco = st.columns([3, 1, 4])
             with col_coord:
                 if coordenadores_lista:
-                    coord_input = st.selectbox(
-                        "COORDENADOR DE VENDAS",
-                        options=[""] + coordenadores_lista,
-                        label_visibility="visible"
-                    )
+                    coord_input = st.selectbox("COORDENADOR DE VENDAS", options=[""] + coordenadores_lista)
                 else:
-                    coord_input = st.text_input(
-                        "COORDENADOR DE VENDAS",
-                        placeholder="Digite o nome do coordenador",
-                        label_visibility="visible"
-                    )
-                    st.caption("⚠️ Coluna 'Coordenador' não encontrada na planilha.")
+                    coord_input = st.text_input("COORDENADOR DE VENDAS", placeholder="Digite o nome")
+                    st.caption("⚠️ Coluna 'Coordenador' não encontrada.")
             with col_btn:
                 st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
                 st.button("Buscar", use_container_width=True, key="btn_buscar_coord")
-
-            if coord_input and coord_input != "":
-                if "Coordenador" in pedidos.columns:
-                    base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
+            if coord_input and coord_input != "" and "Coordenador" in pedidos.columns:
+                base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
                 identificador = f"Coordenador: {coord_input}"
 
     # =========================
@@ -337,7 +351,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             base["Previsão"] = base["Previsão"].apply(formatar_data)
 
         # =========================
-        # SIDEBAR — FILTROS
+        # SIDEBAR — FILTROS (retraída, expande no hover)
         # =========================
         st.sidebar.image("download.png", width=100)
         st.sidebar.header("🔎 Filtros")
@@ -359,7 +373,48 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         if cliente:
             df3 = df3[df3["Cliente"].str.contains(cliente, case=False, na=False)]
 
-        pedidos_view = df3.copy()
+        # Filtro CNPJ com máscara automática via JavaScript
+        st.sidebar.markdown("**CNPJ (buscar)**")
+        cnpj_raw = st.sidebar.text_input(
+            "CNPJ",
+            placeholder="00.000.000/0000-00",
+            max_chars=18,
+            label_visibility="collapsed",
+            key="filtro_cnpj"
+        )
+
+        # Aplica máscara de CNPJ ao digitar
+        st.sidebar.markdown("""
+        <script>
+        const inputs = window.parent.document.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.placeholder === '00.000.000/0000-00') {
+                input.addEventListener('input', function(e) {
+                    let v = e.target.value.replace(/\\D/g, '');
+                    if (v.length > 14) v = v.slice(0,14);
+                    let r = '';
+                    if (v.length > 0)  r += v.slice(0,2);
+                    if (v.length > 2)  r += '.' + v.slice(2,5);
+                    if (v.length > 5)  r += '.' + v.slice(5,8);
+                    if (v.length > 8)  r += '/' + v.slice(8,12);
+                    if (v.length > 12) r += '-' + v.slice(12,14);
+                    e.target.value = r;
+                });
+            }
+        });
+        </script>
+        """, unsafe_allow_html=True)
+
+        df4 = df3.copy()
+        if cnpj_raw.strip() and "CNPJ" in df4.columns:
+            cnpj_digits = cnpj_raw.replace(".", "").replace("/", "").replace("-", "").strip()
+            df4 = df4[df4["CNPJ"].str.replace(".", "").str.replace("/", "").str.replace("-", "").str.contains(cnpj_digits, na=False)]
+
+        pedidos_view = df4.copy()
+
+        # Info usuário na sidebar
+        st.sidebar.markdown("---")
+        st.sidebar.markdown(f"👤 **{usuario_logado}**  \n*{st.session_state.get('tipo_usuario','')}*")
 
         # =========================
         # VALORES NUMÉRICOS
@@ -368,91 +423,34 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
 
         total_pedidos  = len(pedidos_view)
         valor_total    = pedidos_view["Valor_num"].sum()
-
-        valor_liberado = pedidos_view[
-            pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")
-        ]["Valor_num"].sum()
-
-        valor_critico = pedidos_view[
-            pedidos_view["Motivo"].astype(str).str.lower().isin(["estoque", "ag retorno comercial"])
-        ]["Valor_num"].sum()
-
-        valor_pendente = pedidos_view[
-            pedidos_view["Status"].astype(str).str.lower() == "pendente"
-        ]["Valor_num"].sum()
-
-        valor_batch = pedidos_view[
-            pedidos_view["Status"].astype(str).str.lower() == "batch"
-        ]["Valor_num"].sum()
+        valor_liberado = pedidos_view[pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")]["Valor_num"].sum()
+        valor_critico  = pedidos_view[pedidos_view["Motivo"].astype(str).str.lower().isin(["estoque", "ag retorno comercial"])]["Valor_num"].sum()
+        valor_pendente = pedidos_view[pedidos_view["Status"].astype(str).str.lower() == "pendente"]["Valor_num"].sum()
+        valor_batch    = pedidos_view[pedidos_view["Status"].astype(str).str.lower() == "batch"]["Valor_num"].sum()
 
         # =========================
         # KPI CARDS
         # =========================
         k1, k2, k3, k4, k5, k6 = st.columns(6)
-
         with k1:
-            st.markdown(f"""
-            <div class='kpi-card'>
-                <div style='font-size:18px;margin-bottom:4px;'>📦</div>
-                <div style='font-size:20px;font-weight:700;color:#111827;line-height:1;'>{total_pedidos}</div>
-                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Pedido(s)</div>
-            </div>
-            """, unsafe_allow_html=True)
-
+            st.markdown(f"<div class='kpi-card'><div style='font-size:18px;margin-bottom:4px;'>📦</div><div style='font-size:20px;font-weight:700;color:#111827;line-height:1;'>{total_pedidos}</div><div style='font-size:12px;color:#6b7280;margin-top:6px;'>Pedido(s)</div></div>", unsafe_allow_html=True)
         with k2:
-            st.markdown(f"""
-            <div class='kpi-card'>
-                <div style='font-size:18px;margin-bottom:4px;'>🏅</div>
-                <div style='font-size:20px;font-weight:700;color:#111827;line-height:1;'>{formatar_moeda(valor_total)}</div>
-                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Total</div>
-            </div>
-            """, unsafe_allow_html=True)
-
+            st.markdown(f"<div class='kpi-card'><div style='font-size:18px;margin-bottom:4px;'>🏅</div><div style='font-size:20px;font-weight:700;color:#111827;line-height:1;'>{formatar_moeda(valor_total)}</div><div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Total</div></div>", unsafe_allow_html=True)
         with k3:
-            st.markdown(f"""
-            <div class='kpi-card'>
-                <div style='font-size:18px;margin-bottom:4px;'><span style='color:#16a34a;'>●</span></div>
-                <div style='font-size:20px;font-weight:700;color:#16a34a;line-height:1;'>{formatar_moeda(valor_liberado)}</div>
-                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Liberado</div>
-            </div>
-            """, unsafe_allow_html=True)
-
+            st.markdown(f"<div class='kpi-card'><div style='font-size:18px;margin-bottom:4px;'><span style='color:#16a34a;'>●</span></div><div style='font-size:20px;font-weight:700;color:#16a34a;line-height:1;'>{formatar_moeda(valor_liberado)}</div><div style='font-size:12px;color:#6b7280;margin-top:6px;'>Valor Liberado</div></div>", unsafe_allow_html=True)
         with k4:
-            st.markdown(f"""
-            <div class='kpi-card'>
-                <div style='font-size:18px;margin-bottom:4px;'><span style='color:#dc2626;'>●</span></div>
-                <div style='font-size:20px;font-weight:700;color:#dc2626;line-height:1;'>{formatar_moeda(valor_critico)}</div>
-                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Estoque / Ag. Retorno Comercial</div>
-            </div>
-            """, unsafe_allow_html=True)
-
+            st.markdown(f"<div class='kpi-card'><div style='font-size:18px;margin-bottom:4px;'><span style='color:#dc2626;'>●</span></div><div style='font-size:20px;font-weight:700;color:#dc2626;line-height:1;'>{formatar_moeda(valor_critico)}</div><div style='font-size:12px;color:#6b7280;margin-top:6px;'>Estoque / Ag. Retorno Comercial</div></div>", unsafe_allow_html=True)
         with k5:
-            st.markdown(f"""
-            <div class='kpi-card'>
-                <div style='font-size:18px;margin-bottom:4px;'><span style='color:#d97706;'>●</span></div>
-                <div style='font-size:20px;font-weight:700;color:#d97706;line-height:1;'>{formatar_moeda(valor_pendente)}</div>
-                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Aguardando Atendimento</div>
-            </div>
-            """, unsafe_allow_html=True)
-
+            st.markdown(f"<div class='kpi-card'><div style='font-size:18px;margin-bottom:4px;'><span style='color:#d97706;'>●</span></div><div style='font-size:20px;font-weight:700;color:#d97706;line-height:1;'>{formatar_moeda(valor_pendente)}</div><div style='font-size:12px;color:#6b7280;margin-top:6px;'>Aguardando Atendimento</div></div>", unsafe_allow_html=True)
         with k6:
-            st.markdown(f"""
-            <div class='kpi-card'>
-                <div style='font-size:18px;margin-bottom:4px;'><span style='color:#7c3aed;'>●</span></div>
-                <div style='font-size:20px;font-weight:700;color:#7c3aed;line-height:1;'>{formatar_moeda(valor_batch)}</div>
-                <div style='font-size:12px;color:#6b7280;margin-top:6px;'>Batch</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f"<div class='kpi-card'><div style='font-size:18px;margin-bottom:4px;'><span style='color:#7c3aed;'>●</span></div><div style='font-size:20px;font-weight:700;color:#7c3aed;line-height:1;'>{formatar_moeda(valor_batch)}</div><div style='font-size:12px;color:#6b7280;margin-top:6px;'>Batch</div></div>", unsafe_allow_html=True)
 
         st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
 
         # =========================
         # ABAS PRINCIPAIS
         # =========================
-        tab1, tab2 = st.tabs([
-            "📊 Visão Geral",
-            f"📦 Pedidos  {total_pedidos}"
-        ])
+        tab1, tab2 = st.tabs(["📊 Visão Geral", f"📦 Pedidos  {total_pedidos}"])
 
         # =====================================================
         # ABA 1 — VISÃO GERAL
@@ -462,138 +460,78 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             motivo_top   = pedidos_view.groupby("Motivo")["Valor_num"].sum().sort_values(ascending=False)
             motivo_nome  = motivo_top.index[0] if len(motivo_top) > 0 else "-"
             motivo_valor = motivo_top.iloc[0]  if len(motivo_top) > 0 else 0
-
             percentual_motivo   = (motivo_valor / valor_total * 100) if valor_total > 0 else 0
             percentual_liberado = (valor_liberado / valor_total * 100) if valor_total > 0 else 0
-            n_liberados_ped     = len(pedidos_view[
-                pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")
-            ])
+            n_liberados_ped     = len(pedidos_view[pedidos_view["Status"].astype(str).str.lower().str.contains("liberado")])
 
             ins1, ins2 = st.columns(2)
-
             with ins1:
-                st.markdown(f"""
-                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
-                    <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:4px;">
-                        📉 Concentração: "{motivo_nome}"
-                    </div>
-                    <div style="font-size:13px;color:#2563eb;">
-                        Representa {percentual_motivo:.0f}% do valor total ({formatar_moeda(motivo_valor)})
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
+                st.markdown(f"""<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
+                    <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:4px;">📉 Concentração: "{motivo_nome}"</div>
+                    <div style="font-size:13px;color:#2563eb;">Representa {percentual_motivo:.0f}% do valor total ({formatar_moeda(motivo_valor)})</div>
+                </div>""", unsafe_allow_html=True)
             with ins2:
-                st.markdown(f"""
-                <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
-                    <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">
-                        ✅ {percentual_liberado:.0f}% dos pedidos estão liberados
-                    </div>
-                    <div style="font-size:13px;color:#16a34a;">
-                        {n_liberados_ped} de {total_pedidos} pedidos prontos
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"""<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
+                    <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">✅ {percentual_liberado:.0f}% dos pedidos estão liberados</div>
+                    <div style="font-size:13px;color:#16a34a;">{n_liberados_ped} de {total_pedidos} pedidos prontos</div>
+                </div>""", unsafe_allow_html=True)
 
-            st.markdown("""
-            <style>
+            st.markdown("""<style>
             [data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(> [data-testid="stPlotlyChart"]) {
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 30px;
-                padding: 16px;
-                box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-                margin-bottom: 16px;
+                background: white; border: 1px solid #e5e7eb; border-radius: 30px;
+                padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 16px;
             }
-            </style>
-            """, unsafe_allow_html=True)
+            </style>""", unsafe_allow_html=True)
 
-            # ---- LINHA 1: STATUS | VALOR POR MOTIVO ----
             g1, g2 = st.columns(2)
-
             with g1:
                 with st.container():
-                    status_chart = (
-                        pedidos_view.groupby("Status")
-                        .size()
-                        .reset_index(name="Quantidade")
-                    )
-                    color_map = {
-                        "Pendente":  "#f59e0b",
-                        "Conferido": "#3b82f6",
-                        "Liberado":  "#22c55e",
-                        "Batch":     "#7c3aed",
-                    }
+                    status_chart = pedidos_view.groupby("Status").size().reset_index(name="Quantidade")
+                    color_map = {"Pendente": "#f59e0b", "Conferido": "#3b82f6", "Liberado": "#22c55e", "Batch": "#7c3aed"}
                     cores = [color_map.get(s, "#9ca3af") for s in status_chart["Status"]]
                     fig_status = go.Figure(go.Pie(
-                        labels=status_chart["Status"],
-                        values=status_chart["Quantidade"],
-                        hole=0.6,
-                        marker_colors=cores,
+                        labels=status_chart["Status"], values=status_chart["Quantidade"],
+                        hole=0.6, marker_colors=cores,
                         marker=dict(line=dict(color="white", width=2)),
-                        textinfo="percent",
-                        textfont_size=12,
+                        textinfo="percent", textfont_size=12,
                     ))
                     fig_status.update_layout(
                         title=dict(text="DISTRIBUIÇÃO POR STATUS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                        height=320,
-                        margin=dict(l=10, r=10, t=40, b=10),
-                        showlegend=True,
+                        height=320, margin=dict(l=10, r=10, t=40, b=10), showlegend=True,
                         legend=dict(orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5, font=dict(size=11)),
-                        paper_bgcolor="white",
-                        plot_bgcolor="white",
+                        paper_bgcolor="white", plot_bgcolor="white",
                     )
                     st.plotly_chart(fig_status, use_container_width=True, config={"displayModeBar": False})
 
             with g2:
                 with st.container():
-                    motivo_chart = (
-                        pedidos_view.groupby("Motivo")["Valor_num"]
-                        .sum().reset_index().sort_values("Valor_num", ascending=False)
-                    )
-                    paleta = ["#ef4444", "#f97316", "#eab308", "#22c55e",
-                              "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6"]
+                    motivo_chart = pedidos_view.groupby("Motivo")["Valor_num"].sum().reset_index().sort_values("Valor_num", ascending=False)
+                    paleta = ["#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#14b8a6"]
                     fig_motivo = go.Figure()
                     for i, row in motivo_chart.iterrows():
-                        cor = paleta[i % len(paleta)]
                         fig_motivo.add_trace(go.Bar(
-                            x=[row["Motivo"]],
-                            y=[row["Valor_num"]],
-                            name=row["Motivo"],
-                            marker=dict(color=cor, cornerradius=8, line=dict(width=0)),
+                            x=[row["Motivo"]], y=[row["Valor_num"]], name=row["Motivo"],
+                            marker=dict(color=paleta[i % len(paleta)], cornerradius=8, line=dict(width=0)),
                             showlegend=False,
                         ))
                     fig_motivo.update_layout(
                         title=dict(text="VALOR POR MOTIVO", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                        height=320,
-                        margin=dict(l=10, r=10, t=40, b=80),
-                        xaxis_title="", yaxis_title="",
-                        paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
+                        height=320, margin=dict(l=10, r=10, t=40, b=80),
+                        xaxis_title="", yaxis_title="", paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
                         xaxis=dict(tickfont=dict(size=10), tickangle=-30, showgrid=False, zeroline=False, showline=False),
-                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False),
-                        shapes=[]
+                        yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False), shapes=[]
                     )
                     st.plotly_chart(fig_motivo, use_container_width=True, config={"displayModeBar": False})
 
-            # ---- LINHA 2: VALOR POR UF | ESTOQUE POR MÊS ----
             g3, g4 = st.columns(2)
-
             with g3:
                 with st.container():
-                    uf_chart = (
-                        pedidos_view.groupby("UF")["Valor_num"]
-                        .sum().reset_index().sort_values("Valor_num", ascending=True)
-                    )
+                    uf_chart = pedidos_view.groupby("UF")["Valor_num"].sum().reset_index().sort_values("Valor_num", ascending=True)
                     max_uf = uf_chart["Valor_num"].max() if len(uf_chart) > 0 else 1
                     cores_uf = []
                     for v in uf_chart["Valor_num"]:
                         pct = v / max_uf
-                        if pct > 0.66:
-                            cores_uf.append("#dc2626")
-                        elif pct > 0.33:
-                            cores_uf.append("#f87171")
-                        else:
-                            cores_uf.append("#fca5a5")
+                        cores_uf.append("#dc2626" if pct > 0.66 else "#f87171" if pct > 0.33 else "#fca5a5")
                     fig_uf = go.Figure()
                     for i, row in uf_chart.iterrows():
                         fig_uf.add_trace(go.Bar(
@@ -603,43 +541,31 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                         ))
                     fig_uf.update_layout(
                         title=dict(text="VALOR POR ESTADO (UF)", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
-                        height=320,
-                        margin=dict(l=10, r=10, t=40, b=10),
-                        xaxis_title="", yaxis_title="",
+                        height=320, margin=dict(l=10, r=10, t=40, b=10),
                         paper_bgcolor="white", plot_bgcolor="white", bargap=0.4,
                         xaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False),
-                        yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False),
-                        shapes=[],
+                        yaxis=dict(tickfont=dict(size=11), showgrid=False, showline=False, zeroline=False), shapes=[],
                     )
                     st.plotly_chart(fig_uf, use_container_width=True, config={"displayModeBar": False})
 
             with g4:
                 with st.container():
-                    estoque_df = pedidos_view[
-                        pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
-                    ].copy()
-
+                    estoque_df = pedidos_view[pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"].copy()
                     if not estoque_df.empty and "Previsão" in estoque_df.columns:
-
                         def classifica_estoque(prev):
                             val = str(prev).strip()
-                            if val.lower() == "futuro":
-                                return "Futuro"
+                            if val.lower() == "futuro": return "Futuro"
                             try:
                                 dt = pd.to_datetime(val, dayfirst=True, errors="raise")
-                                if pd.notna(dt):
-                                    return "Mês Atual"
-                            except:
-                                pass
+                                if pd.notna(dt): return "Mês Atual"
+                            except: pass
                             return "Outros"
-
                         estoque_df["Tipo"] = estoque_df["Previsão"].apply(classifica_estoque)
                         est_group = estoque_df.groupby("Tipo").size().reset_index(name="Qtde")
                         ordem = ["Mês Atual", "Futuro", "Outros"]
                         est_group["Tipo"] = pd.Categorical(est_group["Tipo"], categories=ordem, ordered=True)
                         est_group = est_group.sort_values("Tipo")
                         color_est = {"Mês Atual": "#f9a8d4", "Futuro": "#dc2626", "Outros": "#d1d5db"}
-
                         fig_est = go.Figure()
                         for _, row in est_group.iterrows():
                             fig_est.add_trace(go.Bar(
@@ -652,26 +578,20 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                         fig_est.update_layout(
                             title=dict(text="ESTOQUE - PREVISÃO POR MÊS", font=dict(size=11, color="#9ca3af"), x=0.01, xanchor="left"),
                             height=320, margin=dict(l=10, r=10, t=40, b=10),
-                            xaxis_title="", yaxis_title="",
                             paper_bgcolor="white", plot_bgcolor="white", bargap=0.5,
                             xaxis=dict(tickfont=dict(size=12), showgrid=False, showline=False, zeroline=False),
-                            yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False),
-                            shapes=[],
+                            yaxis=dict(tickfont=dict(size=10), gridcolor="#f3f4f6", showline=False, zeroline=False), shapes=[],
                         )
                         st.plotly_chart(fig_est, use_container_width=True, config={"displayModeBar": False})
-
                     else:
                         st.info("Nenhum pedido com Motivo 'Estoque' encontrado.")
 
-            # ---- LINHA 3: TOP CLIENTES ----
+            # ---- TOP CLIENTES ----
             top_clientes = (
                 pedidos_view.groupby("Cliente")
                 .agg(Valor=("Valor_num", "sum"), Pedidos=("Pedido", "count"))
-                .sort_values("Valor", ascending=False)
-                .head(8)
-                .reset_index()
+                .sort_values("Valor", ascending=False).head(8).reset_index()
             )
-
             if not top_clientes.empty:
                 max_val = top_clientes["Valor"].max()
                 rows_top = ""
@@ -693,12 +613,9 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                         f'</div></div>'
                     )
                 st.markdown(
-                    f'<div style="background:white;border:1px solid #e5e7eb;border-radius:12px;'
-                    f'padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);margin-bottom:16px;">'
-                    f'<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.08em;'
-                    f'text-transform:uppercase;margin-bottom:8px;">👤 Top Clientes por Valor</div>'
-                    f'{rows_top}</div>',
-                    unsafe_allow_html=True
+                    f'<div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);margin-bottom:16px;">'
+                    f'<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">👤 Top Clientes por Valor</div>'
+                    f'{rows_top}</div>', unsafe_allow_html=True
                 )
             else:
                 st.info("Sem dados de clientes.")
@@ -717,15 +634,14 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             n_batch      = len(pedidos_view[pedidos_view["Status"].str.lower() == "batch"])
 
             ft1, ft2, ft3, ft4, ft5 = st.tabs([
-                f"Todos  {n_todos}",
-                f"Pendentes  {n_pendentes}",
-                f"Liberados  {n_liberados}",
-                f"Conferidos  {n_conferidos}",
-                f"Batch  {n_batch}",
+                f"Todos  {n_todos}", f"Pendentes  {n_pendentes}",
+                f"Liberados  {n_liberados}", f"Conferidos  {n_conferidos}", f"Batch  {n_batch}",
             ])
 
             def renderizar_tabela(df_filtrado):
                 df_show = df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore")
+                # Monta colunas com CNPJ entre Cliente e UF
+                tem_cnpj = "CNPJ" in df_show.columns
                 html = """
                 <style>
                 * { box-sizing: border-box; }
@@ -735,93 +651,68 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 th { padding:10px 14px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; }
                 td { padding:10px 14px; border-bottom:1px solid #f3f4f6; font-size:13px; color:#111827; vertical-align:middle; }
                 tr:hover td { background:#f9fafb; }
-                .ped { font-weight:700; color:#c00000; }
-                .val { font-weight:600; color:#166534; }
-                .mot { font-weight:600; color:#d97706; }
+                .ped  { font-weight:700; color:#c00000; }
+                .val  { font-weight:600; color:#166534; }
+                .mot  { font-weight:600; color:#d97706; }
                 .prev { font-weight:700; color:#374151; }
-                .badge-lib  { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
-                .badge-conf { background:#dbeafe; color:#1d4ed8; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
-                .badge-pend { background:#fef9c3; color:#92400e; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+                .cnpj { font-size:12px; color:#6b7280; white-space:nowrap; }
+                .badge-lib   { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+                .badge-conf  { background:#dbeafe; color:#1d4ed8; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+                .badge-pend  { background:#fef9c3; color:#92400e; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
                 .badge-batch { background:#f3e8ff; color:#7c3aed; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
                 </style>
-                <table>
-                <thead><tr>
-                <th>Pedido</th><th>Cliente</th><th>UF</th><th>Status</th><th>Motivo</th><th>Previsão</th><th>Valor (R$)</th>
-                </tr></thead><tbody>
+                <table><thead><tr>
+                <th>Pedido</th><th>Cliente</th>
                 """
+                if tem_cnpj:
+                    html += "<th>CNPJ</th>"
+                html += "<th>UF</th><th>Status</th><th>Motivo</th><th>Previsão</th><th>Valor (R$)</th></tr></thead><tbody>"
+
                 for _, row in df_show.iterrows():
                     s = str(row.get("Status", "")).strip().lower()
-                    if s == "liberado":
-                        badge = f"<span class='badge-lib'>{row['Status']}</span>"
-                    elif s == "conferido":
-                        badge = f"<span class='badge-conf'>{row['Status']}</span>"
-                    elif s == "batch":
-                        badge = f"<span class='badge-batch'>{row['Status']}</span>"
-                    else:
-                        badge = f"<span class='badge-pend'>{row['Status']}</span>"
-                    html += f"""
-                    <tr>
-                        <td class='ped'>{row.get('Pedido','')}</td>
-                        <td>{row.get('Cliente','')}</td>
-                        <td>{row.get('UF','')}</td>
-                        <td>{badge}</td>
-                        <td class='mot'>{row.get('Motivo','')}</td>
-                        <td class='prev'>{row.get('Previsão','')}</td>
-                        <td class='val'>{row.get('Valor (R$)','')}</td>
-                    </tr>
-                    """
-                html += "</tbody></table>"
-                qtd = len(df_filtrado)
-                altura = min((qtd * 46) + 52, 420)
-                scroll = qtd > 8
-                components.html(html, height=altura, scrolling=scroll)
+                    if s == "liberado":    badge = f"<span class='badge-lib'>{row['Status']}</span>"
+                    elif s == "conferido": badge = f"<span class='badge-conf'>{row['Status']}</span>"
+                    elif s == "batch":     badge = f"<span class='badge-batch'>{row['Status']}</span>"
+                    else:                  badge = f"<span class='badge-pend'>{row['Status']}</span>"
 
-            with ft1:
-                renderizar_tabela(pedidos_view)
-            with ft2:
-                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
-            with ft3:
-                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
-            with ft4:
-                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
-            with ft5:
-                renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "batch"])
+                    html += f"<tr><td class='ped'>{row.get('Pedido','')}</td><td>{row.get('Cliente','')}</td>"
+                    if tem_cnpj:
+                        html += f"<td class='cnpj'>{row.get('CNPJ','')}</td>"
+                    html += f"<td>{row.get('UF','')}</td><td>{badge}</td><td class='mot'>{row.get('Motivo','')}</td><td class='prev'>{row.get('Previsão','')}</td><td class='val'>{row.get('Valor (R$)','')}</td></tr>"
+
+                html += "</tbody></table>"
+                qtd    = len(df_filtrado)
+                altura = min((qtd * 46) + 52, 420)
+                components.html(html, height=altura, scrolling=qtd > 8)
+
+            with ft1: renderizar_tabela(pedidos_view)
+            with ft2: renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
+            with ft3: renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
+            with ft4: renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
+            with ft5: renderizar_tabela(pedidos_view[pedidos_view["Status"].str.lower() == "batch"])
 
             st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
 
             # ---- SELECT PEDIDO ----
             pedidos_view["Pedido_Cliente"] = (
-                pedidos_view["Pedido"].astype(str)
-                + " - "
-                + pedidos_view["Cliente"].astype(str)
+                pedidos_view["Pedido"].astype(str) + " - " + pedidos_view["Cliente"].astype(str)
             )
-
             pedido_escolha = st.selectbox(
                 "📌 Selecione um pedido para ver detalhes:",
                 [""] + pedidos_view["Pedido_Cliente"].tolist()
             )
 
             if pedido_escolha != "":
-
                 pedido_numero = pedido_escolha.split(" - ")[0]
-                pedido_info   = pedidos_view[
-                    pedidos_view["Pedido"].astype(str) == pedido_numero
-                ].iloc[0]
+                pedido_info   = pedidos_view[pedidos_view["Pedido"].astype(str) == pedido_numero].iloc[0]
 
                 st.markdown("<div style='margin-top:12px;'></div>", unsafe_allow_html=True)
-
                 badge_ped = badge_status(pedido_info.get("Status", ""))
+                cnpj_fmt  = pedido_info.get("CNPJ", "") if "CNPJ" in pedido_info.index else ""
 
                 st.markdown(f"""
-                <div style="
-                    background:white;
-                    border:1px solid #e5e7eb;
-                    border-left:5px solid #c00000;
-                    border-radius:12px;
-                    padding:18px 22px;
-                    margin-bottom:18px;
-                    box-shadow:0 1px 4px rgba(0,0,0,0.05);
-                ">
+                <div style="background:white;border:1px solid #e5e7eb;border-left:5px solid #c00000;
+                    border-radius:12px;padding:18px 22px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
                     <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">
                         Pedido Selecionado
                     </div>
@@ -831,120 +722,70 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     </div>
                     <div style="font-size:13px;color:#6b7280;margin-top:10px;display:flex;gap:24px;flex-wrap:wrap;">
                         <span><b style="color:#374151;">Cliente:</b> {pedido_info['Cliente']}</span>
-                        <span>
-                            <b style="color:#374151;">CNPJ:</b> 
-                            {f"{int(float(pedido_info.get('CNPJ',0))):014d}"[:2]}.{f"{int(float(pedido_info.get('CNPJ',0))):014d}"[2:5]}.{f"{int(float(pedido_info.get('CNPJ',0))):014d}"[5:8]}/{f"{int(float(pedido_info.get('CNPJ',0))):014d}"[8:12]}-{f"{int(float(pedido_info.get('CNPJ',0))):014d}"[12:14]}
-                        </span>
-                        <span><b style="color:#374151;">Valor:</b> {pedido_info['Valor (R$)']}</span>
+                        {"<span><b style='color:#374151;'>CNPJ:</b> " + str(cnpj_fmt) + "</span>" if cnpj_fmt else ""}
+                        <span><b style="color:#258a07;">Valor:</b> {pedido_info['Valor (R$)']}</span>
                         <span><b style="color:#374151;">Previsão:</b> {pedido_info.get('Previsão','')}</span>
                         <span><b style="color:#374151;">Motivo:</b> {pedido_info.get('Motivo','')}</span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-                # ---- ITENS DO PEDIDO ----
-                st.markdown("""
-                <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:10px;">
-                📦 Itens do Pedido
-                </div>
-                """, unsafe_allow_html=True)
-
+                # ---- ITENS ----
+                st.markdown("<div style='font-size:14px;font-weight:700;color:#111827;margin-bottom:10px;'>📦 Itens do Pedido</div>", unsafe_allow_html=True)
                 itens_pedido = itens[itens["Pedido"].astype(str) == pedido_numero].copy()
-                colunas_remover = ["RC", "Pedido"]
-                itens_pedido = itens_pedido.drop(
-                    columns=[c for c in colunas_remover if c in itens_pedido.columns]
-                )
+                itens_pedido = itens_pedido.drop(columns=[c for c in ["RC", "Pedido"] if c in itens_pedido.columns])
 
                 if not itens_pedido.empty:
                     itens_pedido = itens_pedido.rename(columns={
-                        "Codigo":        "Código",
-                        "Descricao":     "Descrição",
-                        "Pedido2":       "Qtde",
-                        "Soma de Valor": "Valor (R$)"
+                        "Codigo": "Código", "Descricao": "Descrição",
+                        "Pedido2": "Qtde", "Soma de Valor": "Valor (R$)"
                     })
-
                     if "Previsão Final" in itens_pedido.columns:
-                        itens_pedido["Previsão Final"] = (
-                            itens_pedido["Previsão Final"].apply(formatar_data).replace("NaT", "")
-                        )
-
+                        itens_pedido["Previsão Final"] = itens_pedido["Previsão Final"].apply(formatar_data).replace("NaT", "")
                     if "Valor (R$)" in itens_pedido.columns:
                         itens_pedido["Valor (R$)"] = itens_pedido["Valor (R$)"].apply(formatar_moeda)
 
-                    html_itens = """
-                    <style>
-                    * { box-sizing:border-box; }
-                    body { margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
-                    table { width:100%; border-collapse:collapse; background:white; }
-                    thead tr { background:#f9fafb; border-bottom:2px solid #e5e7eb; }
-                    th { padding:10px 14px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
-                    td { padding:10px 14px; border-bottom:1px solid #f3f4f6; font-size:13px; color:#111827; vertical-align:middle; }
-                    tr:hover td { background:#f9fafb; }
-                    .badge-res { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; }
-                    .badge-sal { background:#fee2e2; color:#991b1b; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; }
-                    </style>
-                    <table><thead><tr>
-                    """
+                    html_itens = """<style>*{box-sizing:border-box;}body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+                    table{width:100%;border-collapse:collapse;background:white;}thead tr{background:#f9fafb;border-bottom:2px solid #e5e7eb;}
+                    th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;}
+                    td{padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#111827;vertical-align:middle;}tr:hover td{background:#f9fafb;}
+                    .badge-res{background:#dcfce7;color:#166534;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;}
+                    .badge-sal{background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;}
+                    </style><table><thead><tr>"""
                     for col in itens_pedido.columns:
                         html_itens += f"<th>{col}</th>"
                     html_itens += "</tr></thead><tbody>"
-
                     for _, row in itens_pedido.iterrows():
                         html_itens += "<tr>"
                         for col in itens_pedido.columns:
                             val = row[col]
                             if col == "Status Reserva":
-                                if str(val).strip().lower() == "reservado":
-                                    val = f"<span class='badge-res'>{val}</span>"
-                                else:
-                                    val = f"<span class='badge-sal'>{val}</span>"
+                                val = f"<span class='badge-res'>{val}</span>" if str(val).strip().lower() == "reservado" else f"<span class='badge-sal'>{val}</span>"
                             html_itens += f"<td>{val}</td>"
                         html_itens += "</tr>"
-
                     html_itens += "</tbody></table>"
-                    qtd_itens    = len(itens_pedido)
-                    altura_itens = min((qtd_itens * 46) + 52, 420)
-                    scroll_itens = qtd_itens > 8
-                    components.html(html_itens, height=altura_itens, scrolling=scroll_itens)
-
+                    qtd_itens = len(itens_pedido)
+                    components.html(html_itens, height=min((qtd_itens * 46) + 52, 420), scrolling=qtd_itens > 8)
                 else:
                     st.info("Nenhum item encontrado para este pedido.")
 
                 st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
 
                 # ---- AÇÃO RECOMENDADA ----
-                st.markdown("""
-                <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:10px;">
-                💡 Ação Recomendada
-                </div>
-                """, unsafe_allow_html=True)
-
+                st.markdown("<div style='font-size:14px;font-weight:700;color:#111827;margin-bottom:10px;'>💡 Ação Recomendada</div>", unsafe_allow_html=True)
                 acoes_pedido = acoes[acoes["Pedido"].astype(str) == pedido_numero]
-
                 if not acoes_pedido.empty:
                     texto = limpar_texto(acoes_pedido.iloc[0]["Texto"])
                     st.markdown(f"""
-                    <div style="
-                        background:#fffbeb;
-                        border:1px solid #fde68a;
-                        border-left:5px solid #f59e0b;
-                        padding:14px 18px;
-                        border-radius:10px;
-                        line-height:1.7;
-                        white-space:pre-line;
-                        font-size:14px;
-                        color:#111827;
-                    ">
+                    <div style="background:#fffbeb;border:1px solid #fde68a;border-left:5px solid #f59e0b;
+                        padding:14px 18px;border-radius:10px;line-height:1.7;white-space:pre-line;font-size:14px;color:#111827;">
                         {texto}
-                    </div>
-                    """, unsafe_allow_html=True)
+                    </div>""", unsafe_allow_html=True)
                 else:
                     st.info("Nenhuma ação cadastrada para este pedido.")
 
     else:
-        # Só exibe aviso se o usuário fez uma busca e não encontrou nada
         if filtro_tipo == "RC":
             st.warning(f"Nenhum pedido encontrado para o RC {filtro_valor}.")
         elif filtro_tipo == "COORDENADOR":
             st.warning(f"Nenhum pedido encontrado para o Coordenador {filtro_valor}.")
-        # Para MASTER sem busca ainda, não exibe nada
