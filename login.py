@@ -137,11 +137,74 @@ def mostrar_login():
                 break
 
         if coord_encontrado:
-            st.session_state.logado = True
-            st.session_state.tipo_usuario = "COORDENADOR"
-            st.session_state.usuario_atual = email_coord
-            st.session_state.coordenador_usuario = coord_encontrado
-            st.rerun()
+
+            codigo_otp_coord = str(
+                random.randint(100000, 999999)
+            )
+
+            st.session_state.codigo_otp_coord = (
+                codigo_otp_coord
+            )
+
+            st.session_state.coord_temp = (
+                coord_encontrado
+            )
+
+            st.session_state.email_coord_temp = (
+                email_coord
+            )
+
+            try:
+
+                remetente = st.secrets[
+                    "EMAIL_REMETENTE"
+                ]
+
+                senha = st.secrets[
+                    "SENHA_EMAIL"
+                ]
+
+                mensagem = MIMEText(
+                    f"Seu código de acesso é: {codigo_otp_coord}"
+                )
+
+                mensagem["Subject"] = (
+                    "Código de acesso Portal"
+                )
+
+                mensagem["From"] = remetente
+
+                mensagem["To"] = email_coord
+
+                servidor = smtplib.SMTP(
+                    "smtp.gmail.com",
+                    587
+                )
+
+                servidor.starttls()
+
+                servidor.login(
+                    remetente,
+                    senha
+                )
+
+                servidor.sendmail(
+                    remetente,
+                    email_coord,
+                    mensagem.as_string()
+                )
+
+                servidor.quit()
+
+                st.success(
+                    "Código enviado no e-mail!"
+                )
+
+            except Exception as erro:
+
+                st.error(
+                    f"Erro ao enviar código: {erro}"
+                )
         else:
             st.error("E-mail do coordenador não encontrado.")  # ← else duplicado removido
 
