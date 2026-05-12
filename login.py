@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import smtplib
+import random
 
 from email.mime.text import MIMEText
 
@@ -58,11 +59,62 @@ def mostrar_login():
                 break
 
         if rc_encontrado:
-            st.session_state.logado = True
-            st.session_state.tipo_usuario = "RC"
-            st.session_state.usuario_atual = email_rc
-            st.session_state.rc_usuario = rc_encontrado
-            st.rerun()
+
+            codigo_otp = str(
+                random.randint(100000, 999999)
+            )
+
+            st.session_state.codigo_otp = codigo_otp
+
+            st.session_state.rc_temp = rc_encontrado
+
+            st.session_state.email_temp = email_rc
+
+            try:
+
+                remetente = st.secrets["EMAIL_REMETENTE"]
+
+                senha = st.secrets["SENHA_EMAIL"]
+
+                mensagem = MIMEText(
+                    f"Seu código de acesso é: {codigo_otp}"
+                )
+
+                mensagem["Subject"] = "Código de acesso Portal"
+
+                mensagem["From"] = remetente
+
+                mensagem["To"] = email_rc
+
+                servidor = smtplib.SMTP(
+                    "smtp.gmail.com",
+                    587
+                )
+
+                servidor.starttls()
+
+                servidor.login(
+                    remetente,
+                    senha
+                )
+
+                servidor.sendmail(
+                    remetente,
+                    email_rc,
+                    mensagem.as_string()
+                )
+
+                servidor.quit()
+
+                st.success(
+                    "Código enviado no e-mail!"
+                )
+
+            except Exception as erro:
+
+                st.error(
+                    f"Erro ao enviar código: {erro}"
+                )
         else:
             st.error("E-mail não encontrado.")
 
