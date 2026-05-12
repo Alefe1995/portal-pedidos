@@ -291,10 +291,77 @@ def mostrar_login():
 
         # ---- ABA ADMIN ----
         with aba_admin:
+
+            st.markdown("""
+            <style>
+            /* Inputs da aba admin com foco vermelho */
+            div[data-testid="stForm"] .stTextInput input {
+                border-radius: 8px !important;
+                border: 1.5px solid #e5e7eb !important;
+                padding: 9px 12px !important;
+                font-size: 13px !important;
+                background: #f9fafb !important;
+                color: #111827 !important;
+                transition: border-color 0.15s, box-shadow 0.15s !important;
+            }
+            div[data-testid="stForm"] .stTextInput input:focus {
+                border-color: #c00000 !important;
+                box-shadow: 0 0 0 3px rgba(192,0,0,0.09) !important;
+                background: white !important;
+            }
+            /* Label com letras maiúsculas e ícone visual */
+            div[data-testid="stForm"] .stTextInput label {
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                color: #374151 !important;
+                letter-spacing: 0.08em !important;
+                text-transform: uppercase !important;
+            }
+            /* Botão submit do form */
+            div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] > button {
+                background-color: #c00000 !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 8px !important;
+                font-weight: 700 !important;
+                font-size: 13px !important;
+                padding: 10px 0 !important;
+                width: 100% !important;
+                letter-spacing: 0.03em !important;
+            }
+            div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] > button:hover {
+                background-color: #a00000 !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
+            st.markdown("""
+            <div style="
+                display:flex; align-items:center; gap:10px;
+                background:#fef2f2;
+                border:1px solid #fecaca;
+                border-radius:10px;
+                padding:12px 14px;
+                margin-bottom:16px;
+            ">
+                <div style="
+                    width:34px; height:34px; flex-shrink:0;
+                    background:#c00000;
+                    border-radius:8px;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:17px;
+                ">🔑</div>
+                <div>
+                    <div style="font-size:13px; font-weight:700; color:#7f1d1d; line-height:1.2;">Área de Atendimento</div>
+                    <div style="font-size:11px; color:#b91c1c;">Acesso restrito — equipe interna ADERE</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
             with st.form("form_login_admin"):
-                usuario     = st.text_input("USUÁRIO", placeholder="admin")
-                senha_admin = st.text_input("SENHA", type="password", placeholder="••••••")
-                botao_login = st.form_submit_button("Entrar →", use_container_width=True)
+                usuario     = st.text_input("👤  Usuário", placeholder="admin")
+                senha_admin = st.text_input("🔒  Senha", type="password", placeholder="••••••")
+                botao_login = st.form_submit_button("Entrar no Portal →", use_container_width=True)
 
             if botao_login:
                 if usuario in USUARIOS_MASTER and USUARIOS_MASTER[usuario] == senha_admin:
@@ -308,6 +375,18 @@ def mostrar_login():
 
             if st.session_state.get("erro_login"):
                 st.error(st.session_state.erro_login)
+
+            st.markdown("""
+            <div style="
+                display:flex; align-items:center; gap:6px;
+                margin-top:10px; padding-top:12px;
+                border-top: 1px solid #f3f4f6;
+            ">
+                <div style="flex:1; height:1px; background:#f3f4f6;"></div>
+                <span style="font-size:10px; color:#9ca3af; letter-spacing:0.06em;">ACESSO RESTRITO</span>
+                <div style="flex:1; height:1px; background:#f3f4f6;"></div>
+            </div>
+            """, unsafe_allow_html=True)
 
     # Rodapé
     st.markdown("""
