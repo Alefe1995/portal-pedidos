@@ -49,7 +49,7 @@ def mostrar_login():
 
     /* Centraliza e limita largura da página */
     .block-container {
-        padding-top: 4rem !important;
+        padding-top: 5rem !important;
         padding-bottom: 2rem !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
@@ -57,15 +57,13 @@ def mostrar_login():
         margin: 0 auto !important;
     }
 
-    /* =============================================
-       CARD — aplica no div que envolve o container
-       ============================================= */
+    /* CARD — detecta o container que contém as abas */
     div[data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(
         div[data-testid="stTabs"]
     ) {
         background: white !important;
         border-radius: 20px !important;
-        padding: 36px 40px 32px 40px !important;
+        padding: 40px 44px 36px 44px !important;
         box-shadow: 0 8px 32px rgba(0,0,0,0.10) !important;
         border: 1px solid #e5e7eb !important;
     }
@@ -88,7 +86,6 @@ def mostrar_login():
         font-size: 14px !important;
         background: #f9fafb !important;
         color: #111827 !important;
-        transition: border-color 0.2s;
     }
     .stTextInput input:focus {
         border-color: #c00000 !important;
@@ -108,13 +105,12 @@ def mostrar_login():
         width: 100% !important;
         margin-top: 6px !important;
         letter-spacing: 0.02em !important;
-        transition: background 0.2s !important;
     }
     div[data-testid="stButton"] > button:hover {
         background-color: #a00000 !important;
     }
 
-    /* Abas — container */
+    /* Abas — fundo */
     .stTabs [data-baseweb="tab-list"] {
         gap: 0 !important;
         background: #f3f4f6 !important;
@@ -150,14 +146,6 @@ def mostrar_login():
     /* Alertas */
     .stAlert { border-radius: 10px !important; }
 
-    /* Rodapé */
-    .login-footer {
-        text-align: center;
-        font-size: 12px;
-        color: #9ca3af;
-        margin-top: 24px;
-    }
-
     </style>
     """, unsafe_allow_html=True)
 
@@ -172,34 +160,35 @@ def mostrar_login():
             st.session_state[k] = None
 
     # =========================
-    # CABEÇALHO (fora do card)
-    # =========================
-    st.markdown("""
-    <div style="text-align:center; margin-bottom: 28px;">
-        <div style="
-            background:#fce8e8;
-            border-radius:20px;
-            width:68px; height:68px;
-            display:inline-flex;
-            align-items:center; justify-content:center;
-            font-size:30px;
-            margin-bottom:16px;
-            box-shadow: 0 2px 8px rgba(192,0,0,0.15);
-        ">✉️</div>
-        <div style="font-size:26px; font-weight:800; color:#111827; margin-bottom:8px;">
-            Acesse o Portal
-        </div>
-        <div style="font-size:14px; color:#6b7280; line-height:1.6;">
-            Informe seu e-mail cadastrado. Vamos enviar um<br>código de acesso temporário.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # =========================
-    # CARD com as abas dentro
+    # CARD — tudo dentro aqui
     # =========================
     with st.container():
 
+        # Ícone + título + subtítulo DENTRO do card
+        st.markdown("""
+        <div style="text-align:center; margin-bottom: 28px;">
+            <div style="
+                background:#fce8e8;
+                border-radius:20px;
+                width:68px; height:68px;
+                display:inline-flex;
+                align-items:center; justify-content:center;
+                font-size:30px;
+                margin-bottom:16px;
+                box-shadow: 0 2px 8px rgba(192,0,0,0.15);
+            ">✉️</div>
+            <div style="font-size:26px; font-weight:800; color:#111827; margin-bottom:8px;">
+                Acesse o Portal
+            </div>
+            <div style="font-size:14px; color:#6b7280; line-height:1.6;">
+                Informe seu e-mail cadastrado. Vamos enviar um<br>código de acesso temporário.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ------------------------------------------------
+        # ABAS
+        # ------------------------------------------------
         aba_rc, aba_coord, aba_admin = st.tabs(["🧑‍💼 RC", "📋 Coordenador", "🔑 Admin"])
 
         # ------------------------------------------------
@@ -211,8 +200,7 @@ def mostrar_login():
                 st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 codigo_digitado = st.text_input(
                     "CÓDIGO RECEBIDO NO E-MAIL",
-                    max_chars=6,
-                    placeholder="000000",
+                    max_chars=6, placeholder="000000",
                     key="otp_rc_input"
                 )
                 col1, col2 = st.columns(2)
@@ -235,8 +223,7 @@ def mostrar_login():
             else:
                 st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 email_rc = st.text_input(
-                    "E-MAIL",
-                    placeholder="seu@email.com",
+                    "E-MAIL", placeholder="seu@email.com",
                     key="input_email_rc"
                 )
                 if st.button("Enviar Código →", key="btn_enviar_rc", use_container_width=True):
@@ -254,7 +241,6 @@ def mostrar_login():
                             if email_rc.strip().lower() in emails:
                                 rc_encontrado = linha["RC"]
                                 break
-
                         if rc_encontrado:
                             codigo = str(random.randint(100000, 999999))
                             st.session_state.codigo_otp = codigo
@@ -278,8 +264,7 @@ def mostrar_login():
                 st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 codigo_coord_digitado = st.text_input(
                     "CÓDIGO RECEBIDO NO E-MAIL",
-                    max_chars=6,
-                    placeholder="000000",
+                    max_chars=6, placeholder="000000",
                     key="otp_coord_input"
                 )
                 col1, col2 = st.columns(2)
@@ -302,8 +287,7 @@ def mostrar_login():
             else:
                 st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 email_coord = st.text_input(
-                    "E-MAIL DO COORDENADOR",
-                    placeholder="coordenador@email.com",
+                    "E-MAIL DO COORDENADOR", placeholder="coordenador@email.com",
                     key="input_email_coord"
                 )
                 if st.button("Enviar Código →", key="btn_enviar_coord", use_container_width=True):
@@ -316,7 +300,6 @@ def mostrar_login():
                             if email_coord.strip().lower() == str(linha.get("E-mail", "")).strip().lower():
                                 coord_encontrado = linha["Coordenador"]
                                 break
-
                         if coord_encontrado:
                             codigo_coord = str(random.randint(100000, 999999))
                             st.session_state.codigo_otp_coord = codigo_coord
@@ -355,9 +338,10 @@ def mostrar_login():
                 st.error(st.session_state.erro_login)
 
     # =========================
-    # RODAPÉ
+    # RODAPÉ (fora do card)
     # =========================
-    st.markdown(
-        "<div class='login-footer'>Acesso exclusivo para representantes comerciais ADERE</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div style="text-align:center; font-size:12px; color:#9ca3af; margin-top:20px;">
+        Acesso exclusivo para representantes comerciais ADERE
+    </div>
+    """, unsafe_allow_html=True)
