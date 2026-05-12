@@ -368,7 +368,7 @@ def mostrar_login():
 
             with st.form("form_login_admin"):
                 usuario     = st.text_input("👤  Usuário", placeholder="admin")
-                senha_admin = st.text_input("🔒  Senha", type="password", placeholder="••••••")
+                senha_admin = st.text_input("🔒  Senha", type="password", placeholder="••••••", autocomplete="new-password")
                 botao_login = st.form_submit_button("Entrar no Portal →", use_container_width=True)
 
             if botao_login:
