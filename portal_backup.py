@@ -822,6 +822,18 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     margin-bottom:18px;
                     box-shadow:0 1px 4px rgba(0,0,0,0.05);
                 ">
+
+                    cnpj_raw = pedido_info.get('CNPJ', '')
+
+                    if cnpj_raw:
+                        cnpj = str(int(float(cnpj_raw))).zfill(14)
+                    
+                        cnpj_formatado = (
+                            f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/"
+                            f"{cnpj[8:12]}-{cnpj[12:]}"
+                        )
+                    else:
+                        cnpj_formatado = ""
                     <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">
                         Pedido Selecionado
                     </div>
@@ -831,7 +843,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     </div>
                     <div style="font-size:13px;color:#6b7280;margin-top:10px;display:flex;gap:24px;flex-wrap:wrap;">
                         <span><b style="color:#374151;">Cliente:</b> {pedido_info['Cliente']}</span>
-                        <span><b style="color:#374151;">CNPJ:</b> {pedido_info.get('CNPJ','')}</span>
+                        <span><b style="color:#374151;">CNPJ:</b> {cnpj_formatado}</span>
                         <span><b style="color:#374151;">Valor:</b> {pedido_info['Valor (R$)']}</span>
                         <span><b style="color:#374151;">Previsão:</b> {pedido_info.get('Previsão','')}</span>
                         <span><b style="color:#374151;">Motivo:</b> {pedido_info.get('Motivo','')}</span>
