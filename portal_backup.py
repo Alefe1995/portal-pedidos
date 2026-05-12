@@ -338,6 +338,11 @@ def mostrar_portal():
         ""
     )
 
+    coordenador_usuario = st.session_state.get(
+        "coordenador_usuario",
+        ""
+    )    
+
     tipo_busca = st.radio(
         label="Tipo de Busca",
         options=["Código RC", "Coordenador de Vendas"],
@@ -366,6 +371,16 @@ def mostrar_portal():
         ].copy()
 
         identificador = f"RC {rc_input}"
+        
+    elif tipo_usuario == "COORDENADOR":
+
+        coord_input = str(coordenador_usuario)
+
+        base = pedidos[
+            pedidos["Coordenador"].astype(str) == coord_input
+        ].copy()
+
+        identificador = f"Coordenador: {coord_input}"    
 
     # ====================================
     # BUSCA POR RC
