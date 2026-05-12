@@ -28,9 +28,6 @@ def enviar_email_otp(destinatario, codigo):
 
 def mostrar_login():
 
-    # =========================
-    # CSS
-    # =========================
     st.markdown("""
     <style>
 
@@ -45,36 +42,45 @@ def mostrar_login():
         visibility: hidden !important;
     }
 
-    /* Fundo */
+    /* Fundo cinza claro */
     .stApp {
         background-color: #f1f3f6;
     }
 
-    /* Remove padding lateral e centraliza */
+    /* Centraliza e limita largura da página */
     .block-container {
-        padding-top: 3rem !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
+        padding-top: 4rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
         max-width: 520px !important;
         margin: 0 auto !important;
     }
 
-    /* Card branco que envolve tudo */
-    [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:first-child {
-        background: white;
-        border-radius: 20px;
-        padding: 40px 44px 36px 44px !important;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    /* =============================================
+       CARD — aplica no div que envolve o container
+       ============================================= */
+    div[data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(
+        div[data-testid="stTabs"]
+    ) {
+        background: white !important;
+        border-radius: 20px !important;
+        padding: 36px 40px 32px 40px !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.10) !important;
+        border: 1px solid #e5e7eb !important;
     }
 
-    /* Inputs */
+    /* Inputs — label */
     .stTextInput label {
         font-size: 11px !important;
         font-weight: 700 !important;
         color: #374151 !important;
         letter-spacing: 0.07em !important;
         text-transform: uppercase !important;
+        margin-bottom: 4px !important;
     }
+
+    /* Inputs — campo */
     .stTextInput input {
         border-radius: 10px !important;
         border: 1.5px solid #e5e7eb !important;
@@ -82,13 +88,15 @@ def mostrar_login():
         font-size: 14px !important;
         background: #f9fafb !important;
         color: #111827 !important;
+        transition: border-color 0.2s;
     }
     .stTextInput input:focus {
         border-color: #c00000 !important;
         box-shadow: 0 0 0 3px rgba(192,0,0,0.08) !important;
+        background: white !important;
     }
 
-    /* Botão */
+    /* Botões */
     div[data-testid="stButton"] > button {
         background-color: #c00000 !important;
         color: white !important;
@@ -99,12 +107,14 @@ def mostrar_login():
         padding: 12px 0 !important;
         width: 100% !important;
         margin-top: 6px !important;
+        letter-spacing: 0.02em !important;
+        transition: background 0.2s !important;
     }
     div[data-testid="stButton"] > button:hover {
         background-color: #a00000 !important;
     }
 
-    /* Abas */
+    /* Abas — container */
     .stTabs [data-baseweb="tab-list"] {
         gap: 0 !important;
         background: #f3f4f6 !important;
@@ -113,6 +123,8 @@ def mostrar_login():
         margin-bottom: 20px !important;
         border-bottom: none !important;
     }
+
+    /* Abas — item */
     .stTabs [data-baseweb="tab"] {
         border-radius: 8px !important;
         font-weight: 600 !important;
@@ -122,25 +134,37 @@ def mostrar_login():
         border: none !important;
         background: transparent !important;
     }
+
+    /* Aba selecionada */
     .stTabs [aria-selected="true"] {
         background: white !important;
         color: #c00000 !important;
         box-shadow: 0 1px 4px rgba(0,0,0,0.10) !important;
     }
-    .stTabs [data-baseweb="tab-border"] { display: none !important; }
-    .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
-    /* Alerta de erro */
+    .stTabs [data-baseweb="tab-border"],
+    .stTabs [data-baseweb="tab-highlight"] {
+        display: none !important;
+    }
+
+    /* Alertas */
     .stAlert { border-radius: 10px !important; }
+
+    /* Rodapé */
+    .login-footer {
+        text-align: center;
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 24px;
+    }
 
     </style>
     """, unsafe_allow_html=True)
 
     # =========================
-    # Inicializa estados OTP
+    # Inicializa session_state
     # =========================
-    for k in ["erro_login", "email_temp", "rc_temp",
-              "email_coord_temp", "coord_temp"]:
+    for k in ["erro_login", "email_temp", "rc_temp", "email_coord_temp", "coord_temp"]:
         if k not in st.session_state:
             st.session_state[k] = ""
     for k in ["codigo_otp", "codigo_otp_coord"]:
@@ -148,41 +172,42 @@ def mostrar_login():
             st.session_state[k] = None
 
     # =========================
-    # CARD PRINCIPAL
+    # CABEÇALHO (fora do card)
+    # =========================
+    st.markdown("""
+    <div style="text-align:center; margin-bottom: 28px;">
+        <div style="
+            background:#fce8e8;
+            border-radius:20px;
+            width:68px; height:68px;
+            display:inline-flex;
+            align-items:center; justify-content:center;
+            font-size:30px;
+            margin-bottom:16px;
+            box-shadow: 0 2px 8px rgba(192,0,0,0.15);
+        ">✉️</div>
+        <div style="font-size:26px; font-weight:800; color:#111827; margin-bottom:8px;">
+            Acesse o Portal
+        </div>
+        <div style="font-size:14px; color:#6b7280; line-height:1.6;">
+            Informe seu e-mail cadastrado. Vamos enviar um<br>código de acesso temporário.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # =========================
+    # CARD com as abas dentro
     # =========================
     with st.container():
 
-        # Ícone + título + subtítulo (HTML puro, só visual)
-        st.markdown("""
-        <div style="text-align:center; margin-bottom: 24px;">
-            <div style="
-                background:#fce8e8; border-radius:16px;
-                width:62px; height:62px;
-                display:inline-flex; align-items:center; justify-content:center;
-                font-size:28px; margin-bottom:14px;">
-                ✉️
-            </div>
-            <div style="font-size:24px; font-weight:800; color:#111827; margin-bottom:6px;">
-                Acesse o Portal
-            </div>
-            <div style="font-size:14px; color:#6b7280; line-height:1.5;">
-                Informe seu e-mail cadastrado. Vamos enviar um<br>código de acesso temporário.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # =========================
-        # ABAS
-        # =========================
         aba_rc, aba_coord, aba_admin = st.tabs(["🧑‍💼 RC", "📋 Coordenador", "🔑 Admin"])
 
-        # ================================================
+        # ------------------------------------------------
         # ABA RC
-        # ================================================
+        # ------------------------------------------------
         with aba_rc:
 
             if st.session_state.codigo_otp:
-                # Mostrar campo de código
                 st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
                 codigo_digitado = st.text_input(
                     "CÓDIGO RECEBIDO NO E-MAIL",
@@ -244,9 +269,9 @@ def mostrar_login():
                         else:
                             st.error("❌ E-mail não encontrado.")
 
-        # ================================================
+        # ------------------------------------------------
         # ABA COORDENADOR
-        # ================================================
+        # ------------------------------------------------
         with aba_coord:
 
             if st.session_state.codigo_otp_coord:
@@ -306,9 +331,9 @@ def mostrar_login():
                         else:
                             st.error("❌ E-mail do coordenador não encontrado.")
 
-        # ================================================
+        # ------------------------------------------------
         # ABA ADMIN
-        # ================================================
+        # ------------------------------------------------
         with aba_admin:
             st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
             with st.form("form_login_admin"):
@@ -329,9 +354,10 @@ def mostrar_login():
             if st.session_state.get("erro_login"):
                 st.error(st.session_state.erro_login)
 
-    # Rodapé fora do card
-    st.markdown("""
-    <div style="text-align:center; font-size:12px; color:#9ca3af; margin-top:24px;">
-        Acesso exclusivo para representantes comerciais ADERE
-    </div>
-    """, unsafe_allow_html=True)
+    # =========================
+    # RODAPÉ
+    # =========================
+    st.markdown(
+        "<div class='login-footer'>Acesso exclusivo para representantes comerciais ADERE</div>",
+        unsafe_allow_html=True
+    )
