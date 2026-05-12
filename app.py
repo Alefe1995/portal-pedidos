@@ -5,7 +5,7 @@ from portal_backup import mostrar_portal
 
 st.set_page_config(
     page_title="Portal de Pedidos",
-    page_icon="🛒",
+    page_icon="📊",
     layout="wide"
 )
 
