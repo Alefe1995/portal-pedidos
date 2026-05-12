@@ -207,7 +207,7 @@ def mostrar_login():
                         st.rerun()
             else:
                 email_rc = st.text_input(
-                    "E-MAIL", placeholder="seu@email.com",
+                    "E-MAIL DO REPRESENTANTE", placeholder="seu@email.com",
                     key="input_email_rc"
                 )
                 if st.button("Enviar Código →", key="btn_enviar_rc", use_container_width=True):
