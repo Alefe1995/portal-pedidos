@@ -176,7 +176,7 @@ def mostrar_login():
         </div>
         """, unsafe_allow_html=True)
 
-        aba_rc, aba_coord, aba_admin = st.tabs(["🧑‍💼 RC", "📋 Coordenador R.", "🔑 Atendimento"])
+        aba_rc, aba_coord, aba_admin = st.tabs(["🧑‍💼 RC", "📋 Coordenador", "🔑 Atendimento"])
 
         # ---- ABA RC ----
         with aba_rc:
