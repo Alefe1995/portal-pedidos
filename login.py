@@ -366,8 +366,26 @@ def mostrar_login():
             </div>
             """, unsafe_allow_html=True)
 
+            st.markdown("""
+            <script>
+            (function() {
+                function disableAutocomplete() {
+                    document.querySelectorAll('form').forEach(function(f) {
+                        f.setAttribute('autocomplete', 'off');
+                    });
+                    document.querySelectorAll('input').forEach(function(i) {
+                        i.setAttribute('autocomplete', 'off');
+                    });
+                }
+                disableAutocomplete();
+                setTimeout(disableAutocomplete, 500);
+                setTimeout(disableAutocomplete, 1500);
+            })();
+            </script>
+            """, unsafe_allow_html=True)
+
             with st.form("form_login_admin"):
-                usuario     = st.text_input("👤  Usuário", placeholder="admin")
+                usuario     = st.text_input("👤  Usuário", placeholder="admin", autocomplete="off")
                 senha_admin = st.text_input("🔒  Senha", type="password", placeholder="••••••", autocomplete="new-password")
                 botao_login = st.form_submit_button("Entrar no Portal →", use_container_width=True)
 
