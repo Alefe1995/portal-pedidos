@@ -24,9 +24,9 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     button[kind="secondary"]       { display: none !important; }
     div[style*="position: fixed"]  { display: none !important; }
 
-    /* ── Esconde o botão nativo de colapso da sidebar ── */
-    [data-testid="collapsedControl"],
-    button[data-testid="baseButton-headerNoPadding"] {
+    /* Remove botão << da sidebar */
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="collapsedControl"] {
         display: none !important;
     }
 
