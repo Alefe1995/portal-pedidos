@@ -347,15 +347,15 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             if (v.length > 12) r += '-' + v.slice(12,14);
             return r;
         }}
-
-        input.addEventListener('input', function() {{
-            const pos = this.selectionStart;
+        
+        input.addEventListener('change', function() {
             this.value = mask(this.value);
-            // Envia valor para Streamlit via query param
+        
             const url = new URL(window.location.href);
             url.searchParams.set('cnpj_filtro', this.value);
-            window.history.replaceState(null, '', url.toString());
-        }});
+        
+            window.location.href = url.toString();
+        });
         </script>
         """
         st.sidebar.components_placeholder = st.sidebar.empty()
