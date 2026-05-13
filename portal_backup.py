@@ -333,32 +333,28 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         <label>CNPJ (buscar)</label>
         <input id="cnpj_input" type="text" maxlength="18" placeholder="00.000.000/0000-00"
                value="{st.session_state.cnpj_filtro}" />
-        
         <script>
         const input = document.getElementById('cnpj_input');
-        
+
         function mask(v) {{
             v = v.replace(/\\D/g,'');
             if (v.length > 14) v = v.slice(0,14);
-        
             let r = '';
-        
             if (v.length > 0)  r += v.slice(0,2);
             if (v.length > 2)  r += '.' + v.slice(2,5);
             if (v.length > 5)  r += '.' + v.slice(5,8);
             if (v.length > 8)  r += '/' + v.slice(8,12);
             if (v.length > 12) r += '-' + v.slice(12,14);
-        
             return r;
         }}
-        
-        input.addEventListener('change', function() {{
+
+        input.addEventListener('input', function() {{
+            const pos = this.selectionStart;
             this.value = mask(this.value);
-        
+            // Envia valor para Streamlit via query param
             const url = new URL(window.location.href);
             url.searchParams.set('cnpj_filtro', this.value);
-        
-            window.location.href = url.toString();
+            window.history.replaceState(null, '', url.toString());
         }});
         </script>
         """
