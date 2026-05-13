@@ -355,7 +355,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             url.searchParams.set('cnpj_filtro', this.value);
         
             window.location.href = url.toString();
-        });
+        }});
         </script>
         """
         st.sidebar.components_placeholder = st.sidebar.empty()
