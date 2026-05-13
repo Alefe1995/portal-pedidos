@@ -570,7 +570,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 tr:hover td{background:#f9fafb;}
                 .ped{font-weight:700;color:#c00000;} .val{font-weight:600;color:#166534;}
                 .mot{font-weight:600;color:#d97706;} .prev{font-weight:700;color:#374151;}
-                .cnpj{font-size:12px;color:#6b7280;white-space:nowrap;font-weight:700;}
+                .cnpj{font-size:12px;color:#595959;white-space:nowrap;font-weight:700;}
                 .badge-lib  {background:#dcfce7;color:#166534;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
                 .badge-conf {background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
                 .badge-pend {background:#fef9c3;color:#92400e;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
