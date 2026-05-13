@@ -625,7 +625,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     <div style="font-size:13px;color:#6b7280;margin-top:10px;display:flex;gap:24px;flex-wrap:wrap;">
                         <span><b style="color:#374151;">Cliente:</b> {pedido_info['Cliente']}</span>
                         {"<span><b style='color:#374151;'>CNPJ:</b> "+str(cnpj_fmt)+"</span>" if cnpj_fmt else ""}
-                        <span><b style="color:#258a07;">Valor:</b> {pedido_info['Valor (R$)']}</span>
+                        <span><b style="color:#374151;">Valor:</b> {pedido_info['Valor (R$)']}</span>
                         <span><b style="color:#374151;">Previsão:</b> {pedido_info.get('Previsão','')}</span>
                         <span><b style="color:#374151;">Motivo:</b> {pedido_info.get('Motivo','')}</span>
                     </div>
