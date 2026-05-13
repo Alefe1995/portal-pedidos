@@ -328,7 +328,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             outline: none;
         }}
         #cnpj_input:focus {{ border-color: #c00000; box-shadow: 0 0 0 2px rgba(192,0,0,0.1); }}
-        label {{ font-size:14px; font-weight:600; color:#374151; display:block; margin-bottom:6px; }}
+        label {{ font-size:14px; color:#374151; display:block; margin-bottom:6px; }}
         </style>
         <label>CNPJ (buscar)</label>
         <input id="cnpj_input" type="text" maxlength="18" placeholder="00.000.000/0000-00"
