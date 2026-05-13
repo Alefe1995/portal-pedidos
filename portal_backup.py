@@ -564,13 +564,13 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 *{box-sizing:border-box;}
                 body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
                 table{width:100%;border-collapse:collapse;background:white;}
-                thead tr{background:#f9fafb;border-bottom:2px solid #e5e7eb;}
+                thead tr{background:#f9fafb;border-bottom:2px solid #e5e7eb;position: sticky;top: 0;z-index: 10;}
                 th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}
                 td{padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#111827;vertical-align:middle;}
                 tr:hover td{background:#f9fafb;}
                 .ped{font-weight:700;color:#c00000;} .val{font-weight:600;color:#166534;}
                 .mot{font-weight:600;color:#d97706;} .prev{font-weight:700;color:#374151;}
-                .cnpj{font-size:12px;color:#6b7280;white-space:nowrap;}
+                .cnpj{font-size:12px;color:#6b7280;white-space:nowrap;font-weight:700;}
                 .badge-lib  {background:#dcfce7;color:#166534;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
                 .badge-conf {background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
                 .badge-pend {background:#fef9c3;color:#92400e;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
