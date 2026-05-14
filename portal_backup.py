@@ -540,133 +540,107 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 st.info("Sem dados de clientes.")
 
             # ─────────────────────────────────────────
-            # ITENS EM RUPTURA
+            # LISTA FINAL DE ITENS EM RUPTURA
             # ─────────────────────────────────────────
-
-            ruptura_df = pedidos_view[
-                pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
-            ].copy()
-
-            if not ruptura_df.empty:
-
-                # Normaliza os pedidos para garantir o match
-                ruptura_df["_pedido_key"] = (
-                    ruptura_df["Pedido"]
-                    .astype(str)
-                    .str.replace(".0", "", regex=False)
-                    .str.strip()
+            
+            # Define colunas disponíveis
+            col_cod = "Codigo" if "Codigo" in ruptura_itens.columns else None
+            col_desc = "Descricao" if "Descricao" in ruptura_itens.columns else None
+            
+            col_prev = (
+                "Previsão Final"
+                if "Previsão Final" in ruptura_itens.columns
+                else "Previsão"
+                if "Previsão" in ruptura_itens.columns
+                else None
+            )
+            
+            # Cria nome do item
+            if col_cod and col_desc:
+            
+                ruptura_itens["_item"] = (
+                    ruptura_itens[col_cod].astype(str).str.strip()
+                    + " - " +
+                    ruptura_itens[col_desc].astype(str).str.strip()
                 )
-                
-                itens["_pedido_key"] = (
-                    itens["Pedido"]
-                    .astype(str)
-                    .str.replace(".0", "", regex=False)
-                    .str.strip()
+            
+            elif col_desc:
+            
+                ruptura_itens["_item"] = (
+                    ruptura_itens[col_desc].astype(str).str.strip()
                 )
-                
-                # Busca itens dos pedidos em ruptura
-                ruptura_itens = itens[
-                    itens["_pedido_key"].isin(
-                        ruptura_df["_pedido_key"]
-                    )
-                ].copy()
-
-                st.write("Pedidos ruptura:", len(ruptura_df))
-                st.write("Itens encontrados:", len(ruptura_itens))
-
-                if not ruptura_itens.empty:
-
-                    col_cod = "Codigo" if "Codigo" in ruptura_itens.columns else None
-                    col_desc = "Descricao" if "Descricao" in ruptura_itens.columns else None
-
-                    col_prev = (
-                        "Previsão Final"
-                        if "Previsão Final" in ruptura_itens.columns
-                        else "Previsão"
-                        if "Previsão" in ruptura_itens.columns
-                        else None
-                    )
-
-                    # Previsão em data
-                    if col_prev:
-                        ruptura_itens["_prev_data"] = pd.to_datetime(
-                            ruptura_itens[col_prev],
-                            errors="coerce",
-                            dayfirst=True
-                        )
-                    else:
-                        ruptura_itens["_prev_data"] = pd.NaT
-
-                    # Colunas para agrupamento
-                    cols_group = []
-
-                    if col_cod:
-                        cols_group.append(col_cod)
-
-                    if col_desc:
-                        cols_group.append(col_desc)
-
-                    if cols_group:
-
-                        agrupado = ruptura_itens.groupby(
-                            cols_group,
-                            dropna=False
-                        ).agg(
-                            Maior_Previsao=("_prev_data", "max"),
-                            Pedidos_Impactados=("Pedido", "nunique")
-                        ).reset_index()
-
-                        # Formata previsão
-                        agrupado["Maior_Previsao"] = agrupado[
-                            "Maior_Previsao"
-                        ].apply(
-                            lambda x: (
-                                x.strftime("%d/%m/%Y")
-                                if pd.notna(x)
-                                else "Sem previsão"
-                            )
-                        )
-
-                        # Renomeia colunas
-                        novos_nomes = {}
-
-                        if col_cod:
-                            novos_nomes[col_cod] = "Código"
-
-                        if col_desc:
-                            novos_nomes[col_desc] = "Descrição"
-
-                        novos_nomes["Maior_Previsao"] = "Maior Previsão"
-                        novos_nomes["Pedidos_Impactados"] = "Pedidos Impactados"
-
-                        agrupado = agrupado.rename(columns=novos_nomes)
-
-                        # Ordena
-                        agrupado = agrupado.sort_values(
-                            by="Pedidos Impactados",
-                            ascending=False
-                        )
-
-                        st.markdown("""
-                        <div style='font-size:11px;font-weight:700;
-                            color:#9ca3af;letter-spacing:0.08em;
-                            text-transform:uppercase;
-                            margin:8px 0 6px;'>
-                            🔴 Itens em Ruptura
-                        </div>
-                        """, unsafe_allow_html=True)
-
-                        st.dataframe(
-                            agrupado,
-                            use_container_width=True,
-                            hide_index=True
-                        )
-
-                else:
-                    st.info("Nenhum item em ruptura encontrado.")
-
+            
+            elif col_cod:
+            
+                ruptura_itens["_item"] = (
+                    ruptura_itens[col_cod].astype(str).str.strip()
+                )
+            
             else:
-                st.info("Não há pedidos com ruptura de estoque.")
+            
+                ruptura_itens["_item"] = "Item sem identificação"
+            
+            # Trata previsão
+            if col_prev:
+            
+                ruptura_itens["_prev_data"] = pd.to_datetime(
+                    ruptura_itens[col_prev],
+                    errors="coerce",
+                    dayfirst=True
+                )
+            
+            else:
+            
+                ruptura_itens["_prev_data"] = pd.NaT
+            
+            # Agrupa por item
+            tabela_rup = ruptura_itens.groupby(
+                "_item",
+                dropna=False
+            ).agg(
+                Maior_Previsao=("_prev_data", "max"),
+                Pedidos_Impactados=("Pedido", "nunique")
+            ).reset_index()
+            
+            # Formata previsão
+            tabela_rup["Maior_Previsao"] = tabela_rup["Maior_Previsao"].apply(
+                lambda x: (
+                    x.strftime("%d/%m/%Y")
+                    if pd.notna(x)
+                    else "Sem previsão"
+                )
+            )
+            
+            # Renomeia colunas
+            tabela_rup = tabela_rup.rename(columns={
+                "_item": "Item",
+                "Maior_Previsao": "Maior Previsão",
+                "Pedidos_Impactados": "Pedidos Impactados"
+            })
+            
+            # Ordena
+            tabela_rup = tabela_rup.sort_values(
+                by="Pedidos Impactados",
+                ascending=False
+            )
+            
+            # Título
+            st.markdown("""
+            <div style='font-size:11px;font-weight:700;
+                color:#9ca3af;
+                letter-spacing:0.08em;
+                text-transform:uppercase;
+                margin:8px 0 6px;'>
+                🔴 Itens em Ruptura
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Exibe tabela
+            st.dataframe(
+                tabela_rup,
+                use_container_width=True,
+                hide_index=True
+            )
         # ─────────────────────────────────────────
         # ABA 2 — PEDIDOS
         # ─────────────────────────────────────────
