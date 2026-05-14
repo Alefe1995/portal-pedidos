@@ -549,11 +549,30 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
 
             if not ruptura_df.empty:
 
+                # Normaliza os pedidos para garantir o match
+                ruptura_df["_pedido_key"] = (
+                    ruptura_df["Pedido"]
+                    .astype(str)
+                    .str.replace(".0", "", regex=False)
+                    .str.strip()
+                )
+                
+                itens["_pedido_key"] = (
+                    itens["Pedido"]
+                    .astype(str)
+                    .str.replace(".0", "", regex=False)
+                    .str.strip()
+                )
+                
+                # Busca itens dos pedidos em ruptura
                 ruptura_itens = itens[
-                    itens["Pedido"].astype(str).isin(
-                        ruptura_df["Pedido"].astype(str)
+                    itens["_pedido_key"].isin(
+                        ruptura_df["_pedido_key"]
                     )
                 ].copy()
+
+                st.write("Pedidos ruptura:", len(ruptura_df))
+                st.write("Itens encontrados:", len(ruptura_itens))
 
                 if not ruptura_itens.empty:
 
