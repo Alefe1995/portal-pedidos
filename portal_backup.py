@@ -573,10 +573,10 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
 
                 if not ruptura_itens.empty:
 
-                    # Colunas
-                    col_cod = "Codigo" if "Codigo" in ruptura_itens.columns else None
-                    col_desc = "Descricao" if "Descricao" in ruptura_itens.columns else None
+                    # Nome da coluna do item
+                    col_item = "Descrição"
 
+                    # Coluna de previsão
                     col_prev = (
                         "Previsão Final"
                         if "Previsão Final" in ruptura_itens.columns
@@ -585,32 +585,14 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                         else None
                     )
 
-                    # Nome item
-                    if col_cod and col_desc:
+                    # Nome do item
+                    ruptura_itens["_item"] = (
+                        ruptura_itens[col_item]
+                        .astype(str)
+                        .str.strip()
+                    )
 
-                        ruptura_itens["_item"] = (
-                            ruptura_itens[col_cod].astype(str).str.strip()
-                            + " - " +
-                            ruptura_itens[col_desc].astype(str).str.strip()
-                        )
-
-                    elif col_desc:
-
-                        ruptura_itens["_item"] = (
-                            ruptura_itens[col_desc].astype(str).str.strip()
-                        )
-
-                    elif col_cod:
-
-                        ruptura_itens["_item"] = (
-                            ruptura_itens[col_cod].astype(str).str.strip()
-                        )
-
-                    else:
-
-                        ruptura_itens["_item"] = "Item sem identificação"
-
-                    # Previsão
+                    # Trata previsão
                     if col_prev:
 
                         ruptura_itens["_prev_data"] = pd.to_datetime(
@@ -623,7 +605,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
 
                         ruptura_itens["_prev_data"] = pd.NaT
 
-                    # Agrupa
+                    # Agrupa por item
                     tabela_rup = ruptura_itens.groupby(
                         "_item",
                         dropna=False
@@ -641,7 +623,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                         )
                     )
 
-                    # Renomeia
+                    # Renomeia colunas
                     tabela_rup = tabela_rup.rename(columns={
                         "_item": "Item",
                         "Maior_Previsao": "Maior Previsão",
@@ -665,7 +647,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     </div>
                     """, unsafe_allow_html=True)
 
-                    # Tabela
+                    # Exibe tabela
                     st.dataframe(
                         tabela_rup,
                         use_container_width=True,
