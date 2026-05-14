@@ -543,9 +543,47 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             # ITENS EM RUPTURA
             # ─────────────────────────────────────────
 
+            # Motivos permitidos no pedido
+            motivos_validos = [
+                "estoque",
+                "mto",
+                "programado mto"
+            ]
+
+            # Normaliza motivo
+            pedidos_view["_motivo_norm"] = (
+                pedidos_view["Motivo"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            # Identifica pedidos com motivos inválidos
+            pedidos_invalidos = (
+                pedidos_view
+                .groupby("Pedido")["_motivo_norm"]
+                .apply(
+                    lambda x: any(
+                        motivo not in motivos_validos
+                        for motivo in x
+                    )
+                )
+            )
+
+            # Lista pedidos válidos
+            pedidos_validos = pedidos_invalidos[
+                pedidos_invalidos == False
+            ].index
+
+            # Mantém apenas pedidos válidos
             ruptura_df = pedidos_view[
-                pedidos_view["Motivo"].astype(str).str.strip().str.lower() == "estoque"
+                pedidos_view["Pedido"].isin(pedidos_validos)
             ].copy()
+
+            # Mantém apenas linhas de ruptura de estoque
+            ruptura_df = ruptura_df[
+                ruptura_df["_motivo_norm"] == "estoque"
+            ]
 
             if not ruptura_df.empty:
 
@@ -576,7 +614,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     # Nome da coluna do item
                     col_item = "Produto"
 
-                    # Coluna de previsão
+                    # Coluna previsão
                     col_prev = (
                         "Previsão Final"
                         if "Previsão Final" in ruptura_itens.columns
@@ -585,7 +623,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                         else None
                     )
 
-                    # Nome do item
+                    # Nome item
                     ruptura_itens["_item"] = (
                         ruptura_itens[col_item]
                         .astype(str)
@@ -605,7 +643,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
 
                         ruptura_itens["_prev_data"] = pd.NaT
 
-                    # Agrupa por item
+                    # Agrupa itens
                     tabela_rup = ruptura_itens.groupby(
                         "_item",
                         dropna=False
@@ -615,7 +653,9 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     ).reset_index()
 
                     # Formata previsão
-                    tabela_rup["Maior_Previsao"] = tabela_rup["Maior_Previsao"].apply(
+                    tabela_rup["Maior_Previsao"] = tabela_rup[
+                        "Maior_Previsao"
+                    ].apply(
                         lambda x: (
                             x.strftime("%d/%m/%Y")
                             if pd.notna(x)
