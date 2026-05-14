@@ -575,10 +575,28 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                         )
             
                     # Agrupa itens
+                    # Define colunas válidas para agrupamento
+                    cols_group = []
+                    
+                    if col_cod:
+                        cols_group.append(col_cod)
+                    
+                    if col_desc:
+                        cols_group.append(col_desc)
+                    
+                    # Se nenhuma coluna existir
+                    if not cols_group:
+                        st.warning("Colunas de Código/Descrição não encontradas.")
+                        return
+                    
+                    # Agrupamento
                     agrupado = ruptura_itens.groupby(
-                        [col_cod, col_desc],
+                        cols_group,
                         dropna=False
                     ).agg(
+                        Maior_Previsao=("_prev_data", "max"),
+                        Pedidos_Impactados=("Pedido", "nunique")
+                    ).reset_index()
                         Maior_Previsao=("_prev_data", "max"),
                         Pedidos_Impactados=("Pedido", "nunique")
                     ).reset_index()
@@ -595,12 +613,18 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     )
             
                     # Renomeia colunas
-                    agrupado.columns = [
-                        "Código",
-                        "Descrição",
-                        "Maior Previsão",
-                        "Pedidos Impactados"
-                    ]
+                    novos_nomes = {}
+                    
+                    if col_cod:
+                        novos_nomes[col_cod] = "Código"
+                    
+                    if col_desc:
+                        novos_nomes[col_desc] = "Descrição"
+                    
+                    novos_nomes["Maior_Previsao"] = "Maior Previsão"
+                    novos_nomes["Pedidos_Impactados"] = "Pedidos Impactados"
+                    
+                    agrupado = agrupado.rename(columns=novos_nomes)
             
                     # ── Título ──
                     st.markdown("""
