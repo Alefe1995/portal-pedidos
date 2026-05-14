@@ -574,7 +574,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 if not ruptura_itens.empty:
 
                     # Nome da coluna do item
-                    col_item = "Descrição"
+                    col_item = "Produto"
 
                     # Coluna de previsão
                     col_prev = (
