@@ -543,162 +543,104 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             # ITENS EM RUPTURA
             # ─────────────────────────────────────────
 
-            # Motivos permitidos no pedido
-            motivos_validos = [
-                "estoque",
-                "mto",
-                "programado mto"
-            ]
-
-            # Normaliza motivo
-            pedidos_view["_motivo_norm"] = (
-                pedidos_view["Motivo"]
+            # Normaliza pedidos filtrados no portal
+            pedidos_filtrados = (
+                pedidos_view["Pedido"]
                 .astype(str)
+                .str.replace(".0", "", regex=False)
                 .str.strip()
-                .str.lower()
             )
 
-            # Identifica pedidos com motivos inválidos
-            pedidos_invalidos = (
-                pedidos_view
-                .groupby("Pedido")["_motivo_norm"]
-                .apply(
-                    lambda x: any(
-                        motivo not in motivos_validos
-                        for motivo in x
-                    )
-                )
+            # Normaliza pedidos da tabela itens
+            itens["_pedido_key"] = (
+                itens["Pedido"]
+                .astype(str)
+                .str.replace(".0", "", regex=False)
+                .str.strip()
             )
 
-            # Lista pedidos válidos
-            pedidos_validos = pedidos_invalidos[
-                pedidos_invalidos == False
-            ].index
-
-            # Mantém apenas pedidos válidos
-            ruptura_df = pedidos_view[
-                pedidos_view["Pedido"].isin(pedidos_validos)
+            # Mantém apenas itens dos pedidos filtrados
+            ruptura_itens = itens[
+                itens["_pedido_key"].isin(pedidos_filtrados)
             ].copy()
 
-            # Mantém apenas linhas de ruptura de estoque
-            ruptura_df = ruptura_df[
-                ruptura_df["_motivo_norm"] == "estoque"
+            # Mantém apenas itens com Status Reserva = Saldo
+            ruptura_itens = ruptura_itens[
+                ruptura_itens["Status Reserva"]
+                .astype(str)
+                .str.strip()
+                .str.lower() == "saldo"
             ]
 
-            if not ruptura_df.empty:
+            if not ruptura_itens.empty:
 
-                # Normaliza pedidos
-                ruptura_df["_pedido_key"] = (
-                    ruptura_df["Pedido"]
+                # Produto
+                ruptura_itens["_item"] = (
+                    ruptura_itens["Produto"]
                     .astype(str)
-                    .str.replace(".0", "", regex=False)
                     .str.strip()
                 )
 
-                itens["_pedido_key"] = (
-                    itens["Pedido"]
-                    .astype(str)
-                    .str.replace(".0", "", regex=False)
-                    .str.strip()
+                # Previsão
+                ruptura_itens["_prev_data"] = pd.to_datetime(
+                    ruptura_itens["Previsão Final"],
+                    errors="coerce",
+                    dayfirst=True
                 )
 
-                # Busca itens dos pedidos em ruptura
-                ruptura_itens = itens[
-                    itens["_pedido_key"].isin(
-                        ruptura_df["_pedido_key"]
+                # Agrupa por item
+                tabela_rup = ruptura_itens.groupby(
+                    "_item",
+                    dropna=False
+                ).agg(
+                    Maior_Previsao=("_prev_data", "max"),
+                    Pedidos_Impactados=("Pedido", "nunique")
+                ).reset_index()
+
+                # Formata previsão
+                tabela_rup["Maior_Previsao"] = tabela_rup[
+                    "Maior_Previsao"
+                ].apply(
+                    lambda x: (
+                        x.strftime("%d/%m/%Y")
+                        if pd.notna(x)
+                        else "Sem previsão"
                     )
-                ].copy()
+                )
 
-                if not ruptura_itens.empty:
+                # Renomeia colunas
+                tabela_rup = tabela_rup.rename(columns={
+                    "_item": "Item",
+                    "Maior_Previsao": "Maior Previsão",
+                    "Pedidos_Impactados": "Pedidos Impactados"
+                })
 
-                    # Nome da coluna do item
-                    col_item = "Produto"
+                # Ordena
+                tabela_rup = tabela_rup.sort_values(
+                    by="Pedidos Impactados",
+                    ascending=False
+                )
 
-                    # Coluna previsão
-                    col_prev = (
-                        "Previsão Final"
-                        if "Previsão Final" in ruptura_itens.columns
-                        else "Previsão"
-                        if "Previsão" in ruptura_itens.columns
-                        else None
-                    )
+                # Título
+                st.markdown("""
+                <div style='font-size:11px;font-weight:700;
+                    color:#9ca3af;
+                    letter-spacing:0.08em;
+                    text-transform:uppercase;
+                    margin:8px 0 6px;'>
+                    🔴 Itens em Ruptura
+                </div>
+                """, unsafe_allow_html=True)
 
-                    # Nome item
-                    ruptura_itens["_item"] = (
-                        ruptura_itens[col_item]
-                        .astype(str)
-                        .str.strip()
-                    )
-
-                    # Trata previsão
-                    if col_prev:
-
-                        ruptura_itens["_prev_data"] = pd.to_datetime(
-                            ruptura_itens[col_prev],
-                            errors="coerce",
-                            dayfirst=True
-                        )
-
-                    else:
-
-                        ruptura_itens["_prev_data"] = pd.NaT
-
-                    # Agrupa itens
-                    tabela_rup = ruptura_itens.groupby(
-                        "_item",
-                        dropna=False
-                    ).agg(
-                        Maior_Previsao=("_prev_data", "max"),
-                        Pedidos_Impactados=("Pedido", "nunique")
-                    ).reset_index()
-
-                    # Formata previsão
-                    tabela_rup["Maior_Previsao"] = tabela_rup[
-                        "Maior_Previsao"
-                    ].apply(
-                        lambda x: (
-                            x.strftime("%d/%m/%Y")
-                            if pd.notna(x)
-                            else "Sem previsão"
-                        )
-                    )
-
-                    # Renomeia colunas
-                    tabela_rup = tabela_rup.rename(columns={
-                        "_item": "Item",
-                        "Maior_Previsao": "Maior Previsão",
-                        "Pedidos_Impactados": "Pedidos Impactados"
-                    })
-
-                    # Ordena
-                    tabela_rup = tabela_rup.sort_values(
-                        by="Pedidos Impactados",
-                        ascending=False
-                    )
-
-                    # Título
-                    st.markdown("""
-                    <div style='font-size:11px;font-weight:700;
-                        color:#9ca3af;
-                        letter-spacing:0.08em;
-                        text-transform:uppercase;
-                        margin:8px 0 6px;'>
-                        🔴 Itens em Ruptura
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                    # Exibe tabela
-                    st.dataframe(
-                        tabela_rup,
-                        use_container_width=True,
-                        hide_index=True
-                    )
-
-                else:
-                    st.info("Nenhum item encontrado para os pedidos em ruptura.")
+                # Exibe tabela
+                st.dataframe(
+                    tabela_rup,
+                    use_container_width=True,
+                    hide_index=True
+                )
 
             else:
-                st.info("Não há pedidos em ruptura.")
+                st.info("Não há itens em ruptura para os filtros aplicados.")
         # ─────────────────────────────────────────
         # ABA 2 — PEDIDOS
         # ─────────────────────────────────────────
