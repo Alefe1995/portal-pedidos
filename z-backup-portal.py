@@ -621,26 +621,126 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     ascending=False
                 )
 
-                # Título
-                st.markdown("""
-                <div style='font-size:11px;font-weight:700;
-                    color:#9ca3af;
-                    letter-spacing:0.08em;
-                    text-transform:uppercase;
-                    margin:8px 0 6px;'>
-                    🔴 Itens em Ruptura
-                </div>
-                """, unsafe_allow_html=True)
+                # ── Tabela HTML corporativa — Itens em Ruptura ──
+                n_rup = len(tabela_rup)
 
-                # Exibe tabela
-                st.dataframe(
-                    tabela_rup,
-                    use_container_width=True,
-                    hide_index=True
-                )
+                rows_rup = ""
+                for _, row in tabela_rup.iterrows():
+                    n_ped = int(row["Pedidos Impactados"])
+                    cor_badge = "#dc2626" if n_ped >= 3 else "#d97706" if n_ped == 2 else "#6b7280"
+                    bg_badge  = "#fee2e2" if n_ped >= 3 else "#fef3c7" if n_ped == 2 else "#f3f4f6"
+                    rows_rup += f"""
+                    <tr>
+                        <td class="item-name">{row['Item']}</td>
+                        <td class="prev-val">{row['Maior Previsão']}</td>
+                        <td class="right">
+                            <span style="display:inline-block;background:{bg_badge};color:{cor_badge};
+                                font-size:12px;font-weight:700;padding:3px 14px;
+                                border-radius:999px;min-width:32px;text-align:center;">
+                                {n_ped}
+                            </span>
+                        </td>
+                    </tr>"""
+
+                html_rup = f"""
+                <style>
+                * {{ box-sizing: border-box; }}
+                body {{ margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }}
+                .rup-wrapper {{
+                    background: white;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 12px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+                    overflow: hidden;
+                }}
+                .rup-header {{
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 13px 18px 11px;
+                    border-bottom: 2px solid #f3f4f6;
+                    background: #fff;
+                }}
+                .rup-dot {{
+                    width: 9px; height: 9px;
+                    background: #dc2626;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                    box-shadow: 0 0 0 3px #fee2e2;
+                }}
+                .rup-title {{
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #6b7280;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                }}
+                .rup-count {{
+                    margin-left: auto;
+                    background: #fee2e2;
+                    color: #991b1b;
+                    font-size: 11px;
+                    font-weight: 700;
+                    padding: 2px 11px;
+                    border-radius: 999px;
+                    white-space: nowrap;
+                }}
+                table {{ width: 100%; border-collapse: collapse; }}
+                thead tr {{
+                    background: #f9fafb;
+                    border-bottom: 2px solid #e5e7eb;
+                }}
+                th {{
+                    padding: 10px 16px;
+                    text-align: left;
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #9ca3af;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    white-space: nowrap;
+                }}
+                th.right {{ text-align: right; }}
+                td {{
+                    padding: 10px 16px;
+                    border-bottom: 1px solid #f3f4f6;
+                    font-size: 13px;
+                    color: #111827;
+                    vertical-align: middle;
+                }}
+                td.right {{ text-align: right; }}
+                tr:last-child td {{ border-bottom: none; }}
+                tr:hover td {{ background: #fef2f2; transition: background 0.15s; }}
+                .item-name {{ font-weight: 500; color: #111827; }}
+                .prev-val   {{ font-weight: 700; color: #374151; white-space: nowrap; }}
+                </style>
+
+                <div class="rup-wrapper">
+                  <div class="rup-header">
+                    <div class="rup-dot"></div>
+                    <div class="rup-title">Itens em Ruptura</div>
+                    <div class="rup-count">{n_rup} iten(s)</div>
+                  </div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Maior Previsão</th>
+                        <th class="right">Pedidos Impactados</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows_rup}
+                    </tbody>
+                  </table>
+                </div>
+                """
+
+                components.html(html_rup, height=min((n_rup * 46) + 90, 500), scrolling=n_rup > 9)
 
             else:
                 st.info("Não há itens em ruptura para os filtros aplicados.")
+
         # ─────────────────────────────────────────
         # ABA 2 — PEDIDOS
         # ─────────────────────────────────────────
