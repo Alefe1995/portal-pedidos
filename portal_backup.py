@@ -249,7 +249,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
         if tipo_busca == "Código RC":
             col_rc, col_btn, _ = st.columns([2,1,5])
             with col_rc:
-                rc_input = st.text_input("CÓDIGO RC", placeholder="Ex: 614", max_chars=5)
+                rc_input = st.text_input("CÓDIGO RC", placeholder="Ex: 9999", max_chars=4)
             with col_btn:
                 st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
                 st.button("Buscar", use_container_width=True)
