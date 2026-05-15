@@ -322,21 +322,73 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
     """, unsafe_allow_html=True)
 
     # =========================
-    # FILTRAGEM AUTOMÁTICA POR PARÂMETRO DE LOGIN
+    # BUSCA / FILTRAGEM — depende do tipo de usuário
     # =========================
     base = pd.DataFrame()
     identificador = ""
 
     if filtro_tipo == "RC" and filtro_valor:
+        # Usuário RC: carrega automaticamente só os pedidos do seu RC
         base = pedidos[pedidos["RC"].astype(str) == str(filtro_valor)].copy()
         identificador = f"RC {filtro_valor}"
+
     elif filtro_tipo == "COORDENADOR" and filtro_valor:
+        # Usuário Coordenador: carrega automaticamente só os seus pedidos
         if "Coordenador" in pedidos.columns:
             base = pedidos[pedidos["Coordenador"].astype(str) == str(filtro_valor)].copy()
         identificador = f"Coordenador: {filtro_valor}"
-    elif filtro_tipo == "MASTER":
-        base = pedidos.copy()
-        identificador = "Todos os pedidos"
+
+    else:
+        # Usuário MASTER: tela de busca manual (RC ou Coordenador)
+        st.markdown("<div style='margin-bottom:8px;font-size:13px;font-weight:600;color:#374151;'>🔍 Buscar por:</div>", unsafe_allow_html=True)
+
+        tipo_busca = st.radio(
+            label="Tipo de Busca",
+            options=["Código RC", "Coordenador de Vendas"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+
+        if tipo_busca == "Código RC":
+            col_rc, col_btn, col_espaco = st.columns([2, 1, 5])
+            with col_rc:
+                rc_input = st.text_input("CÓDIGO RC", placeholder="Ex: 614", label_visibility="visible", max_chars=5)
+            with col_btn:
+                st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
+                st.button("Buscar", use_container_width=True)
+            if rc_input:
+                base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
+                identificador = f"RC {rc_input}"
+
+        else:  # Coordenador de Vendas
+            if "Coordenador" in pedidos.columns:
+                coordenadores_lista = sorted(pedidos["Coordenador"].dropna().astype(str).unique().tolist())
+            else:
+                coordenadores_lista = []
+
+            col_coord, col_btn, col_espaco = st.columns([3, 1, 4])
+            with col_coord:
+                if coordenadores_lista:
+                    coord_input = st.selectbox(
+                        "COORDENADOR DE VENDAS",
+                        options=[""] + coordenadores_lista,
+                        label_visibility="visible"
+                    )
+                else:
+                    coord_input = st.text_input(
+                        "COORDENADOR DE VENDAS",
+                        placeholder="Digite o nome do coordenador",
+                        label_visibility="visible"
+                    )
+                    st.caption("⚠️ Coluna 'Coordenador' não encontrada na planilha.")
+            with col_btn:
+                st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
+                st.button("Buscar", use_container_width=True)
+
+            if coord_input and coord_input != "":
+                if "Coordenador" in pedidos.columns:
+                    base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
+                identificador = f"Coordenador: {coord_input}"
 
     # =========================
     # PROCESSAMENTO
@@ -813,23 +865,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
 
             st.markdown("<div style='margin-top:12px;'></div>", unsafe_allow_html=True)
 
-            # ---- CONTAGENS POR STATUS ----
-            n_todos      = len(pedidos_view)
-            n_pendentes  = len(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
-            n_liberados  = len(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
-            n_conferidos = len(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
-            n_batch      = len(pedidos_view[pedidos_view["Status"].str.lower() == "batch"])
-
-            # ---- ABAS DE STATUS (idêntico ao original) ----
-            ft1, ft2, ft3, ft4, ft5 = st.tabs([
-                f"Todos  {n_todos}",
-                f"Pendentes  {n_pendentes}",
-                f"Liberados  {n_liberados}",
-                f"Conferidos  {n_conferidos}",
-                f"Batch  {n_batch}",
-            ])
-
-            # ---- FILTRO DE MOTIVO — selectbox dinâmico abaixo das abas ----
+            # ---- FILTRO DE MOTIVO — acima das abas, lado direito ----
             motivos_disponiveis = sorted(
                 pedidos_view["Motivo"].dropna().astype(str).unique().tolist()
             ) if "Motivo" in pedidos_view.columns else []
@@ -860,6 +896,22 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     st.rerun()
 
             motivo_ativo = st.session_state["filtro_motivo_pedidos"]
+
+            # ---- CONTAGENS POR STATUS ----
+            n_todos      = len(pedidos_view)
+            n_pendentes  = len(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
+            n_liberados  = len(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
+            n_conferidos = len(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
+            n_batch      = len(pedidos_view[pedidos_view["Status"].str.lower() == "batch"])
+
+            # ---- ABAS DE STATUS ----
+            ft1, ft2, ft3, ft4, ft5 = st.tabs([
+                f"Todos  {n_todos}",
+                f"Pendentes  {n_pendentes}",
+                f"Liberados  {n_liberados}",
+                f"Conferidos  {n_conferidos}",
+                f"Batch  {n_batch}",
+            ])
 
             def aplicar_filtro_motivo(df):
                 if motivo_ativo == "Todos os motivos":
@@ -1091,6 +1143,5 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 else:
                     st.info("Nenhuma ação cadastrada para este pedido.")
 
-    else:
-        if filtro_valor:
-            st.error("Nenhum pedido encontrado para os critérios informados.")
+    elif base.empty and identificador:
+        st.error("Nenhum pedido encontrado para os critérios informados.")
