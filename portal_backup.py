@@ -433,7 +433,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 </div>""", unsafe_allow_html=True)
             with ins2:
                 st.markdown(f"""<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
-                    <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">✅ {pct_liberado:.0f}% dos pedidos estão liberados</div>
+                    <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">✅ {pct_liberado:.0f}% dos pedidos estão </div>
                     <div style="font-size:13px;color:#16a34a;">{n_lib} de {total_pedidos} pedidos prontos</div>
                 </div>""", unsafe_allow_html=True)
 
@@ -763,13 +763,13 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             n_todos      = len(pedidos_view)
             n_pendentes  = len(pedidos_view[pedidos_view["Status"].str.lower()=="pendente"])
             n_liberados  = len(pedidos_view[pedidos_view["Status"].str.lower()=="liberado"])
-            n_liberado Parcial  = len(pedidos_view[pedidos_view["Status"].str.lower()=="liberado parcial"])
+            n_parcial  = len(pedidos_view[pedidos_view["Status"].str.lower()=="liberado parcial"])
             n_conferidos = len(pedidos_view[pedidos_view["Status"].str.lower()=="conferido"])
             n_batch      = len(pedidos_view[pedidos_view["Status"].str.lower()=="batch"])
 
             ft1,ft2,ft3,ft4,ft5 = st.tabs([
                 f"Todos  {n_todos}", f"Pendentes  {n_pendentes}",
-                f"Liberados  {n_liberados}", f"Conferidos  {n_conferidos}", f"Batch  {n_batch}", f"liberado parcial  {n_liberado parcial}",
+                f"Liberados  {n_liberados}", f"Conferidos  {n_conferidos}", f"Batch  {n_batch}", f"parcial  {n_parcial}",
             ])
 
             def renderizar_tabela(df_filtrado):
