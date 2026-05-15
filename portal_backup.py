@@ -863,83 +863,139 @@ if not base.empty:
 
         st.markdown("<div style='margin-top:12px;'></div>", unsafe_allow_html=True)
 
-        # ---- FILTRO POR STATUS (ABAS TIPO BASE44) ----
+        # ---- CONTAGENS POR STATUS ----
         n_todos      = len(pedidos_view)
         n_pendentes  = len(pedidos_view[pedidos_view["Status"].str.lower() == "pendente"])
         n_liberados  = len(pedidos_view[pedidos_view["Status"].str.lower() == "liberado"])
         n_conferidos = len(pedidos_view[pedidos_view["Status"].str.lower() == "conferido"])
         n_batch      = len(pedidos_view[pedidos_view["Status"].str.lower() == "batch"])
 
-        # ---- FILTRO POR MOTIVO (LADO DIREITO) — via session_state ----
-        motivos_disponiveis = sorted(pedidos_view["Motivo"].dropna().astype(str).unique().tolist()) if "Motivo" in pedidos_view.columns else []
+        # ---- SESSION STATE — filtro de Status ----
+        if "filtro_status_pedidos" not in st.session_state:
+            st.session_state["filtro_status_pedidos"] = "Todos"
+
+        # ---- SESSION STATE — filtro de Motivo ----
+        motivos_disponiveis = sorted(
+            pedidos_view["Motivo"].dropna().astype(str).unique().tolist()
+        ) if "Motivo" in pedidos_view.columns else []
         opcoes_motivo = ["Todos"] + motivos_disponiveis
 
         if "filtro_motivo_pedidos" not in st.session_state:
             st.session_state["filtro_motivo_pedidos"] = "Todos"
-
-        # Garante que o motivo salvo ainda existe nos dados atuais
         if st.session_state["filtro_motivo_pedidos"] not in opcoes_motivo:
             st.session_state["filtro_motivo_pedidos"] = "Todos"
 
-        # CSS para estilizar os botões de motivo como pills no canto direito
+        status_ativo = st.session_state["filtro_status_pedidos"]
+        motivo_ativo = st.session_state["filtro_motivo_pedidos"]
+
+        # ---- CSS — barra dupla de filtros ----
         st.markdown("""
         <style>
-        /* Botões de motivo — estilo pill, canto direito */
-        div[data-testid="column"]:last-child div[data-testid="stButton"] button {
-            background: #f3f4f6 !important;
-            color: #374151 !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 999px !important;
-            font-size: 12px !important;
+        /* Remove padding extra dos botões na barra de filtros */
+        div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] button {
+            padding: 5px 14px !important;
+            font-size: 13px !important;
             font-weight: 600 !important;
-            padding: 4px 12px !important;
-            height: auto !important;
-            min-height: 28px !important;
-            line-height: 1.4 !important;
+            border-radius: 6px 6px 0 0 !important;
+            border: none !important;
+            border-bottom: 2px solid transparent !important;
+            background: transparent !important;
+            color: #6b7280 !important;
             white-space: nowrap !important;
+            height: auto !important;
+            min-height: 34px !important;
+            line-height: 1.3 !important;
         }
-        div[data-testid="column"]:last-child div[data-testid="stButton"] button:hover {
-            background: #e5e7eb !important;
-            border-color: #d1d5db !important;
+        div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] button:hover {
+            color: #111827 !important;
+            background: #f3f4f6 !important;
         }
         </style>
         """, unsafe_allow_html=True)
 
-        # Layout: abas de Status (esquerda) + filtros de Motivo (direita)
-        col_status, col_motivo = st.columns([6, 4])
+        # ---- BARRA DE FILTROS: Status (esquerda) | Motivo (direita) ----
+        # Linha separadora visual no topo
+        st.markdown(
+            "<div style='border-bottom:2px solid #e5e7eb;margin-bottom:0;display:flex;"
+            "align-items:flex-end;justify-content:space-between;'></div>",
+            unsafe_allow_html=True
+        )
 
-        with col_status:
-            ft1, ft2, ft3, ft4, ft5 = st.tabs([
-                f"Todos  {n_todos}",
-                f"Pendentes  {n_pendentes}",
-                f"Liberados  {n_liberados}",
-                f"Conferidos  {n_conferidos}",
-                f"Batch  {n_batch}",
-            ])
+        col_esq, col_dir = st.columns([5, 5])
 
-        with col_motivo:
-            motivo_selecionado = st.session_state["filtro_motivo_pedidos"]
-            st.markdown(
-                f"<div style='font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.06em;"
-                f"text-transform:uppercase;margin-bottom:6px;margin-top:4px;'>🔖 Motivo: "
-                f"<span style='color:#d97706;'>{motivo_selecionado}</span></div>",
-                unsafe_allow_html=True
-            )
-            # Renderiza pills de motivo em linha
-            cols_pills = st.columns(len(opcoes_motivo))
-            for i, opcao in enumerate(opcoes_motivo):
-                with cols_pills[i]:
-                    label = "✕ Todos" if opcao == "Todos" else opcao
-                    if st.button(label, key=f"mot_pill_{opcao}"):
-                        st.session_state["filtro_motivo_pedidos"] = opcao
+        # — FILTROS DE STATUS (esquerda) —
+        with col_esq:
+            status_opcoes = [
+                ("Todos",      n_todos),
+                ("Pendentes",  n_pendentes),
+                ("Liberados",  n_liberados),
+                ("Conferidos", n_conferidos),
+                ("Batch",      n_batch),
+            ]
+            cols_status = st.columns(len(status_opcoes))
+            for i, (label, qtd) in enumerate(status_opcoes):
+                with cols_status[i]:
+                    ativo = (status_ativo == label)
+                    cor_bg    = "#c00000" if ativo else "transparent"
+                    cor_txt   = "white"   if ativo else "#6b7280"
+                    borda_bot = f"border-bottom:3px solid #c00000;" if ativo else "border-bottom:3px solid transparent;"
+                    st.markdown(
+                        f"<div style='text-align:center;'>"
+                        f"<button onclick=\"window.parent.document.querySelectorAll"
+                        f"('[data-testid=stButton] button')[{i}].click()\" "
+                        f"style='background:{cor_bg};color:{cor_txt};border:none;"
+                        f"border-radius:6px 6px 0 0;{borda_bot}"
+                        f"padding:6px 10px;font-size:13px;font-weight:600;"
+                        f"cursor:pointer;width:100%;white-space:nowrap;'>"
+                        f"{label} <span style='opacity:0.75;font-size:12px;'>{qtd}</span>"
+                        f"</button></div>",
+                        unsafe_allow_html=True
+                    )
+                    if st.button(f"{label} {qtd}", key=f"st_status_{label}", label_visibility="collapsed"):
+                        st.session_state["filtro_status_pedidos"] = label
                         st.rerun()
 
-        # Aplica filtro de motivo ao dataframe
+        # — FILTROS DE MOTIVO (direita) —
+        with col_dir:
+            st.markdown(
+                f"<div style='font-size:11px;font-weight:700;color:#9ca3af;"
+                f"letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;"
+                f"text-align:right;'>🔖 Motivo</div>",
+                unsafe_allow_html=True
+            )
+            # selectbox estilizado como pill — dinâmico com os motivos disponíveis
+            idx_atual = opcoes_motivo.index(motivo_ativo) if motivo_ativo in opcoes_motivo else 0
+            motivo_sel = st.selectbox(
+                "Filtrar por Motivo",
+                options=opcoes_motivo,
+                index=idx_atual,
+                key="sel_motivo_dir",
+                label_visibility="collapsed"
+            )
+            if motivo_sel != st.session_state["filtro_motivo_pedidos"]:
+                st.session_state["filtro_motivo_pedidos"] = motivo_sel
+                st.rerun()
+
+        st.markdown("<div style='border-bottom:2px solid #e5e7eb;margin-bottom:12px;'></div>", unsafe_allow_html=True)
+
+        # ---- APLICA OS DOIS FILTROS ----
+        df_tab = pedidos_view.copy()
+
+        # Filtro Status
+        status_ativo = st.session_state["filtro_status_pedidos"]
+        if status_ativo == "Pendentes":
+            df_tab = df_tab[df_tab["Status"].str.lower() == "pendente"]
+        elif status_ativo == "Liberados":
+            df_tab = df_tab[df_tab["Status"].str.lower() == "liberado"]
+        elif status_ativo == "Conferidos":
+            df_tab = df_tab[df_tab["Status"].str.lower() == "conferido"]
+        elif status_ativo == "Batch":
+            df_tab = df_tab[df_tab["Status"].str.lower() == "batch"]
+
+        # Filtro Motivo
         motivo_ativo = st.session_state["filtro_motivo_pedidos"]
         if motivo_ativo != "Todos":
-            pedidos_filtrado_motivo = pedidos_view[pedidos_view["Motivo"].astype(str) == motivo_ativo]
-        else:
-            pedidos_filtrado_motivo = pedidos_view
+            df_tab = df_tab[df_tab["Motivo"].astype(str) == motivo_ativo]
 
         def renderizar_tabela(df_filtrado):
             df_show = df_filtrado.drop(columns=["Valor_num", "Pedido_Cliente"], errors="ignore")
@@ -954,7 +1010,7 @@ if not base.empty:
             td { padding:10px 14px; border-bottom:1px solid #f3f4f6; font-size:13px; color:#111827; vertical-align:middle; }
             tr:hover td { background:#f9fafb; }
             .ped { font-weight:700; color:#c00000; }
-            .val { font-weight:600; color:#166534;; }
+            .val { font-weight:600; color:#166534; }
             .mot { font-weight:600; color:#d97706; }
             .prev { font-weight:700; color:#374151; }
             .badge-lib  { background:#dcfce7; color:#166534; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
@@ -998,16 +1054,7 @@ if not base.empty:
             scroll = qtd > 8
             components.html(html, height=altura, scrolling=scroll)
 
-        with ft1:
-            renderizar_tabela(pedidos_filtrado_motivo)
-        with ft2:
-            renderizar_tabela(pedidos_filtrado_motivo[pedidos_filtrado_motivo["Status"].str.lower() == "pendente"])
-        with ft3:
-            renderizar_tabela(pedidos_filtrado_motivo[pedidos_filtrado_motivo["Status"].str.lower() == "liberado"])
-        with ft4:
-            renderizar_tabela(pedidos_filtrado_motivo[pedidos_filtrado_motivo["Status"].str.lower() == "conferido"])
-        with ft5:
-            renderizar_tabela(pedidos_filtrado_motivo[pedidos_filtrado_motivo["Status"].str.lower() == "batch"])
+        renderizar_tabela(df_tab)
 
         st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
 
