@@ -559,12 +559,17 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 .str.strip()
             )
 
-            # Remove pedidos com STATUS = Batch
+            # Mantém apenas pedidos com motivos específicos
             pedidos_sem_batch = pedidos_view[
                 pedidos_view["Motivo"]
                 .astype(str)
                 .str.strip()
-                .str.lower() == "estoque"
+                .str.lower()
+                .isin([
+                    "estoque",
+                    "mto",
+                    "programado mto"
+                ])
             ]["Pedido"].astype(str).str.replace(".0", "", regex=False).str.strip()
             
             # Mantém apenas itens dos pedidos válidos
