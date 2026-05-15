@@ -620,24 +620,124 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                     by="Pedidos Impactados",
                     ascending=False
                 )
-
-                # Título
-                st.markdown("""
-                <div style='font-size:11px;font-weight:700;
-                    color:#9ca3af;
-                    letter-spacing:0.08em;
-                    text-transform:uppercase;
-                    margin:8px 0 6px;'>
-                    🔴 Itens em Ruptura
+                
+                # ── Título + tabela HTML corporativa ──
+                n_rup = len(tabela_rup)
+                
+                html_rup = """
+                <style>
+                * { box-sizing: border-box; }
+                body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+                .rup-wrapper {
+                    background: white;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 12px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+                    overflow: hidden;
+                }
+                .rup-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 14px 18px 10px;
+                    border-bottom: 1px solid #f3f4f6;
+                }
+                .rup-dot {
+                    width: 10px; height: 10px;
+                    background: #dc2626;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                }
+                .rup-title {
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #6b7280;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                }
+                .rup-badge {
+                    margin-left: auto;
+                    background: #fee2e2;
+                    color: #991b1b;
+                    font-size: 11px;
+                    font-weight: 700;
+                    padding: 2px 10px;
+                    border-radius: 999px;
+                }
+                table { width: 100%; border-collapse: collapse; }
+                thead tr {
+                    background: #f9fafb;
+                    border-bottom: 2px solid #e5e7eb;
+                    position: sticky; top: 0; z-index: 10;
+                }
+                th {
+                    padding: 10px 16px;
+                    text-align: left;
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #6b7280;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    white-space: nowrap;
+                }
+                th.right { text-align: right; }
+                td {
+                    padding: 10px 16px;
+                    border-bottom: 1px solid #f3f4f6;
+                    font-size: 13px;
+                    color: #111827;
+                    vertical-align: middle;
+                }
+                td.right { text-align: right; }
+                tr:last-child td { border-bottom: none; }
+                tr:hover td { background: #fef2f2; }
+                .item-name { font-weight: 500; color: #111827; }
+                .prev-val  { font-weight: 700; color: #374151; }
+                .badge-ped {
+                    display: inline-block;
+                    background: #fee2e2;
+                    color: #991b1b;
+                    font-size: 12px;
+                    font-weight: 700;
+                    padding: 3px 12px;
+                    border-radius: 999px;
+                    min-width: 32px;
+                    text-align: center;
+                }
+                </style>
+                <div class="rup-wrapper">
+                  <div class="rup-header">
+                    <div class="rup-dot"></div>
+                    <div class="rup-title">Itens em Ruptura</div>
+                    <div class="rup-badge">""" + str(n_rup) + """ iten(s)</div>
+                  </div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Maior Previsão</th>
+                        <th class="right">Pedidos Impactados</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                """
+                
+                for _, row in tabela_rup.iterrows():
+                    html_rup += f"""
+                      <tr>
+                        <td class="item-name">{row['Item']}</td>
+                        <td class="prev-val">{row['Maior Previsão']}</td>
+                        <td class="right"><span class="badge-ped">{int(row['Pedidos Impactados'])}</span></td>
+                      </tr>
+                    """
+                
+                html_rup += """
+                    </tbody>
+                  </table>
                 </div>
-                """, unsafe_allow_html=True)
-
-                # Exibe tabela
-                st.dataframe(
-                    tabela_rup,
-                    use_container_width=True,
-                    hide_index=True
-                )
+                """
+                
+                components.html(html_rup, height=min((n_rup * 45) + 90, 480), scrolling=n_rup > 9)
 
             else:
                 st.info("Não há itens em ruptura para os filtros aplicados.")
