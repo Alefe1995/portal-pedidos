@@ -763,12 +763,13 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             n_todos      = len(pedidos_view)
             n_pendentes  = len(pedidos_view[pedidos_view["Status"].str.lower()=="pendente"])
             n_liberados  = len(pedidos_view[pedidos_view["Status"].str.lower()=="liberado"])
+            n_liberado Parcial  = len(pedidos_view[pedidos_view["Status"].str.lower()=="liberado parcial"])
             n_conferidos = len(pedidos_view[pedidos_view["Status"].str.lower()=="conferido"])
             n_batch      = len(pedidos_view[pedidos_view["Status"].str.lower()=="batch"])
 
             ft1,ft2,ft3,ft4,ft5 = st.tabs([
                 f"Todos  {n_todos}", f"Pendentes  {n_pendentes}",
-                f"Liberados  {n_liberados}", f"Conferidos  {n_conferidos}", f"Batch  {n_batch}",
+                f"Liberados  {n_liberados}", f"Conferidos  {n_conferidos}", f"Batch  {n_batch}", f"liberado parcial  {n_liberado parcial}",
             ])
 
             def renderizar_tabela(df_filtrado):
