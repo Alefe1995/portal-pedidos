@@ -559,9 +559,17 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 .str.strip()
             )
 
-            # Mantém apenas itens dos pedidos filtrados
+            # Pega apenas pedidos cujo motivo NÃO seja Batch
+            pedidos_sem_batch = pedidos_view[
+                pedidos_view["Motivo"]
+                .astype(str)
+                .str.strip()
+                .str.lower() != "Batch"
+            ]["Pedido"].astype(str).str.replace(".0", "", regex=False).str.strip()
+            
+            # Mantém apenas itens dos pedidos válidos
             ruptura_itens = itens[
-                itens["_pedido_key"].isin(pedidos_filtrados)
+                itens["_pedido_key"].isin(pedidos_sem_batch)
             ].copy()
             
             # Mantém apenas itens com Status Reserva = Saldo
