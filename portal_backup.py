@@ -244,8 +244,8 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
 
     else:
         st.markdown("<div style='margin-bottom:8px;font-size:13px;font-weight:600;color:#374151;'>🔍 Buscar por:</div>", unsafe_allow_html=True)
-        tipo_busca = st.radio("Tipo de Busca", ["Código RC","Coordenador de Vendas"], horizontal=True, label_visibility="collapsed")
-
+        tipo_busca = st.radio("Tipo de Busca", ["Código RC", "Coordenador de Vendas", "Todos"], horizontal=True, label_visibility="collapsed")
+    
         if tipo_busca == "Código RC":
             col_rc, col_btn, _ = st.columns([2,1,5])
             with col_rc:
@@ -256,7 +256,8 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             if rc_input:
                 base = pedidos[pedidos["RC"].astype(str) == rc_input].copy()
                 identificador = f"RC {rc_input}"
-        else:
+    
+        elif tipo_busca == "Coordenador de Vendas":
             coordenadores_lista = sorted(pedidos["Coordenador"].dropna().astype(str).unique().tolist()) if "Coordenador" in pedidos.columns else []
             col_coord, col_btn, _ = st.columns([3,1,4])
             with col_coord:
@@ -270,7 +271,10 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             if coord_input and coord_input != "" and "Coordenador" in pedidos.columns:
                 base = pedidos[pedidos["Coordenador"].astype(str) == coord_input].copy()
                 identificador = f"Coordenador: {coord_input}"
-
+    
+        else:  # Todos
+            base = pedidos.copy()
+            identificador = "Todos os Pedidos"
     # =========================
     # PROCESSAMENTO
     # =========================
@@ -899,3 +903,5 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
             st.warning(f"Nenhum pedido encontrado para o RC {filtro_valor}.")
         elif filtro_tipo == "COORDENADOR":
             st.warning(f"Nenhum pedido encontrado para o Coordenador {filtro_valor}.")
+        else:
+            st.warning("Nenhum pedido encontrado na base de dados.")
