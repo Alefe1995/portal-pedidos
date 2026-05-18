@@ -437,7 +437,7 @@ def mostrar_portal(filtro_tipo="MASTER", filtro_valor=None):
                 </div>""", unsafe_allow_html=True)
             with ins2:
                 st.markdown(f"""<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 18px;margin-bottom:16px;">
-                    <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">✅ {pct_liberado:.0f}% dos pedidos estão </div>
+                    <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">✅ {pct_liberado:.0f}% dos pedidos estão Liberados </div>
                     <div style="font-size:13px;color:#16a34a;">{n_lib} de {total_pedidos} pedidos prontos</div>
                 </div>""", unsafe_allow_html=True)
 
